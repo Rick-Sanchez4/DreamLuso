@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLuso.Domain", "DreamLuso.Domain\DreamLuso.Domain.csproj", "{903EDDE4-583E-4540-8533-F098D13A55B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLuso.Domain.Core", "DreamLuso.Domain.Core\DreamLuso.Domain.Core.csproj", "{88F3ADBC-43EB-43BD-B13E-9163FC0C5CAB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLuso.Application", "DreamLuso.Application\DreamLuso.Application.csproj", "{4E71E321-E713-461E-920D-D214DB1F2384}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLuso.Data", "DreamLuso.Data\DreamLuso.Data.csproj", "{EB9EDE70-49E3-427F-956F-1AE9504249D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLuso.Security", "DreamLuso.Security\DreamLuso.Security.csproj", "{AF6B8714-5B64-4F6A-80C2-2B44C186C457}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLuso.IoC", "DreamLuso.IoC\DreamLuso.IoC.csproj", "{16A8E9F5-4888-4353-9973-CB351D897683}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLuso.WebAPI", "DreamLuso.WebAPI\DreamLuso.WebAPI.csproj", "{C87F48E7-7209-429A-8EF0-67DA14E652D7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{903EDDE4-583E-4540-8533-F098D13A55B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{903EDDE4-583E-4540-8533-F098D13A55B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{903EDDE4-583E-4540-8533-F098D13A55B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{903EDDE4-583E-4540-8533-F098D13A55B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88F3ADBC-43EB-43BD-B13E-9163FC0C5CAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88F3ADBC-43EB-43BD-B13E-9163FC0C5CAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88F3ADBC-43EB-43BD-B13E-9163FC0C5CAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88F3ADBC-43EB-43BD-B13E-9163FC0C5CAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E71E321-E713-461E-920D-D214DB1F2384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E71E321-E713-461E-920D-D214DB1F2384}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E71E321-E713-461E-920D-D214DB1F2384}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E71E321-E713-461E-920D-D214DB1F2384}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB9EDE70-49E3-427F-956F-1AE9504249D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB9EDE70-49E3-427F-956F-1AE9504249D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB9EDE70-49E3-427F-956F-1AE9504249D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB9EDE70-49E3-427F-956F-1AE9504249D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF6B8714-5B64-4F6A-80C2-2B44C186C457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF6B8714-5B64-4F6A-80C2-2B44C186C457}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF6B8714-5B64-4F6A-80C2-2B44C186C457}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF6B8714-5B64-4F6A-80C2-2B44C186C457}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16A8E9F5-4888-4353-9973-CB351D897683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16A8E9F5-4888-4353-9973-CB351D897683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16A8E9F5-4888-4353-9973-CB351D897683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16A8E9F5-4888-4353-9973-CB351D897683}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C87F48E7-7209-429A-8EF0-67DA14E652D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C87F48E7-7209-429A-8EF0-67DA14E652D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C87F48E7-7209-429A-8EF0-67DA14E652D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C87F48E7-7209-429A-8EF0-67DA14E652D7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

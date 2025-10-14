@@ -1,0 +1,203 @@
+### DreamLuso API Tests
+@baseUrl = http://localhost:5000/api
+@token = 
+
+### ==================================================
+### ACCOUNTS - Autenticação
+### ==================================================
+
+### 1. Registar Utilizador (Client)
+POST {{baseUrl}}/accounts/register
+Content-Type: application/json
+
+{
+  "firstName": "João",
+  "lastName": "Silva",
+  "email": "joao.silva@example.com",
+  "password": "Password123!",
+  "role": 1,
+  "phone": "912345678"
+}
+
+### 2. Registar Utilizador (Agent)
+POST {{baseUrl}}/accounts/register
+Content-Type: application/json
+
+{
+  "firstName": "Maria",
+  "lastName": "Santos",
+  "email": "maria.santos@dreamluso.pt",
+  "password": "AgentPass123!",
+  "role": 2,
+  "phone": "918765432"
+}
+
+### 3. Login
+POST {{baseUrl}}/accounts/login
+Content-Type: application/json
+
+{
+  "email": "joao.silva@example.com",
+  "password": "Password123!"
+}
+
+### 4. Refresh Token
+POST {{baseUrl}}/accounts/refresh-token
+Content-Type: application/json
+
+{
+  "accessToken": "{{token}}",
+  "refreshToken": "your-refresh-token-here"
+}
+
+### ==================================================
+### CLIENTS - Gestão de Clientes
+### ==================================================
+
+### 5. Criar Perfil de Cliente
+POST {{baseUrl}}/clients
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "user-guid-here",
+  "nif": "123456789",
+  "citizenCard": "12345678 9 ZZ0",
+  "type": 0,
+  "minBudget": 150000,
+  "maxBudget": 300000,
+  "preferredContactMethod": "Email"
+}
+
+### 6. Listar Clientes
+GET {{baseUrl}}/clients?pageNumber=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 7. Obter Cliente por ID
+GET {{baseUrl}}/clients/{client-id}
+Authorization: Bearer {{token}}
+
+### ==================================================
+### AGENTS - Agentes Imobiliários
+### ==================================================
+
+### 8. Criar Perfil de Agente
+POST {{baseUrl}}/agents
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "agent-user-guid-here",
+  "licenseNumber": "AMI-12345",
+  "licenseExpiry": "2026-12-31T00:00:00Z",
+  "officeEmail": "maria.santos@dreamluso.pt",
+  "officePhone": "211234567",
+  "commissionRate": 3.5,
+  "specialization": "Residencial",
+  "certifications": ["AMI", "RICS"],
+  "languagesSpoken": [0, 1, 2]
+}
+
+### 9. Listar Agentes
+GET {{baseUrl}}/agents?pageNumber=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 10. Obter Agente por ID
+GET {{baseUrl}}/agents/{agent-id}
+Authorization: Bearer {{token}}
+
+### ==================================================
+### PROPERTIES - Imóveis
+### ==================================================
+
+### 11. Criar Imóvel
+POST {{baseUrl}}/properties
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Apartamento T3 em Lisboa",
+  "description": "Excelente apartamento T3 no centro de Lisboa, completamente remodelado",
+  "realEstateAgentId": "agent-guid-here",
+  "price": 350000,
+  "size": 120,
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "type": 1,
+  "status": 0,
+  "transactionType": 0,
+  "street": "Rua Augusta",
+  "number": "123",
+  "parish": "Santa Maria Maior",
+  "municipality": "Lisboa",
+  "district": "Lisboa",
+  "postalCode": "1100-048",
+  "complement": "3º Andar, Esquerdo",
+  "grossArea": 140,
+  "wcCount": 2,
+  "floor": 3,
+  "parkingSpaces": 1,
+  "condominium": 80,
+  "yearBuilt": 2010,
+  "energyRating": "B",
+  "orientation": "Sul",
+  "hasElevator": true,
+  "hasGarage": true,
+  "hasPool": false,
+  "isFurnished": false
+}
+
+### 12. Listar Imóveis (com filtros)
+GET {{baseUrl}}/properties?pageNumber=1&pageSize=20&minPrice=100000&maxPrice=500000&municipality=Lisboa
+Authorization: Bearer {{token}}
+
+### 13. Obter Imóvel por ID
+GET {{baseUrl}}/properties/{property-id}
+Authorization: Bearer {{token}}
+
+### 14. Pesquisar Imóveis
+GET {{baseUrl}}/properties?searchTerm=Lisboa&type=1&status=0&minBedrooms=2
+Authorization: Bearer {{token}}
+
+### 15. Imóveis em Destaque
+GET {{baseUrl}}/properties?featuredOnly=true&pageSize=10
+Authorization: Bearer {{token}}
+
+### ==================================================
+### HEALTH CHECK
+### ==================================================
+
+### 16. Health Check
+GET {{baseUrl}}/../health
+
+### ==================================================
+### ENUMS REFERENCE
+### ==================================================
+
+# UserRole:
+# 0 = Guest
+# 1 = Client
+# 2 = RealEstateAgent
+# 3 = Admin
+
+# ClientType:
+# 0 = Individual
+# 1 = Company
+
+# PropertyType:
+# 0 = House, 1 = Apartment, 2 = Condo, 3 = Townhouse
+# 4 = Land, 5 = Commercial, 6 = Office, 7 = Warehouse
+# 8 = Farm, 9 = Villa, 10 = Studio, 11 = Penthouse, 12 = Other
+
+# PropertyStatus:
+# 0 = Available, 1 = Reserved, 2 = UnderContract
+# 3 = Sold, 4 = Rented, 5 = Unavailable, 6 = InNegotiation
+
+# TransactionType:
+# 0 = Sale, 1 = Rent, 2 = Both
+
+# Language:
+# 0 = Portuguese, 1 = English, 2 = Spanish
+# 3 = French, 4 = German, 5 = Italian
+# 6 = Chinese, 7 = Arabic, 8 = Russian
+
