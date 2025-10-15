@@ -6,7 +6,7 @@ const routes: Routes = [
     path: '',
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      // TODO: Add agent routes here
+      // Agent routes will be added here
     ]
   }
 ];
@@ -16,4 +16,3 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AgentRoutingModule { }
-

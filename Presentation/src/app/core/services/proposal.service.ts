@@ -25,6 +25,10 @@ export class ProposalService {
     return this.http.get<Result<PropertyProposal[]>>(`${this.apiUrl}/client/${clientId}`);
   }
 
+  getByAgent(agentId: string): Observable<Result<PropertyProposal[]>> {
+    return this.http.get<Result<PropertyProposal[]>>(`${this.apiUrl}/agent/${agentId}`);
+  }
+
   approve(proposalId: string): Observable<Result<boolean>> {
     return this.http.put<Result<boolean>>(`${this.apiUrl}/${proposalId}/approve`, {});
   }

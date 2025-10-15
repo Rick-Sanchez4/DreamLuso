@@ -36,5 +36,13 @@ export class PropertyService {
   delete(id: string): Observable<Result<boolean>> {
     return this.http.delete<Result<boolean>>(`${this.apiUrl}/${id}`);
   }
+
+  getByAgent(agentId: string): Observable<Result<Property[]>> {
+    return this.http.get<Result<Property[]>>(`${this.apiUrl}/agent/${agentId}`);
+  }
+
+  getPropertyRating(propertyId: string): Observable<Result<any>> {
+    return this.http.get<Result<any>>(`${this.apiUrl}/${propertyId}/rating`);
+  }
 }
 
