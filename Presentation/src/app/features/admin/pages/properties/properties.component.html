@@ -1,0 +1,177 @@
+<div class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Gestão de Imóveis</h1>
+          <p class="text-gray-600 mt-1">Supervisionar todos os imóveis do sistema</p>
+        </div>
+        <button routerLink="/admin/dashboard" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+          ← Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <!-- Search -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pesquisar</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onFilterChange()"
+            placeholder="Título ou Cidade..."
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+          <select 
+            [(ngModel)]="statusFilter"
+            (change)="onFilterChange()"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option value="all">Todos</option>
+            <option value="Available">Disponível</option>
+            <option value="Reserved">Reservado</option>
+            <option value="Sold">Vendido</option>
+            <option value="Rented">Arrendado</option>
+            <option value="Inactive">Inativo</option>
+          </select>
+        </div>
+
+        <!-- Type Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+          <select 
+            [(ngModel)]="typeFilter"
+            (change)="onFilterChange()"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option value="all">Todos</option>
+            <option value="Apartment">Apartamento</option>
+            <option value="House">Casa</option>
+            <option value="Villa">Moradia</option>
+            <option value="Land">Terreno</option>
+            <option value="Commercial">Comercial</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties List -->
+    @if (loading) {
+      <div class="bg-white rounded-xl shadow-md p-12 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mx-auto"></div>
+        <p class="text-gray-600 mt-4">A carregar imóveis...</p>
+      </div>
+    } @else if (filteredProperties.length === 0) {
+      <div class="bg-white rounded-xl shadow-md p-12 text-center">
+        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum imóvel encontrado</h3>
+        <p class="text-gray-600">Tente ajustar os filtros de pesquisa</p>
+      </div>
+    } @else {
+      <div class="space-y-4">
+        @for (property of filteredProperties; track property.id) {
+          <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+            <div class="flex flex-col md:flex-row">
+              
+              <!-- Property Image -->
+              <div class="md:w-48 h-32 md:h-auto bg-gray-200 flex-shrink-0">
+                @if (property.images && property.images.length > 0) {
+                  <img 
+                    [src]="property.images[0].url" 
+                    [alt]="property.title"
+                    class="w-full h-full object-cover">
+                } @else {
+                  <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                  </div>
+                }
+              </div>
+
+              <!-- Property Info -->
+              <div class="flex-1 p-5">
+                <div class="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ property.title }}</h3>
+                    <p class="text-sm text-gray-600">{{ property.address.city }}, {{ property.address.district }}</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <span [class]="getStatusBadgeClass(property.status)">
+                      {{ property.status }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                      {{ getTransactionTypeLabel(property.transactionType) }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Features -->
+                <div class="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                  <span>{{ property.bedrooms }} quartos</span>
+                  <span>•</span>
+                  <span>{{ property.bathrooms }} WC</span>
+                  <span>•</span>
+                  <span>{{ property.area }}m²</span>
+                </div>
+
+                <!-- Price & Actions -->
+                <div class="flex items-center justify-between">
+                  <p class="text-2xl font-bold text-primary-600">
+                    €{{ property.price.toLocaleString('pt-PT') }}
+                  </p>
+                  <div class="flex gap-2">
+                    <button 
+                      [routerLink]="['/property', property.id]"
+                      class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors text-sm">
+                      Ver no Site
+                    </button>
+                    <button 
+                      (click)="deleteProperty(property.id, property.title)"
+                      class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors text-sm">
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <p class="text-sm font-medium text-gray-600 mb-2">Total Exibido</p>
+          <p class="text-2xl font-bold text-gray-900">{{ filteredProperties.length }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <p class="text-sm font-medium text-gray-600 mb-2">Disponíveis</p>
+          <p class="text-2xl font-bold text-green-600">{{ (filteredProperties.filter((p: Property) => p.status === 'Available')).length }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <p class="text-sm font-medium text-gray-600 mb-2">Reservados</p>
+          <p class="text-2xl font-bold text-yellow-600">{{ (filteredProperties.filter((p: Property) => p.status === 'Reserved')).length }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <p class="text-sm font-medium text-gray-600 mb-2">Vendidos/Arrendados</p>
+          <p class="text-2xl font-bold text-red-600">{{ (filteredProperties.filter((p: Property) => p.status === 'Sold' || p.status === 'Rented')).length }}</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
