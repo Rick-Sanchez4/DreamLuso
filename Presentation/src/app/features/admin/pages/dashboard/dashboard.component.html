@@ -1,0 +1,223 @@
+<div class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-4xl font-bold">
+            Olá, {{ currentUser?.firstName }}! 👨‍💼
+          </h1>
+          <p class="text-primary-100 mt-2">Painel de Administração - DreamLuso</p>
+        </div>
+        <button routerLink="/" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
+          ← Voltar ao site
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    @if (loading) {
+      <div class="bg-white rounded-xl shadow-md p-12 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mx-auto"></div>
+        <p class="text-gray-600 mt-4">A carregar estatísticas...</p>
+      </div>
+    } @else {
+      
+      <!-- Main Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        <!-- Total Users -->
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Total Usuários</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalUsers }}</p>
+              <p class="text-xs text-gray-500 mt-1">Clientes: {{ stats.totalClients }} | Agentes: {{ stats.totalAgents }}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Properties -->
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Total Imóveis</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalProperties }}</p>
+              <p class="text-xs text-green-600 mt-1">{{ stats.activeProperties }} ativos</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Proposals -->
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Propostas Pendentes</p>
+              <p class="text-3xl font-bold text-yellow-600 mt-2">{{ stats.pendingProposals }}</p>
+              <p class="text-xs text-gray-500 mt-1">de {{ stats.totalProposals }} totais</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Contracts -->
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Contratos</p>
+              <p class="text-3xl font-bold text-purple-600 mt-2">{{ stats.totalContracts }}</p>
+              <p class="text-xs text-gray-500 mt-1">Receita: €{{ stats.monthlyRevenue.toLocaleString('pt-PT') }}</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <button routerLink="/admin/users" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
+          <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors mb-4">
+            <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-1">Gerir Usuários</h3>
+          <p class="text-sm text-gray-600">Ver e editar usuários</p>
+        </button>
+
+        <button routerLink="/admin/properties" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
+          <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors mb-4">
+            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-1">Imóveis</h3>
+          <p class="text-sm text-gray-600">Supervisionar imóveis</p>
+        </button>
+
+        <button routerLink="/admin/proposals" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
+          <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center group-hover:bg-yellow-200 transition-colors mb-4">
+            <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-1">Propostas</h3>
+          <p class="text-sm text-gray-600">Monitorizar propostas</p>
+        </button>
+
+        <button routerLink="/admin/analytics" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
+          <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors mb-4">
+            <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-1">Análises</h3>
+          <p class="text-sm text-gray-600">Relatórios e gráficos</p>
+        </button>
+      </div>
+
+      <!-- Charts & Analytics Preview -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- System Overview -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Resumo do Sistema</h2>
+          <div class="space-y-4">
+            
+            <!-- Properties Status -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-600">Imóveis Ativos</span>
+                <span class="text-sm font-semibold text-gray-900">{{ stats.activeProperties }}/{{ stats.totalProperties }}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  class="bg-green-500 h-2 rounded-full transition-all duration-300"
+                  [style.width.%]="(stats.activeProperties / stats.totalProperties) * 100">
+                </div>
+              </div>
+            </div>
+
+            <!-- Proposals Completion -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-600">Taxa de Conversão</span>
+                <span class="text-sm font-semibold text-gray-900">
+                  {{ stats.totalProposals > 0 ? ((stats.totalContracts / stats.totalProposals) * 100).toFixed(1) : 0 }}%
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  class="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  [style.width.%]="stats.totalProposals > 0 ? (stats.totalContracts / stats.totalProposals) * 100 : 0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Pending Work -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-600">Propostas Pendentes</span>
+                <span class="text-sm font-semibold text-yellow-600">{{ stats.pendingProposals }}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  class="bg-yellow-500 h-2 rounded-full transition-all duration-300"
+                  [style.width.%]="stats.totalProposals > 0 ? (stats.pendingProposals / stats.totalProposals) * 100 : 0">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Card -->
+        <div class="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-md p-6 text-white">
+          <h2 class="text-xl font-semibold mb-2">Receita Mensal</h2>
+          <p class="text-4xl font-bold mb-4">€{{ stats.monthlyRevenue.toLocaleString('pt-PT') }}</p>
+          <div class="flex items-center gap-2 text-primary-100">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+            <span class="text-sm">+12% vs mês anterior</span>
+          </div>
+          <div class="mt-6 pt-6 border-t border-primary-400">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="text-primary-200">Contratos Ativos</p>
+                <p class="text-2xl font-bold mt-1">{{ stats.totalContracts }}</p>
+              </div>
+              <div>
+                <p class="text-primary-200">Média/Contrato</p>
+                <p class="text-2xl font-bold mt-1">
+                  €{{ stats.totalContracts > 0 ? (stats.monthlyRevenue / stats.totalContracts).toFixed(0) : 0 }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
