@@ -1,0 +1,306 @@
+<div class="min-h-screen bg-gray-50">
+  <app-navbar></app-navbar>
+
+  @if (loading) {
+    <div class="flex justify-center items-center h-screen">
+      <div class="animate-spin rounded-full h-16 w-16 border-4 border-primary-500 border-t-transparent"></div>
+    </div>
+  } @else if (property) {
+    <div class="pt-20 pb-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumb -->
+        <nav class="mb-6 text-sm text-gray-600">
+          <a routerLink="/" class="hover:text-primary-600">Início</a>
+          <span class="mx-2">/</span>
+          <a routerLink="/properties" class="hover:text-primary-600">Imóveis</a>
+          <span class="mx-2">/</span>
+          <span class="text-gray-900">{{ property.title }}</span>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Main Content (2/3) -->
+          <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Image Gallery -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div class="relative h-96">
+                @if (property.images && property.images.length > 0) {
+                  <img 
+                    [src]="property.images[currentImageIndex]?.url"
+                    [alt]="property.title"
+                    class="w-full h-full object-cover">
+                  
+                  <!-- Navigation Arrows -->
+                  @if (property.images.length > 1) {
+                    <button (click)="previousImage()" class="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                      </svg>
+                    </button>
+                    <button (click)="nextImage()" class="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+                  }
+
+                  <!-- Image Counter -->
+                  <div class="absolute bottom-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm text-white rounded-full text-sm">
+                    {{ currentImageIndex + 1 }} / {{ property.images.length }}
+                  </div>
+                } @else {
+                  <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-400">Sem imagens</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Property Info -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+              <div class="mb-6">
+                <div class="flex items-start justify-between mb-4">
+                  <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ property.title }}</h1>
+                    <div class="flex items-center gap-2 text-gray-600">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                      <span>{{ property.address.street }}, {{ property.address.city }}</span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-4xl font-bold text-primary-600">{{ property.price | currencyPt }}</p>
+                    @if (property.transactionType === 'Rent') {
+                      <p class="text-sm text-gray-500">por mês</p>
+                    }
+                  </div>
+                </div>
+
+                <!-- Rating -->
+                @if (rating) {
+                  <div class="flex items-center gap-4 mb-4">
+                    <app-rating-stars 
+                      [rating]="rating.averageRating"
+                      [totalReviews]="rating.totalComments"
+                      [interactive]="false">
+                    </app-rating-stars>
+                  </div>
+                }
+
+                <!-- Features -->
+                <div class="grid grid-cols-3 gap-4 py-6 border-y border-gray-200">
+                  <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">{{ property.bedrooms }}</p>
+                    <p class="text-sm text-gray-600">Quartos</p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">{{ property.bathrooms }}</p>
+                    <p class="text-sm text-gray-600">Casas de Banho</p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-3xl font-bold text-gray-900">{{ property.area }}</p>
+                    <p class="text-sm text-gray-600">m²</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Descrição</h2>
+                <p class="text-gray-700 leading-relaxed">{{ property.description }}</p>
+              </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+              <h2 class="text-2xl font-semibold text-gray-900 mb-6">
+                Avaliações e Comentários ({{ rating?.totalComments || 0 }})
+              </h2>
+
+              @if (rating) {
+                <!-- Rating Summary -->
+                <div class="bg-gray-50 rounded-xl p-6 mb-8">
+                  <div class="flex items-center gap-8">
+                    <div class="text-center">
+                      <p class="text-5xl font-bold text-gray-900">{{ rating.averageRating.toFixed(1) }}</p>
+                      <app-rating-stars [rating]="rating.averageRating" [showCount]="false" [interactive]="false"></app-rating-stars>
+                      <p class="text-sm text-gray-600 mt-2">{{ rating.totalComments }} avaliações</p>
+                    </div>
+                    <div class="flex-1 space-y-2">
+                      @for (star of [5, 4, 3, 2, 1]; track star) {
+                        <div class="flex items-center gap-4">
+                          <span class="text-sm text-gray-600 w-12">{{ star }} ★</span>
+                          <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              class="h-full bg-yellow-400 transition-all duration-300"
+                              [style.width.%]="getStarPercentage(star)">
+                            </div>
+                          </div>
+                          <span class="text-sm text-gray-600 w-8">{{ getStarCount(star) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Add Comment Form -->
+              @if (isAuthenticated) {
+                <div class="mb-8 p-6 bg-gray-50 rounded-xl">
+                  <h3 class="font-semibold text-gray-900 mb-4">Deixe a sua avaliação</h3>
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">A sua avaliação</label>
+                    <app-rating-stars 
+                      [rating]="newRating"
+                      [interactive]="true"
+                      [showCount]="false"
+                      (ratingChange)="newRating = $event">
+                    </app-rating-stars>
+                  </div>
+                  <textarea
+                    [(ngModel)]="newComment"
+                    rows="4"
+                    placeholder="Partilhe a sua experiência..."
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent mb-4">
+                  </textarea>
+                  <button
+                    (click)="submitComment()"
+                    [disabled]="!newComment.trim()"
+                    class="px-6 py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 text-white font-medium rounded-lg transition-all">
+                    Publicar Comentário
+                  </button>
+                </div>
+              }
+
+              <!-- Comments List -->
+              <div class="space-y-6">
+                @for (comment of comments; track comment.id) {
+                  <div class="border-b border-gray-200 pb-6 last:border-0">
+                    <div class="flex items-start gap-4">
+                      <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-semibold flex-shrink-0">
+                        {{ comment.userName.substring(0, 2).toUpperCase() }}
+                      </div>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                          <h4 class="font-semibold text-gray-900">{{ comment.userName }}</h4>
+                          @if (comment.rating) {
+                            <app-rating-stars [rating]="comment.rating" [showCount]="false" [interactive]="false"></app-rating-stars>
+                          }
+                        </div>
+                        <p class="text-gray-700 mb-3">{{ comment.message }}</p>
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                          <button (click)="incrementHelpful(comment.id)" class="flex items-center gap-1 hover:text-primary-600 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                            </svg>
+                            <span>Útil ({{ comment.helpfulCount }})</span>
+                          </button>
+                          <span>{{ comment.createdAt | date: 'dd/MM/yyyy' }}</span>
+                        </div>
+
+                        <!-- Replies -->
+                        @if (comment.replies && comment.replies.length > 0) {
+                          <div class="mt-4 ml-8 space-y-4">
+                            @for (reply of comment.replies; track reply.id) {
+                              <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-semibold flex-shrink-0 text-sm">
+                                  {{ reply.userName.substring(0, 2).toUpperCase() }}
+                                </div>
+                                <div class="flex-1">
+                                  <h5 class="font-medium text-gray-900 text-sm">{{ reply.userName }}</h5>
+                                  <p class="text-gray-700 text-sm mt-1">{{ reply.message }}</p>
+                                  <p class="text-xs text-gray-500 mt-2">{{ reply.createdAt | date: 'dd/MM/yyyy' }}</p>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                @if (comments.length === 0) {
+                  <p class="text-center text-gray-500 py-8">Ainda não há comentários. Seja o primeiro a avaliar!</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar (1/3) -->
+          <div class="space-y-6">
+            
+            <!-- Quick Contact Card -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+              <h3 class="text-xl font-semibold text-gray-900 mb-6">Interessado?</h3>
+              
+              <div class="space-y-4">
+                <button class="w-full px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                  </svg>
+                  Contactar Agente
+                </button>
+
+                <button class="w-full px-6 py-3 bg-white hover:bg-gray-50 text-primary-600 font-semibold border-2 border-primary-500 rounded-lg transition-all flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  Agendar Visita
+                </button>
+
+                @if (isAuthenticated) {
+                  <button 
+                    (click)="showProposalForm = !showProposalForm"
+                    class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Fazer Proposta
+                  </button>
+                }
+              </div>
+
+              <!-- Proposal Form -->
+              @if (showProposalForm) {
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                  <h4 class="font-semibold text-gray-900 mb-4">Faça a sua proposta</h4>
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Valor Proposto</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="proposalValue"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                        placeholder="€0">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Notas Adicionais</label>
+                      <textarea
+                        [(ngModel)]="proposalNotes"
+                        rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                        placeholder="Informações adicionais..."></textarea>
+                    </div>
+                    <button
+                      (click)="submitProposal()"
+                      class="w-full px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition-all">
+                      Enviar Proposta
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <app-footer></app-footer>
+</div>
+
