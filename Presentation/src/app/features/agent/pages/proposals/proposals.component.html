@@ -1,0 +1,189 @@
+<div class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Propostas Recebidas</h1>
+          <p class="text-gray-600 mt-1">Gerir e responder às propostas dos clientes</p>
+        </div>
+        <button routerLink="/agent/dashboard" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+          ← Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Search -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pesquisar</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onFilterChange()"
+            placeholder="Nº Proposta ou Imóvel..."
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+          <select 
+            [(ngModel)]="statusFilter"
+            (change)="onFilterChange()"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option value="all">Todos</option>
+            <option value="Pending">Pendente</option>
+            <option value="UnderAnalysis">Em Análise</option>
+            <option value="InNegotiation">Em Negociação</option>
+            <option value="Approved">Aprovada</option>
+            <option value="Rejected">Rejeitada</option>
+            <option value="Withdrawn">Retirada</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proposals List -->
+    <div class="space-y-4">
+      @if (loading) {
+        <div class="bg-white rounded-xl shadow-md p-12 text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mx-auto"></div>
+          <p class="text-gray-600 mt-4">A carregar propostas...</p>
+        </div>
+      } @else if (filteredProposals.length === 0) {
+        <div class="bg-white rounded-xl shadow-md p-12 text-center">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhuma proposta encontrada</h3>
+          <p class="text-gray-600">
+            @if (searchTerm || statusFilter !== 'all') {
+              Tente ajustar os filtros de pesquisa
+            } @else {
+              Ainda não recebeu nenhuma proposta nos seus imóveis
+            }
+          </p>
+        </div>
+      } @else {
+        @for (proposal of filteredProposals; track proposal.id) {
+          <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+            <div class="p-6">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                
+                <!-- Proposal Info -->
+                <div class="flex-1">
+                  <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                      <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getStatusIcon(proposal.status)"/>
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ proposal.propertyTitle || 'Imóvel' }}</h3>
+                        <span [class]="getTypeBadgeClass(proposal.type)">
+                          {{ proposal.type === 'Purchase' ? 'Compra' : 'Arrendamento' }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-2">Proposta #{{ proposal.proposalNumber }}</p>
+                      <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                        <span class="flex items-center gap-1">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                          </svg>
+                          {{ proposal.createdAt | date: 'dd/MM/yyyy' }}
+                        </span>
+                        <span class="flex items-center gap-1 font-semibold text-gray-900">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          €{{ proposal.proposedValue.toLocaleString('pt-PT') }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status & Actions -->
+                <div class="flex flex-col items-end gap-3">
+                  <span [class]="getStatusBadgeClass(proposal.status)">
+                    {{ proposal.status }}
+                  </span>
+                  
+                  @if (proposal.status === 'Pending' || proposal.status === 'UnderAnalysis' || proposal.status === 'InNegotiation') {
+                    <div class="flex gap-2">
+                      <button 
+                        (click)="approveProposal(proposal.id)"
+                        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
+                        ✓ Aprovar
+                      </button>
+                      <button 
+                        (click)="rejectProposal(proposal.id)"
+                        class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors">
+                        ✕ Rejeitar
+                      </button>
+                    </div>
+                  }
+                  
+                  <button 
+                    [routerLink]="['/agent/proposals', proposal.id]"
+                    class="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+                    Ver Detalhes →
+                  </button>
+                </div>
+              </div>
+
+              <!-- Additional Notes -->
+              @if (proposal.additionalNotes) {
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                  <p class="text-sm text-gray-600">
+                    <span class="font-medium">Notas do Cliente:</span> {{ proposal.additionalNotes }}
+                  </p>
+                </div>
+              }
+
+              <!-- Payment Method -->
+              @if (proposal.paymentMethod) {
+                <div class="mt-2">
+                  <p class="text-sm text-gray-600">
+                    <span class="font-medium">Método de Pagamento:</span> {{ proposal.paymentMethod }}
+                  </p>
+                </div>
+              }
+
+              <!-- Intended Move Date -->
+              @if (proposal.intendedMoveDate) {
+                <div class="mt-2">
+                  <p class="text-sm text-gray-600">
+                    <span class="font-medium">Data Prevista de Mudança:</span> {{ proposal.intendedMoveDate | date: 'dd/MM/yyyy' }}
+                  </p>
+                </div>
+              }
+
+              <!-- Negotiation Count -->
+              @if (proposal.negotiations && proposal.negotiations.length > 0) {
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                  <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <span>{{ proposal.negotiations.length }} mensagem(ns) de negociação</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
