@@ -142,5 +142,13 @@ export class AdminUsersComponent implements OnInit {
       ? 'px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800'
       : 'px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800';
   }
+
+  getActiveUsersCount(): number {
+    return this.filteredUsers.filter(u => u.isActive).length;
+  }
+
+  getInactiveUsersCount(): number {
+    return this.filteredUsers.filter(u => !u.isActive).length;
+  }
 }
 

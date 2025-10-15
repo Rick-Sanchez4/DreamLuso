@@ -161,11 +161,11 @@
       </div>
       <div class="bg-white rounded-xl shadow-md p-6">
         <p class="text-sm font-medium text-gray-600 mb-2">Usuários Ativos</p>
-        <p class="text-2xl font-bold text-green-600">{{ (filteredUsers.filter((u: User) => u.isActive)).length }}</p>
+        <p class="text-2xl font-bold text-green-600">{{ getActiveUsersCount() }}</p>
       </div>
       <div class="bg-white rounded-xl shadow-md p-6">
         <p class="text-sm font-medium text-gray-600 mb-2">Usuários Inativos</p>
-        <p class="text-2xl font-bold text-red-600">{{ (filteredUsers.filter((u: User) => !u.isActive)).length }}</p>
+        <p class="text-2xl font-bold text-red-600">{{ getInactiveUsersCount() }}</p>
       </div>
     </div>
   </div>

@@ -100,7 +100,7 @@ export class ClientProfileComponent implements OnInit {
     }
 
     this.loading = true;
-    this.http.put(`${environment.apiUrl}/accounts/change-password`, {
+    this.http.post(`${environment.apiUrl}/accounts/change-password`, {
       currentPassword: this.passwordForm.currentPassword,
       newPassword: this.passwordForm.newPassword
     }).subscribe({

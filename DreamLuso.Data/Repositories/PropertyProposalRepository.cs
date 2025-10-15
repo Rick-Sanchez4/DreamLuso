@@ -62,6 +62,19 @@ public class PropertyProposalRepository : Repository<PropertyProposal>, IPropert
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<PropertyProposal>> GetByAgentAsync(Guid agentId)
+    {
+        return await _dbSet
+            .Include(p => p.Property)
+                .ThenInclude(pr => pr!.Address)
+            .Include(p => p.Client)
+                .ThenInclude(c => c!.User)
+            .Include(p => p.Negotiations)
+            .Where(p => p.Property!.RealEstateAgentId == agentId)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<PropertyProposal>> GetByStatusAsync(ProposalStatus status)
     {
         return await _dbSet

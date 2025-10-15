@@ -5,6 +5,7 @@ using DreamLuso.Application.CQ.Properties.Commands.DeleteProperty;
 using DreamLuso.Application.CQ.Properties.Queries.GetProperties;
 using DreamLuso.Application.CQ.Properties.Queries.GetPropertyById;
 using DreamLuso.Application.CQ.Properties.Common;
+using DreamLuso.Domain.Core.Uow;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,12 @@ public static class PropertyEndpoints
         properties.MapGet("/{id:guid}", Queries.GetPropertyById)
             .WithName("GetPropertyById")
             .Produces<PropertyDetailResponse>(200)
+            .Produces<Error>(404);
+
+        // GET /api/properties/agent/{agentId} - Obter imóveis do agente
+        properties.MapGet("/agent/{agentId:guid}", Queries.GetPropertiesByAgent)
+            .WithName("GetPropertiesByAgent")
+            .Produces<GetPropertiesResponse>(200)
             .Produces<Error>(404);
 
         // POST /api/properties - Criar novo imóvel
@@ -180,6 +187,35 @@ public static class PropertyEndpoints
             return result.IsSuccess
                 ? TypedResults.Ok(result.Value)
                 : TypedResults.NotFound(result.Error);
+        }
+
+        public static async Task<Results<Ok<IEnumerable<PropertyResponse>>, NotFound<Error>>> GetPropertiesByAgent(
+            [FromServices] IUnitOfWork unitOfWork,
+            [FromRoute] Guid agentId,
+            CancellationToken cancellationToken = default)
+        {
+            var properties = await unitOfWork.PropertyRepository.GetByAgentIdAsync(agentId);
+
+            var response = properties.Select(p => new PropertyResponse
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Description = p.Description,
+                Price = p.Price,
+                Size = p.Size,
+                Bedrooms = p.Bedrooms,
+                Bathrooms = p.Bathrooms,
+                Type = p.Type.ToString(),
+                Status = p.Status.ToString(),
+                TransactionType = p.TransactionType.ToString(),
+                Street = p.Address.Street,
+                Municipality = p.Address.Municipality,
+                District = p.Address.District,
+                PostalCode = p.Address.PostalCode,
+                CreatedAt = p.CreatedAt
+            });
+
+            return TypedResults.Ok(response);
         }
     }
 }

@@ -96,5 +96,17 @@ export class AdminPropertiesComponent implements OnInit {
   getTransactionTypeLabel(type: string): string {
     return type === 'Sale' ? 'Venda' : 'Arrendamento';
   }
+
+  getAvailableCount(): number {
+    return this.filteredProperties.filter(p => p.status === 'Available').length;
+  }
+
+  getReservedCount(): number {
+    return this.filteredProperties.filter(p => p.status === 'Reserved').length;
+  }
+
+  getSoldRentedCount(): number {
+    return this.filteredProperties.filter(p => p.status === 'Sold' || p.status === 'Rented').length;
+  }
 }
 

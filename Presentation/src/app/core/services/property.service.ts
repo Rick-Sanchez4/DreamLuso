@@ -42,7 +42,7 @@ export class PropertyService {
   }
 
   getPropertyRating(propertyId: string): Observable<Result<any>> {
-    return this.http.get<Result<any>>(`${this.apiUrl}/${propertyId}/rating`);
+    return this.http.get<Result<any>>(`${environment.apiUrl}/comments/property/${propertyId}/rating`);
   }
 }
 

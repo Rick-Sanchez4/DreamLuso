@@ -26,6 +26,10 @@ public static class PropertyProposalEndpoints
             .WithName("GetProposalsByClient")
             .RequireAuthorization();
 
+        proposals.MapGet("/agent/{agentId:guid}", Commands.GetProposalsByAgent)
+            .WithName("GetProposalsByAgent")
+            .RequireAuthorization();
+
         proposals.MapPut("/{proposalId:guid}/approve", Commands.ApproveProposal)
             .WithName("ApproveProposal")
             .RequireAuthorization();
@@ -72,6 +76,19 @@ public static class PropertyProposalEndpoints
             CancellationToken cancellationToken = default)
         {
             var query = new GetProposalsByClientQuery(clientId);
+            var result = await sender.Send(query, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.NotFound(result.Error!);
+        }
+
+        public static async Task<Results<Ok<IEnumerable<PropertyProposalResponse>>, NotFound<Error>>> GetProposalsByAgent(
+            [FromServices] ISender sender,
+            [FromRoute] Guid agentId,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new GetProposalsByAgentQuery(agentId);
             var result = await sender.Send(query, cancellationToken);
 
             return result.IsSuccess
