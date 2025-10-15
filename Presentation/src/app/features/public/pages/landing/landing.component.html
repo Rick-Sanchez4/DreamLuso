@@ -8,23 +8,39 @@
     
     <!-- Video Background -->
     <div class="absolute inset-0 z-0">
-      <div class="absolute inset-0 bg-black/50 z-10"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-950/90 via-primary-900/80 to-purple-900/70 z-10"></div>
       <video autoplay loop muted playsinline class="w-full h-full object-cover">
         <source src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-neighborhood-with-houses-50646-large.mp4" type="video/mp4">
       </video>
     </div>
 
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0 z-10 overflow-hidden pointer-events-none">
+      <div class="absolute -top-40 -right-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+
     <!-- Content -->
-    <div class="relative z-20 text-center px-4 max-w-4xl mx-auto">
-      <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-        Encontre o Seu <span class="text-primary-500">Imóvel de Sonho</span>
+    <div class="relative z-20 text-center px-4 max-w-6xl mx-auto">
+      <div class="mb-6 animate-fade-in-up">
+        <span class="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-medium mb-6">
+          🏆 Plataforma #1 de Imóveis em Portugal
+        </span>
+      </div>
+      
+      <h1 class="text-5xl md:text-7xl font-playfair font-bold text-white mb-6 animate-fade-in-up leading-tight" style="animation-delay: 0.2s;">
+        Encontre o Seu <br/>
+        <span class="text-gradient bg-gradient-to-r from-purple-400 via-pink-400 to-primary-400 bg-clip-text text-transparent">
+          Imóvel de Sonho
+        </span>
       </h1>
-      <p class="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
-        Milhares de propriedades em Portugal. A sua casa perfeita está à distância de um clique.
+      
+      <p class="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto animate-fade-in-up font-light" style="animation-delay: 0.4s;">
+        Milhares de propriedades exclusivas em Portugal. A sua casa perfeita está à distância de um clique.
       </p>
 
       <!-- Search Bar -->
-      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 max-w-3xl mx-auto">
+      <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 max-w-4xl mx-auto shadow-2xl border border-white/20 animate-scale-in" style="animation-delay: 0.6s;">
         <form (ngSubmit)="onSearch()" class="flex flex-col md:flex-row gap-4">
           <div class="flex-1">
             <input
@@ -32,13 +48,13 @@
               [(ngModel)]="searchCity"
               name="searchCity"
               placeholder="Digite cidade, distrito ou código postal..."
-              class="w-full px-6 py-4 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+              class="w-full px-6 py-5 rounded-2xl bg-white/95 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg backdrop-blur-sm font-medium">
           </div>
           <button
             type="submit"
-            class="px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105">
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="px-10 py-5 bg-gradient-luxury text-white font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow">
+            <div class="flex items-center gap-3">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
               </svg>
               <span>Buscar</span>
@@ -47,88 +63,173 @@
         </form>
 
         <!-- Quick Filters -->
-        <div class="flex flex-wrap justify-center gap-4 mt-6">
-          <button (click)="navigateToProperties('Sale')" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all backdrop-blur-sm">
-            🏠 Comprar
+        <div class="flex flex-wrap justify-center gap-4 mt-8">
+          <button (click)="navigateToProperties('Sale')" class="group px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-all backdrop-blur-sm border border-white/10 hover:border-white/30 hover:scale-105 duration-300">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl group-hover:scale-110 transition-transform">🏠</span>
+              <span class="font-semibold">Comprar</span>
+            </div>
           </button>
-          <button (click)="navigateToProperties('Rent')" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all backdrop-blur-sm">
-            🔑 Arrendar
+          <button (click)="navigateToProperties('Rent')" class="group px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-all backdrop-blur-sm border border-white/10 hover:border-white/30 hover:scale-105 duration-300">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl group-hover:scale-110 transition-transform">🔑</span>
+              <span class="font-semibold">Arrendar</span>
+            </div>
           </button>
-          <button (click)="navigateToProperties()" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all backdrop-blur-sm">
-            🏘️ Ver Todos
+          <button (click)="navigateToProperties()" class="group px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition-all backdrop-blur-sm border border-white/10 hover:border-white/30 hover:scale-105 duration-300">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl group-hover:scale-110 transition-transform">🏘️</span>
+              <span class="font-semibold">Ver Todos</span>
+            </div>
           </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto animate-fade-in-up" style="animation-delay: 0.8s;">
+        <div class="text-center">
+          <div class="text-4xl font-bold text-white mb-2">10K+</div>
+          <div class="text-white/70 text-sm">Imóveis</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-white mb-2">5K+</div>
+          <div class="text-white/70 text-sm">Clientes Felizes</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-white mb-2">500+</div>
+          <div class="text-white/70 text-sm">Agentes</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold text-white mb-2">98%</div>
+          <div class="text-white/70 text-sm">Satisfação</div>
         </div>
       </div>
     </div>
 
     <!-- Scroll Indicator -->
-    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
-      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-      </svg>
+    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20 animate-bounce-slow">
+      <div class="flex flex-col items-center gap-2">
+        <span class="text-white/60 text-sm">Explore</span>
+        <svg class="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+        </svg>
+      </div>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-4xl font-bold text-gray-900 mb-4">
-          Porquê Escolher <span class="text-primary-500">DreamLuso</span>?
+  <section class="py-24 bg-gradient-to-b from-white via-primary-50/30 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 relative overflow-hidden" data-animate>
+    <!-- Background decoration -->
+    <div class="absolute inset-0 pointer-events-none opacity-40 dark:opacity-20">
+      <div class="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 dark:bg-primary-500/20 rounded-full blur-3xl parallax-slow"></div>
+      <div class="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/30 dark:bg-purple-500/20 rounded-full blur-3xl parallax-slow"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="text-center mb-20" data-animate>
+        <span class="inline-block px-4 py-2 bg-gradient-luxury text-white rounded-full text-sm font-semibold mb-6">
+          ✨ Por Que Nos Escolher
+        </span>
+        <h2 class="text-5xl md:text-6xl font-playfair font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+          Porquê Escolher <br class="hidden md:block"/>
+          <span class="text-gradient">DreamLuso</span>?
         </h2>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-          A plataforma mais completa de imóveis em Portugal
+        <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          A plataforma mais completa e inovadora de imóveis em Portugal, com tecnologia de ponta e serviço personalizado
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8" data-animate>
         <!-- Feature 1 -->
-        <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6">
-            <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+        <div class="group card-luxury p-10 hover:-translate-y-2 border border-transparent hover:border-primary-200">
+          <div class="relative mb-8">
+            <div class="absolute inset-0 bg-gradient-luxury opacity-20 rounded-full blur-xl group-hover:opacity-30 transition-opacity"></div>
+            <div class="relative w-20 h-20 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center transform group-hover:rotate-6 transition-transform">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Imóveis Verificados</h3>
-          <p class="text-gray-600">Todos os imóveis são verificados pela nossa equipa para garantir qualidade e confiança.</p>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">Imóveis Verificados</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Todos os imóveis são rigorosamente verificados pela nossa equipa especializada para garantir máxima qualidade e confiança.</p>
         </div>
 
         <!-- Feature 2 -->
-        <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6">
-            <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+        <div class="group card-luxury p-10 hover:-translate-y-2 border border-transparent hover:border-primary-200 dark:hover:border-primary-700">
+          <div class="relative mb-8">
+            <div class="absolute inset-0 bg-gradient-luxury opacity-20 rounded-full blur-xl group-hover:opacity-30 transition-opacity"></div>
+            <div class="relative w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center transform group-hover:rotate-6 transition-transform">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Sistema de Propostas</h3>
-          <p class="text-gray-600">Faça propostas online e negocie diretamente com os proprietários de forma transparente.</p>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">Sistema de Propostas</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Faça propostas online e negocie diretamente com os proprietários de forma 100% transparente e segura.</p>
         </div>
 
         <!-- Feature 3 -->
-        <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6">
-            <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-            </svg>
+        <div class="group card-luxury p-10 hover:-translate-y-2 border border-transparent hover:border-primary-200 dark:hover:border-primary-700">
+          <div class="relative mb-8">
+            <div class="absolute inset-0 bg-gradient-luxury opacity-20 rounded-full blur-xl group-hover:opacity-30 transition-opacity"></div>
+            <div class="relative w-20 h-20 bg-gradient-to-br from-pink-500 to-primary-600 rounded-2xl flex items-center justify-center transform group-hover:rotate-6 transition-transform">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+              </svg>
+            </div>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">Reviews Detalhadas</h3>
-          <p class="text-gray-600">Leia avaliações reais de outros clientes e tome decisões informadas.</p>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">Reviews Detalhadas</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Leia avaliações autênticas de outros clientes e tome decisões informadas com total confiança.</p>
+        </div>
+      </div>
+
+      <!-- Additional features grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+        <div class="text-center p-6 bg-white/60 dark:bg-white/5 rounded-2xl backdrop-blur-sm border border-transparent dark:border-white/10">
+          <div class="text-3xl mb-3">🔒</div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">100% Seguro</p>
+        </div>
+        <div class="text-center p-6 bg-white/60 dark:bg-white/5 rounded-2xl backdrop-blur-sm border border-transparent dark:border-white/10">
+          <div class="text-3xl mb-3">⚡</div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Resposta Rápida</p>
+        </div>
+        <div class="text-center p-6 bg-white/60 dark:bg-white/5 rounded-2xl backdrop-blur-sm border border-transparent dark:border-white/10">
+          <div class="text-3xl mb-3">🎯</div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Busca Inteligente</p>
+        </div>
+        <div class="text-center p-6 bg-white/60 dark:bg-white/5 rounded-2xl backdrop-blur-sm border border-transparent dark:border-white/10">
+          <div class="text-3xl mb-3">💎</div>
+          <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Premium Quality</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Featured Properties -->
-  <section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-gray-900 mb-4">Imóveis em Destaque</h2>
-        <p class="text-xl text-gray-600">Selecionados especialmente para você</p>
+  <section class="py-24 bg-white dark:bg-dark-800 relative overflow-hidden" data-animate>
+    <div class="absolute inset-0 pointer-events-none opacity-30 dark:opacity-20">
+      <div class="absolute top-40 right-20 w-80 h-80 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl parallax-slow"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="text-center mb-16" data-animate>
+        <span class="inline-block px-4 py-2 bg-gradient-sunset text-white rounded-full text-sm font-semibold mb-6">
+          🏡 Destaques da Semana
+        </span>
+        <h2 class="text-5xl md:text-6xl font-playfair font-bold text-gray-900 dark:text-white mb-6">
+          Imóveis em <span class="text-gradient">Destaque</span>
+        </h2>
+        <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Selecionados especialmente para você pela nossa equipa de especialistas
+        </p>
       </div>
 
       @if (loading) {
         <div class="flex justify-center items-center h-64">
-          <div class="animate-spin rounded-full h-16 w-16 border-4 border-primary-500 border-t-transparent"></div>
+          <div class="relative">
+            <div class="animate-spin rounded-full h-20 w-20 border-4 border-primary-200"></div>
+            <div class="animate-spin rounded-full h-20 w-20 border-4 border-primary-600 border-t-transparent absolute top-0"></div>
+          </div>
         </div>
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -137,29 +238,202 @@
           }
         </div>
 
-        <div class="text-center mt-12">
-          <button (click)="navigateToProperties()" class="px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105">
+        <div class="text-center mt-16">
+          <button (click)="navigateToProperties()" class="btn-primary text-lg px-12 py-5">
             Ver Todos os Imóveis
+            <svg class="w-5 h-5 inline-block ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
           </button>
         </div>
       }
     </div>
   </section>
 
+  <!-- Testimonials Section -->
+  <section class="py-24 bg-gradient-to-br from-primary-50 via-purple-50 to-pink-50 dark:from-dark-900 dark:via-primary-950 dark:to-purple-950" data-animate>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16" data-animate>
+        <span class="inline-block px-4 py-2 bg-white dark:bg-white/10 text-primary-600 dark:text-white rounded-full text-sm font-semibold mb-6 shadow-lg backdrop-blur-sm">
+          💬 Depoimentos
+        </span>
+        <h2 class="text-5xl md:text-6xl font-playfair font-bold text-gray-900 dark:text-white mb-6">
+          O Que Dizem Nossos <span class="text-gradient">Clientes</span>
+        </h2>
+        <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Milhares de clientes satisfeitos já encontraram o imóvel dos seus sonhos conosco
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8" data-animate>
+        <!-- Testimonial 1 -->
+        <div class="card-luxury p-8">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          </div>
+          <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">"Encontrei a casa perfeita para a minha família! O processo foi rápido e transparente. Recomendo 100%!"</p>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-gradient-luxury rounded-full flex items-center justify-center text-white font-bold">
+              MC
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900 dark:text-white">Maria Costa</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Lisboa</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="card-luxury p-8">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          </div>
+          <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">"Excelente plataforma! O sistema de propostas facilitou muito a negociação. Profissionalismo nota 10!"</p>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-gradient-luxury rounded-full flex items-center justify-center text-white font-bold">
+              JS
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900 dark:text-white">João Silva</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Porto</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="card-luxury p-8">
+          <div class="flex items-center gap-1 mb-4">
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          </div>
+          <p class="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">"Atendimento impecável e imóveis de qualidade. Realizei meu sonho graças à DreamLuso!"</p>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-gradient-luxury rounded-full flex items-center justify-center text-white font-bold">
+              AS
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900 dark:text-white">Ana Santos</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Braga</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Section -->
-  <section class="py-20 bg-gradient-to-r from-primary-600 to-primary-800 text-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 class="text-4xl font-bold mb-6">Pronto para Encontrar a Sua Casa?</h2>
-      <p class="text-xl mb-8 text-white/90">
-        Junte-se a milhares de clientes satisfeitos que encontraram o imóvel perfeito com a DreamLuso
+  <section class="relative py-32 overflow-hidden">
+    <!-- Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600"></div>
+    
+    <!-- Pattern Overlay -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    </div>
+
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
+    </div>
+
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="mb-8">
+        <span class="inline-block px-5 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full text-sm font-semibold mb-8">
+          ✨ Comece Hoje Mesmo
+        </span>
+      </div>
+
+      <h2 class="text-5xl md:text-6xl font-playfair font-bold text-white mb-8 leading-tight">
+        Pronto para Encontrar <br class="hidden md:block"/>
+        a Sua <span class="inline-block px-4 bg-white/20 rounded-lg">Casa Perfeita</span>?
+      </h2>
+      
+      <p class="text-xl md:text-2xl mb-12 text-white/90 max-w-3xl mx-auto font-light">
+        Junte-se a milhares de clientes satisfeitos que realizaram o sonho da casa própria com a DreamLuso
       </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <button (click)="navigateToProperties()" class="px-8 py-4 bg-white text-primary-600 font-semibold rounded-xl hover:bg-gray-100 transition-all">
-          Explorar Imóveis
+
+      <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+        <button (click)="navigateToProperties()" class="group px-10 py-5 bg-white text-primary-600 font-bold rounded-2xl hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 shadow-2xl text-lg">
+          <span class="flex items-center gap-3">
+            Explorar Imóveis
+            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </span>
         </button>
-        <button (click)="router.navigate(['/register'])" class="px-8 py-4 bg-primary-700 hover:bg-primary-900 text-white font-semibold rounded-xl border-2 border-white/20 transition-all">
-          Criar Conta Grátis
+        
+        <button (click)="router.navigate(['/register'])" class="group px-10 py-5 bg-transparent hover:bg-white/10 text-white font-bold rounded-2xl border-2 border-white/40 hover:border-white transition-all duration-300 transform hover:scale-105 text-lg">
+          <span class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Criar Conta Grátis
+          </span>
         </button>
+      </div>
+
+      <!-- Trust Indicators -->
+      <div class="mt-16 flex flex-wrap justify-center items-center gap-12 text-white/80">
+        <div class="flex items-center gap-2">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+          </svg>
+          <span class="font-medium">100% Seguro</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+          </svg>
+          <span class="font-medium">Sem Custos Ocultos</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+          </svg>
+          <span class="font-medium">Suporte 24/7</span>
+        </div>
       </div>
     </div>
   </section>

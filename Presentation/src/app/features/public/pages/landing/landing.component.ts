@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -15,18 +15,65 @@ import { FooterComponent } from '../../../../shared/components/footer/footer.com
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss'
 })
-export class LandingComponent implements OnInit {
+export class LandingComponent implements OnInit, OnDestroy {
   searchCity: string = '';
   featuredProperties: Property[] = [];
   loading: boolean = false;
+  scrollY: number = 0;
 
   constructor(
     private propertyService: PropertyService,
     public router: Router
   ) {}
 
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.scrollY = window.scrollY;
+    this.handleScrollAnimations();
+  }
+
   ngOnInit(): void {
     this.loadFeaturedProperties();
+    this.initScrollAnimations();
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup if needed
+  }
+
+  private initScrollAnimations(): void {
+    // Intersection Observer for fade-in animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-in-up');
+          entry.target.classList.remove('opacity-0');
+        }
+      });
+    }, observerOptions);
+
+    // Observe elements with data-animate attribute
+    setTimeout(() => {
+      const animateElements = document.querySelectorAll('[data-animate]');
+      animateElements.forEach(el => {
+        el.classList.add('opacity-0');
+        observer.observe(el);
+      });
+    }, 100);
+  }
+
+  private handleScrollAnimations(): void {
+    // Parallax effect for hero section elements
+    const heroElements = document.querySelectorAll('.parallax-slow');
+    heroElements.forEach((el: any) => {
+      const speed = 0.5;
+      el.style.transform = `translateY(${this.scrollY * speed}px)`;
+    });
   }
 
   loadFeaturedProperties(): void {

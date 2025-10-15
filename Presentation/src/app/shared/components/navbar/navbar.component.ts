@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { User, UserRole } from '../../../core/models/user.model';
 import { Notification } from '../../../core/models/notification.model';
 
@@ -22,6 +23,7 @@ export class NavbarComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
+    public themeService: ThemeService,
     private router: Router
   ) {}
 
