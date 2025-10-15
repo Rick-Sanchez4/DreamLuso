@@ -1,0 +1,197 @@
+<div class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Meus Imóveis</h1>
+          <p class="text-gray-600 mt-1">Gerir e acompanhar todos os seus imóveis</p>
+        </div>
+        <div class="flex gap-3">
+          <button routerLink="/agent/dashboard" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+            ← Dashboard
+          </button>
+          <button routerLink="/agent/properties/new" class="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+            + Adicionar Imóvel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <!-- Search -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pesquisar</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onFilterChange()"
+            placeholder="Título ou Cidade..."
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+          <select 
+            [(ngModel)]="statusFilter"
+            (change)="onFilterChange()"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option value="all">Todos</option>
+            <option value="Available">Disponível</option>
+            <option value="Reserved">Reservado</option>
+            <option value="Sold">Vendido</option>
+            <option value="Rented">Arrendado</option>
+            <option value="Inactive">Inativo</option>
+          </select>
+        </div>
+
+        <!-- Type Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Negócio</label>
+          <select 
+            [(ngModel)]="typeFilter"
+            (change)="onFilterChange()"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option value="all">Todos</option>
+            <option value="Sale">Venda</option>
+            <option value="Rent">Arrendamento</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties List -->
+    @if (loading) {
+      <div class="bg-white rounded-xl shadow-md p-12 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mx-auto"></div>
+        <p class="text-gray-600 mt-4">A carregar imóveis...</p>
+      </div>
+    } @else if (filteredProperties.length === 0) {
+      <div class="bg-white rounded-xl shadow-md p-12 text-center">
+        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum imóvel encontrado</h3>
+        <p class="text-gray-600 mb-4">
+          @if (searchTerm || statusFilter !== 'all' || typeFilter !== 'all') {
+            Tente ajustar os filtros de pesquisa
+          } @else {
+            Comece adicionando o seu primeiro imóvel
+          }
+        </p>
+        <button routerLink="/agent/properties/new" class="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+          Adicionar Imóvel
+        </button>
+      </div>
+    } @else {
+      <div class="space-y-4">
+        @for (property of filteredProperties; track property.id) {
+          <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+            <div class="flex flex-col md:flex-row">
+              
+              <!-- Property Image -->
+              <div class="md:w-64 h-48 md:h-auto bg-gray-200 flex-shrink-0">
+                @if (property.images && property.images.length > 0) {
+                  <img 
+                    [src]="property.images[0].url" 
+                    [alt]="property.title"
+                    class="w-full h-full object-cover">
+                } @else {
+                  <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                  </div>
+                }
+              </div>
+
+              <!-- Property Info -->
+              <div class="flex-1 p-6">
+                <div class="flex items-start justify-between mb-3">
+                  <div class="flex-1">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ property.title }}</h3>
+                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                      <span>{{ property.address.city }}, {{ property.address.district }}</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-end gap-2">
+                    <span [class]="getStatusBadgeClass(property.status)">
+                      {{ property.status }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                      {{ getTransactionTypeLabel(property.transactionType) }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Property Features -->
+                <div class="flex items-center gap-6 text-sm text-gray-600 mb-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span>{{ property.bedrooms }} quartos</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>{{ property.bathrooms }} WC</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
+                    <span>{{ property.area }}m²</span>
+                  </div>
+                </div>
+
+                <!-- Price & Actions -->
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                  <div>
+                    <p class="text-2xl font-bold text-primary-600">
+                      €{{ property.price.toLocaleString('pt-PT') }}
+                    </p>
+                    @if (property.transactionType === 'Rent') {
+                      <p class="text-xs text-gray-500">por mês</p>
+                    }
+                  </div>
+                  <div class="flex gap-2">
+                    <button 
+                      [routerLink]="['/property', property.id]"
+                      class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors">
+                      Ver no Site
+                    </button>
+                    <button 
+                      [routerLink]="['/agent/properties/edit', property.id]"
+                      class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+                      Editar
+                    </button>
+                    <button 
+                      (click)="deleteProperty(property.id, property.title)"
+                      class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors">
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
