@@ -21,7 +21,6 @@ public static class DependencyInjection
         
         // Add behaviors
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>));
         
         // Add File Upload Service
         var uploadPath = Path.Combine(environment.WebRootPath ?? environment.ContentRootPath, "uploads");
@@ -33,6 +32,13 @@ public static class DependencyInjection
                 baseUrl
             ));
         
+        // Add Email Service
+        services.AddScoped<IEmailService, EmailService>();
+        
+        // Add PDF Generation Service
+        services.AddScoped<IPdfGenerationService, PdfGenerationService>();
+        
         return services;
     }
 }
+

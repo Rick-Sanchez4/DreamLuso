@@ -14,7 +14,7 @@ internal class UnitOfWork : IUnitOfWork
     private IDbContextTransaction? _transaction;
     private bool _disposed;
 
-    // Repositories
+    // Existing Repositories
     public IUserRepository UserRepository { get; }
     public IClientRepository ClientRepository { get; }
     public IRealEstateAgentRepository RealEstateAgentRepository { get; }
@@ -22,6 +22,11 @@ internal class UnitOfWork : IUnitOfWork
     public IPropertyImageRepository PropertyImageRepository { get; }
     public IPropertyVisitRepository PropertyVisitRepository { get; }
     public IContractRepository ContractRepository { get; }
+    
+    // New Repositories
+    public INotificationRepository NotificationRepository { get; }
+    public IPropertyProposalRepository PropertyProposalRepository { get; }
+    public ICommentRepository CommentRepository { get; }
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -31,7 +36,10 @@ internal class UnitOfWork : IUnitOfWork
         IPropertyRepository propertyRepository,
         IPropertyImageRepository propertyImageRepository,
         IPropertyVisitRepository propertyVisitRepository,
-        IContractRepository contractRepository)
+        IContractRepository contractRepository,
+        INotificationRepository notificationRepository,
+        IPropertyProposalRepository propertyProposalRepository,
+        ICommentRepository commentRepository)
     {
         _context = context;
         UserRepository = userRepository;
@@ -41,97 +49,34 @@ internal class UnitOfWork : IUnitOfWork
         PropertyImageRepository = propertyImageRepository;
         PropertyVisitRepository = propertyVisitRepository;
         ContractRepository = contractRepository;
+        NotificationRepository = notificationRepository;
+        PropertyProposalRepository = propertyProposalRepository;
+        CommentRepository = commentRepository;
     }
 
-    public bool Commit()
+    public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
     {
-        return _context.SaveChanges() > 0;
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> CommitAsync(CancellationToken cancellationToken = default)
+    public async Task RollbackAsync()
     {
-        return await _context.SaveChangesAsync(cancellationToken) > 0;
-    }
-
-    public async Task<DbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-        return _transaction.GetDbTransaction();
-    }
-
-    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        if (_transaction != null)
+        await Task.Run(() =>
         {
-            await _transaction.RollbackAsync(cancellationToken);
-            await _transaction.DisposeAsync();
-            _transaction = null;
-        }
-    }
-
-    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await _context.SaveChangesAsync(cancellationToken);
-            
-            if (_transaction != null)
+            foreach (var entry in _context.ChangeTracker.Entries())
             {
-                await _transaction.CommitAsync(cancellationToken);
-            }
-        }
-        catch
-        {
-            await RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
-        finally
-        {
-            if (_transaction != null)
-            {
-                await _transaction.DisposeAsync();
-                _transaction = null;
-            }
-        }
-    }
-
-    public bool HasChanges()
-    {
-        return _context.ChangeTracker.HasChanges();
-    }
-
-    public IEnumerable<string> DebugChanges()
-    {
-        var changes = new StringBuilder();
-        foreach (var entry in _context.ChangeTracker.Entries())
-        {
-            if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.State == EntityState.Deleted)
-            {
-                changes.AppendLine($"Entity: {entry.Entity.GetType().Name}");
-                changes.AppendLine($"State: {entry.State}");
-
-                foreach (var property in entry.OriginalValues.Properties)
+                switch (entry.State)
                 {
-                    var originalValue = entry.OriginalValues[property]?.ToString();
-                    var currentValue = entry.CurrentValues[property]?.ToString();
-
-                    if (entry.State == EntityState.Added)
-                    {
-                        changes.AppendLine($"Property: {property.Name} | New Value: {currentValue}");
-                    }
-                    else if (entry.State == EntityState.Deleted)
-                    {
-                        changes.AppendLine($"Property: {property.Name} | Original Value: {originalValue}");
-                    }
-                    else if (entry.State == EntityState.Modified && originalValue != currentValue)
-                    {
-                        changes.AppendLine($"Property: {property.Name} | Original Value: {originalValue} | Current Value: {currentValue}");
-                    }
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+                    case EntityState.Modified:
+                    case EntityState.Deleted:
+                        entry.Reload();
+                        break;
                 }
-                changes.AppendLine();
             }
-        }
-        return changes.ToString().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        });
     }
 
     protected virtual void Dispose(bool disposing)
@@ -153,4 +98,3 @@ internal class UnitOfWork : IUnitOfWork
         GC.SuppressFinalize(this);
     }
 }
-

@@ -5,6 +5,7 @@ namespace DreamLuso.Data.Context;
 
 public class ApplicationDbContext : DbContext
 {
+    // Existing DbSets
     public DbSet<User> Users { get; set; }
     public DbSet<Client> Clients { get; set; }
     public DbSet<RealEstateAgent> RealEstateAgents { get; set; }
@@ -12,6 +13,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<PropertyImage> PropertyImages { get; set; }
     public DbSet<PropertyVisit> PropertyVisits { get; set; }
     public DbSet<Contract> Contracts { get; set; }
+    
+    // New DbSets
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<PropertyProposal> PropertyProposals { get; set; }
+    public DbSet<ProposalNegotiation> ProposalNegotiations { get; set; }
+    public DbSet<Comment> Comments { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)

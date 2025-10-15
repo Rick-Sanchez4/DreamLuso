@@ -18,6 +18,11 @@ public static class RegisterAllEndpoints
         
         // Dashboard
         routes.RegisterDashboardEndpoints();
+        
+        // New Features
+        routes.RegisterNotificationEndpoints();
+        routes.RegisterPropertyProposalEndpoints();
+        routes.RegisterCommentEndpoints();
     }
 }
 

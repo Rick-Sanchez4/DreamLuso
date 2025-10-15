@@ -44,6 +44,9 @@ public static class DependencyInjection
         services.AddScoped<IPropertyImageRepository, PropertyImageRepository>();
         services.AddScoped<IPropertyVisitRepository, PropertyVisitRepository>();
         services.AddScoped<IContractRepository, ContractRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IPropertyProposalRepository, PropertyProposalRepository>();
+        services.AddScoped<ICommentRepository, CommentRepository>();
 
         // Register Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
