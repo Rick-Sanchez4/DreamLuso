@@ -22,7 +22,7 @@ export class LandingComponent implements OnInit {
 
   constructor(
     private propertyService: PropertyService,
-    private router: Router
+    public router: Router
   ) {}
 
   ngOnInit(): void {

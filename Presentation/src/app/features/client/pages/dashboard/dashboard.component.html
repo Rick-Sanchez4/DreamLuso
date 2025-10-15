@@ -1,0 +1,198 @@
+<div class="min-h-screen bg-gray-50">
+  
+  <!-- Header -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">
+            Olá, {{ currentUser?.firstName }}! 👋
+          </h1>
+          <p class="text-gray-600 mt-1">Bem-vindo ao seu painel de cliente</p>
+        </div>
+        <button routerLink="/" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+          ← Voltar ao site
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      
+      <!-- Total Proposals -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Minhas Propostas</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalProposals }}</p>
+          </div>
+          <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Proposals -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Pendentes</p>
+            <p class="text-3xl font-bold text-yellow-600 mt-2">{{ stats.pendingProposals }}</p>
+          </div>
+          <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Approved Proposals -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Aprovadas</p>
+            <p class="text-3xl font-bold text-green-600 mt-2">{{ stats.approvedProposals }}</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" routerLink="/client/notifications">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600">Notificações</p>
+            <p class="text-3xl font-bold text-blue-600 mt-2">{{ unreadNotifications }}</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <button routerLink="/properties" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+            <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900">Procurar Imóveis</h3>
+            <p class="text-sm text-gray-600">Encontre a casa perfeita</p>
+          </div>
+        </div>
+      </button>
+
+      <button routerLink="/client/proposals" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
+            <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900">Minhas Propostas</h3>
+            <p class="text-sm text-gray-600">Ver estado das propostas</p>
+          </div>
+        </div>
+      </button>
+
+      <button routerLink="/client/visits" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+            <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900">Visitas Agendadas</h3>
+            <p class="text-sm text-gray-600">Gerir as minhas visitas</p>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Recent Proposals -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold text-gray-900">Propostas Recentes</h2>
+        <a routerLink="/client/proposals" class="text-primary-600 hover:text-primary-700 font-medium">
+          Ver todas →
+        </a>
+      </div>
+
+      @if (loading) {
+        <div class="flex justify-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+        </div>
+      } @else if (myProposals.length === 0) {
+        <div class="text-center py-12">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <p class="text-gray-600 mb-4">Ainda não fez nenhuma proposta</p>
+          <button routerLink="/properties" class="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+            Procurar Imóveis
+          </button>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Imóvel</th>
+                <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Valor Proposto</th>
+                <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Estado</th>
+                <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Data</th>
+                <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (proposal of myProposals; track proposal.id) {
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <td class="py-4 px-4">
+                    <p class="font-medium text-gray-900">{{ proposal.propertyTitle }}</p>
+                    <p class="text-sm text-gray-500">{{ proposal.proposalNumber }}</p>
+                  </td>
+                  <td class="py-4 px-4">
+                    <p class="font-semibold text-gray-900">€{{ proposal.proposedValue.toLocaleString('pt-PT') }}</p>
+                  </td>
+                  <td class="py-4 px-4">
+                    <span [class]="getStatusBadgeClass(proposal.status)">
+                      {{ proposal.status }}
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-gray-600">
+                    {{ proposal.createdAt | date: 'dd/MM/yyyy' }}
+                  </td>
+                  <td class="py-4 px-4">
+                    <button [routerLink]="['/client/proposals', proposal.id]" class="text-primary-600 hover:text-primary-700 font-medium">
+                      Ver Detalhes →
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+

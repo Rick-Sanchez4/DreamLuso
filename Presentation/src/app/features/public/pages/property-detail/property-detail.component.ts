@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PropertyService } from '../../../../core/services/property.service';
@@ -18,7 +18,7 @@ import { CurrencyPtPipe } from '../../../../shared/pipes/currency-pt.pipe';
 @Component({
   selector: 'app-property-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent, FooterComponent, RatingStarsComponent, CurrencyPtPipe],
+  imports: [CommonModule, DatePipe, FormsModule, RouterModule, NavbarComponent, FooterComponent, RatingStarsComponent, CurrencyPtPipe],
   templateUrl: './property-detail.component.html',
   styleUrl: './property-detail.component.scss'
 })

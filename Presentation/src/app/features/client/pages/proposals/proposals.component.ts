@@ -1,0 +1,106 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ProposalService } from '../../../../core/services/proposal.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { PropertyProposal } from '../../../../core/models/proposal.model';
+import { User } from '../../../../core/models/user.model';
+
+@Component({
+  selector: 'app-client-proposals',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
+  templateUrl: './proposals.component.html',
+  styleUrl: './proposals.component.scss'
+})
+export class ClientProposalsComponent implements OnInit {
+  currentUser: User | null = null;
+  proposals: PropertyProposal[] = [];
+  filteredProposals: PropertyProposal[] = [];
+  loading: boolean = true;
+  
+  // Filters
+  statusFilter: string = 'all';
+  typeFilter: string = 'all';
+  searchTerm: string = '';
+
+  constructor(
+    private proposalService: ProposalService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.currentUser = this.authService.getCurrentUser();
+    if (this.currentUser) {
+      this.loadProposals();
+    }
+  }
+
+  loadProposals(): void {
+    this.loading = true;
+    this.proposalService.getByClient(this.currentUser!.id).subscribe(result => {
+      if (result.isSuccess && result.value) {
+        this.proposals = result.value;
+        this.applyFilters();
+      }
+      this.loading = false;
+    });
+  }
+
+  applyFilters(): void {
+    this.filteredProposals = this.proposals.filter(p => {
+      const matchesStatus = this.statusFilter === 'all' || p.status === this.statusFilter;
+      const matchesType = this.typeFilter === 'all' || p.type === this.typeFilter;
+      const matchesSearch = !this.searchTerm || 
+        p.propertyTitle?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        p.proposalNumber.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      return matchesStatus && matchesType && matchesSearch;
+    });
+  }
+
+  onFilterChange(): void {
+    this.applyFilters();
+  }
+
+  getStatusBadgeClass(status: string): string {
+    const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold';
+    switch (status) {
+      case 'Pending':
+        return `${baseClass} bg-yellow-100 text-yellow-800`;
+      case 'UnderAnalysis':
+        return `${baseClass} bg-blue-100 text-blue-800`;
+      case 'InNegotiation':
+        return `${baseClass} bg-purple-100 text-purple-800`;
+      case 'Approved':
+        return `${baseClass} bg-green-100 text-green-800`;
+      case 'Rejected':
+        return `${baseClass} bg-red-100 text-red-800`;
+      case 'Withdrawn':
+        return `${baseClass} bg-gray-100 text-gray-800`;
+      default:
+        return `${baseClass} bg-gray-100 text-gray-800`;
+    }
+  }
+
+  getTypeBadgeClass(type: string): string {
+    return type === 'Purchase' 
+      ? 'px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800'
+      : 'px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800';
+  }
+
+  getStatusIcon(status: string): string {
+    switch (status) {
+      case 'Pending':
+        return 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z';
+      case 'Approved':
+        return 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
+      case 'Rejected':
+        return 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z';
+      default:
+        return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+    }
+  }
+}
+
