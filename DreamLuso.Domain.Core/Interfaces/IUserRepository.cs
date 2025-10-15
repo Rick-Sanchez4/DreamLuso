@@ -9,5 +9,6 @@ public interface IUserRepository : IRepository<User>
     Task<User?> GetByRefreshTokenAsync(string refreshToken);
     Task<bool> EmailExistsAsync(string email);
     Task<IEnumerable<User>> GetByRoleAsync(UserRole role);
+    Task<IEnumerable<User>> GetActiveUsersAsync();
     Task<User> UpdateAsync(User user);
 }

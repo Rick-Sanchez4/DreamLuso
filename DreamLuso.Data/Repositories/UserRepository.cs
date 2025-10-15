@@ -20,12 +20,25 @@ public class UserRepository : Repository<User>, IUserRepository
         return user;
     }
 
+    public override async Task<User?> GetByIdAsync(Guid id)
+    {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
+        return await _dbSet
+            .Include(u => u.Client)
+            .Include(u => u.RealEstateAgent)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
+
     public async Task<User?> GetByEmailAsync(string email)
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email cannot be null or empty", nameof(email));
 
         return await _dbSet
+            .Include(u => u.Client)
+            .Include(u => u.RealEstateAgent)
             .FirstOrDefaultAsync(u => u.Email == email.ToLower());
     }
 
@@ -35,6 +48,8 @@ public class UserRepository : Repository<User>, IUserRepository
             throw new ArgumentException("Refresh token cannot be null or empty", nameof(refreshToken));
 
         return await _dbSet
+            .Include(u => u.Client)
+            .Include(u => u.RealEstateAgent)
             .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
     }
 
@@ -49,7 +64,18 @@ public class UserRepository : Repository<User>, IUserRepository
     public async Task<IEnumerable<User>> GetByRoleAsync(UserRole role)
     {
         return await _dbSet
+            .Include(u => u.Client)
+            .Include(u => u.RealEstateAgent)
             .Where(u => u.Role == role)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<User>> GetActiveUsersAsync()
+    {
+        return await _dbSet
+            .Include(u => u.Client)
+            .Include(u => u.RealEstateAgent)
+            .Where(u => u.IsActive)
             .ToListAsync();
     }
 

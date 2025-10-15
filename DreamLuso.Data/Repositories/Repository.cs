@@ -89,5 +89,36 @@ public abstract class Repository<T> : IRepository<T> where T : class
             ? await _dbSet.CountAsync()
             : await _dbSet.CountAsync(predicate);
     }
+
+    // Método para paginação
+    public virtual async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<T, bool>>? filter = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
+    {
+        if (pageNumber < 1)
+            throw new ArgumentException("Page number must be greater than 0", nameof(pageNumber));
+
+        if (pageSize < 1)
+            throw new ArgumentException("Page size must be greater than 0", nameof(pageSize));
+
+        IQueryable<T> query = _dbSet;
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        var totalCount = await query.CountAsync();
+
+        if (orderBy != null)
+            query = orderBy(query);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
 }
 
