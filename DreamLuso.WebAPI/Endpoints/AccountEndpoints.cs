@@ -1,10 +1,15 @@
 using DreamLuso.Application.CQ.Accounts.Commands.RegisterUser;
 using DreamLuso.Application.CQ.Accounts.Commands.LoginUser;
 using DreamLuso.Application.CQ.Accounts.Commands.RefreshToken;
+using DreamLuso.Application.CQ.Accounts.Commands.ChangePassword;
+using DreamLuso.Application.CQ.Accounts.Commands.UpdateUserProfile;
+using DreamLuso.Application.CQ.Accounts.Commands.UploadProfileImage;
+using DreamLuso.Application.CQ.Accounts.Queries.GetUserProfile;
 using DreamLuso.Application.Common.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DreamLuso.WebAPI.Endpoints;
 
@@ -31,6 +36,27 @@ public static class AccountEndpoints
                 .WithName("RefreshToken")
                 .Produces<RefreshTokenResponse>(200)
                 .Produces<Error>(400);
+
+        // GET /api/accounts/profile/{userId} - Obter perfil do utilizador
+        accounts.MapGet("/profile/{userId:guid}", Commands.GetUserProfile)
+                .WithName("GetUserProfile")
+                .Produces<UserProfileResponse>(200)
+                .Produces<Error>(404)
+                .RequireAuthorization();
+
+        // PUT /api/accounts/profile - Atualizar perfil do utilizador
+        accounts.MapPut("/profile", Commands.UpdateUserProfile)
+                .WithName("UpdateUserProfile")
+                .Produces<object>(200)
+                .Produces<Error>(400)
+                .RequireAuthorization();
+
+        // POST /api/accounts/change-password - Alterar senha
+        accounts.MapPost("/change-password", Commands.ChangePassword)
+                .WithName("ChangePassword")
+                .Produces<object>(200)
+                .Produces<Error>(400)
+                .RequireAuthorization();
     }
 
     private static class Commands
@@ -68,6 +94,46 @@ public static class AccountEndpoints
 
             return result.IsSuccess
                 ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        [Authorize]
+        public static async Task<Results<Ok<UserProfileResponse>, NotFound<Error>>> GetUserProfile(
+            [FromServices] ISender sender,
+            [FromRoute] Guid userId,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new GetUserProfileQuery(userId);
+            var result = await sender.Send(query, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.NotFound(result.Error!);
+        }
+
+        [Authorize]
+        public static async Task<Results<Ok<object>, BadRequest<Error>>> UpdateUserProfile(
+            [FromServices] ISender sender,
+            [FromBody] UpdateUserProfileCommand command,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(new { message = "Perfil atualizado com sucesso" } as object)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        [Authorize]
+        public static async Task<Results<Ok<object>, BadRequest<Error>>> ChangePassword(
+            [FromServices] ISender sender,
+            [FromBody] ChangePasswordCommand command,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(new { message = "Senha alterada com sucesso" } as object)
                 : TypedResults.BadRequest(result.Error!);
         }
     }
