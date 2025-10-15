@@ -4,6 +4,8 @@ export interface User {
   firstName: string;
   lastName: string;
   phone?: string;
+  phoneNumber?: string;
+  address?: string;
   role: UserRole;
   profileImageUrl?: string;
   isActive: boolean;
@@ -13,6 +15,13 @@ export enum UserRole {
   Admin = 'Admin',
   RealEstateAgent = 'RealEstateAgent',
   Client = 'Client'
+}
+
+export interface UpdateProfileRequest {
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+  address?: string;
 }
 
 export interface LoginRequest {
