@@ -6,20 +6,8 @@ import { LoadingService } from '../../../core/services/loading.service';
   selector: 'app-loading-spinner',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    @if (loadingService.loading$ | async) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div class="relative">
-          <div class="w-16 h-16 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <svg class="w-8 h-8 text-primary-500" fill="none" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    }
-  `
+  templateUrl: './loading-spinner.component.html',
+  styleUrl: './loading-spinner.component.scss'
 })
 export class LoadingSpinnerComponent {
   constructor(public loadingService: LoadingService) {}
