@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { PropertyService } from '../../../../core/services/property.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Property } from '../../../../core/models/property.model';
+import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
 
 @Component({
   selector: 'app-admin-properties',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AdminSidebarComponent],
   templateUrl: './properties.component.html',
   styleUrl: './properties.component.scss'
 })
@@ -95,6 +96,10 @@ export class AdminPropertiesComponent implements OnInit {
 
   getTransactionTypeLabel(type: string): string {
     return type === 'Sale' ? 'Venda' : 'Arrendamento';
+  }
+
+  getApprovedPropertiesCount(): number {
+    return this.properties.filter(p => p.status === 'Available').length;
   }
 
   getAvailableCount(): number {

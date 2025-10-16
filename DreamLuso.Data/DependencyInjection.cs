@@ -24,11 +24,7 @@ public static class DependencyInjection
             
             options.UseSqlServer(connectionString, sqlOptions =>
             {
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
-                sqlOptions.CommandTimeout(180);
+                sqlOptions.CommandTimeout(30);
             });
             
             // Add interceptor

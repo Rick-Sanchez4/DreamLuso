@@ -36,6 +36,9 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
         _passwordHasher.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
         // Create user
+        // RealEstateAgents require admin approval, so they start as inactive
+        var isActive = request.Role != UserRole.RealEstateAgent;
+        
         var user = new User
         {
             Name = new Name(request.FirstName, request.LastName),
@@ -44,7 +47,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
             PasswordSalt = passwordSalt,
             Phone = request.Phone,
             Role = request.Role,
-            IsActive = true
+            IsActive = isActive
         };
 
         // Save user

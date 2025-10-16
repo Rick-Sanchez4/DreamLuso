@@ -30,7 +30,7 @@
             <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalProperties }}</p>
           </div>
           <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-            <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
           </div>
@@ -88,7 +88,7 @@
       <button routerLink="/agent/properties/new" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
         <div class="flex items-center gap-4">
           <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-            <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
           </div>
@@ -132,14 +132,14 @@
     <div class="bg-white rounded-xl shadow-md p-6 mb-6">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-semibold text-gray-900">Imóveis Recentes</h2>
-        <a routerLink="/agent/properties" class="text-primary-600 hover:text-primary-700 font-medium">
+        <a routerLink="/agent/properties" class="text-green-600 hover:text-primary-700 font-medium">
           Ver todos →
         </a>
       </div>
 
       @if (loading) {
         <div class="flex justify-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent"></div>
         </div>
       } @else if (myProperties.length === 0) {
         <div class="text-center py-12">
@@ -147,7 +147,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
           </svg>
           <p class="text-gray-600 mb-4">Ainda não tem imóveis cadastrados</p>
-          <button routerLink="/agent/properties/new" class="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+          <button routerLink="/agent/properties/new" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
             Adicionar Primeiro Imóvel
           </button>
         </div>
@@ -162,7 +162,7 @@
                 </span>
               </div>
               <p class="text-sm text-gray-600 mb-2">{{ property.address.city }}</p>
-              <p class="text-xl font-bold text-primary-600 mb-3">
+              <p class="text-xl font-bold text-green-600 mb-3">
                 €{{ property.price.toLocaleString('pt-PT') }}
               </p>
               <button [routerLink]="['/agent/properties', property.id]" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors">
@@ -178,7 +178,7 @@
     <div class="bg-white rounded-xl shadow-md p-6">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-semibold text-gray-900">Propostas Recentes</h2>
-        <a routerLink="/agent/proposals" class="text-primary-600 hover:text-primary-700 font-medium">
+        <a routerLink="/agent/proposals" class="text-green-600 hover:text-primary-700 font-medium">
           Ver todas →
         </a>
       </div>
@@ -199,7 +199,7 @@
                 <span [class]="getStatusBadgeClass(proposal.status)">
                   {{ proposal.status }}
                 </span>
-                <button [routerLink]="['/agent/proposals', proposal.id]" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+                <button [routerLink]="['/agent/proposals', proposal.id]" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
                   Ver
                 </button>
               </div>

@@ -1,0 +1,244 @@
+<app-admin-sidebar></app-admin-sidebar>
+
+<div class="ml-72 min-h-screen transition-all duration-300 bg-gradient-to-br from-gray-50 via-white to-green-50/20 dark:from-dark-950 dark:via-dark-900 dark:to-green-950">
+  
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-green-800 via-teal-800 to-emerald-800 text-white shadow-xl sticky top-0 z-40">
+    <div class="px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs font-semibold mb-2">
+            🏢 Gestão de Agentes
+          </div>
+          <h1 class="text-3xl font-bold mb-1">Agentes Imobiliários</h1>
+          <p class="text-white/70 text-sm">Gerir todos os agentes da plataforma</p>
+        </div>
+        <div class="text-right">
+          <p class="text-sm font-semibold">Total: {{ agents.length }}</p>
+          <p class="text-xs text-white/60">{{ filteredAgents.length }} exibidos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-8 py-8">
+    
+    <!-- Tabs + Search -->
+    <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 mb-6 border border-gray-100 dark:border-white/10">
+      <!-- Tabs -->
+      <div class="flex gap-3 mb-6">
+        <button 
+          (click)="toggleView(true)"
+          [class]="showPending 
+            ? 'px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-full shadow-lg' 
+            : 'px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all'">
+          ⏳ Agentes Pendentes
+          @if (pendingAgents.length > 0) {
+            <span class="ml-2 px-2 py-0.5 bg-white/30 rounded-full text-xs font-bold">{{ pendingAgents.length }}</span>
+          }
+        </button>
+        <button 
+          (click)="toggleView(false)"
+          [class]="!showPending 
+            ? 'px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold rounded-full shadow-lg' 
+            : 'px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all'">
+          ✅ Agentes Aprovados
+          <span class="ml-2 px-2 py-0.5 bg-white/30 rounded-full text-xs font-bold">{{ agents.length - pendingAgents.length }}</span>
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="flex gap-4">
+        <div class="flex-1">
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">🔍 Pesquisar Agente</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()"
+            placeholder="Nome ou Email..."
+            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">
+        </div>
+      </div>
+    </div>
+
+    <!-- Agents Grid -->
+    @if (loading) {
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-12 text-center border border-gray-100 dark:border-white/10">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent mx-auto"></div>
+        <p class="text-gray-600 dark:text-gray-300 mt-4 font-medium">A carregar agentes...</p>
+      </div>
+    } @else if (filteredAgents.length === 0) {
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-12 text-center border border-gray-100 dark:border-white/10">
+        <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhum agente encontrado</h3>
+        <p class="text-gray-600 dark:text-gray-400">Tente ajustar a pesquisa</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (agent of filteredAgents; track agent.id) {
+          <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10 hover:shadow-2xl transition-all"
+               [class.border-orange-300]="!agent.isActive"
+               [class.dark:border-orange-700]="!agent.isActive"
+               [class.border-green-300]="agent.isActive"
+               [class.dark:border-green-700]="agent.isActive">
+            
+            <!-- Status Badge -->
+            @if (!agent.isActive) {
+              <div class="mb-4">
+                <span class="px-4 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-xs font-bold">
+                  ⏳ Aguardando Aprovação
+                </span>
+              </div>
+            } @else {
+              <div class="mb-4">
+                <span class="px-4 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-bold">
+                  ✅ Agente Aprovado
+                </span>
+              </div>
+            }
+
+            <!-- Avatar -->
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                {{ agent.name.charAt(0) }}
+              </div>
+              <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ agent.name }}</h3>
+                @if (agent.isActive && agent.rating > 0) {
+                  <div class="flex items-center gap-1 mt-1">
+                    <span class="text-yellow-500">⭐</span>
+                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ agent.rating }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Stats (only for active agents) -->
+            @if (agent.isActive) {
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-3 text-center border border-green-100 dark:border-green-800/30">
+                  <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ agent.properties }}</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Imóveis</p>
+                </div>
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 text-center border border-blue-100 dark:border-blue-800/30">
+                  <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ agent.sales }}</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Vendas</p>
+                </div>
+              </div>
+            }
+
+            <!-- Contact -->
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center gap-2 text-sm">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-gray-600 dark:text-gray-300 text-xs truncate">{{ agent.email }}</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                </svg>
+                <span class="text-gray-600 dark:text-gray-300 text-xs">{{ agent.phone }}</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            @if (!agent.isActive) {
+              <!-- Pending Agent Actions -->
+              <div class="space-y-2">
+                <button 
+                  (click)="viewAgentProfile(agent)"
+                  class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all shadow-md">
+                  👁️ Ver Detalhes
+                </button>
+                <div class="flex gap-2">
+                  <button 
+                    (click)="approveAgent(agent.id)"
+                    class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all shadow-md">
+                    ✅ Aprovar
+                  </button>
+                  <button 
+                    (click)="rejectAgent(agent.id)"
+                    class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-full transition-all shadow-md">
+                    ❌ Rejeitar
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <!-- Active Agent Actions -->
+              <button 
+                (click)="viewAgentProfile(agent)"
+                class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all shadow-md">
+                👤 Ver Perfil Completo
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Stats Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+        <div class="text-center">
+          <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-3">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ agents.length }}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Total Agentes</p>
+        </div>
+      </div>
+
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+        <div class="text-center">
+          <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-3">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
+          </div>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">57</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Total Imóveis</p>
+        </div>
+      </div>
+
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+        <div class="text-center">
+          <div class="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-3">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">42</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Vendas</p>
+        </div>
+      </div>
+
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+        <div class="text-center">
+          <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-3">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+            </svg>
+          </div>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">4.85</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Rating Médio</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Agent Detail Modal -->
+<app-agent-detail-modal 
+  [isOpen]="showAgentModal"
+  [agent]="selectedAgent"
+  (closeModal)="closeAgentModal()"
+  (approveAgent)="approveAgentFromModal($event)"
+  (rejectAgent)="rejectAgentFromModal($event)">
+</app-agent-detail-modal>
+

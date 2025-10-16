@@ -30,7 +30,7 @@
             <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalProposals }}</p>
           </div>
           <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-            <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
           </div>
@@ -88,7 +88,7 @@
       <button routerLink="/properties" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all text-left group">
         <div class="flex items-center gap-4">
           <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-            <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
           </div>
@@ -132,14 +132,14 @@
     <div class="bg-white rounded-xl shadow-md p-6">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-semibold text-gray-900">Propostas Recentes</h2>
-        <a routerLink="/client/proposals" class="text-primary-600 hover:text-primary-700 font-medium">
+        <a routerLink="/client/proposals" class="text-green-600 hover:text-primary-700 font-medium">
           Ver todas →
         </a>
       </div>
 
       @if (loading) {
         <div class="flex justify-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent"></div>
         </div>
       } @else if (myProposals.length === 0) {
         <div class="text-center py-12">
@@ -147,7 +147,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
           </svg>
           <p class="text-gray-600 mb-4">Ainda não fez nenhuma proposta</p>
-          <button routerLink="/properties" class="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors">
+          <button routerLink="/properties" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
             Procurar Imóveis
           </button>
         </div>
@@ -182,7 +182,7 @@
                     {{ proposal.createdAt | date: 'dd/MM/yyyy' }}
                   </td>
                   <td class="py-4 px-4">
-                    <button [routerLink]="['/client/proposals', proposal.id]" class="text-primary-600 hover:text-primary-700 font-medium">
+                    <button [routerLink]="['/client/proposals', proposal.id]" class="text-green-600 hover:text-primary-700 font-medium">
                       Ver Detalhes →
                     </button>
                   </td>

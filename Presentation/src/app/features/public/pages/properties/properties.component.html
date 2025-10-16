@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/20 dark:from-gray-900 dark:via-dark-900 dark:to-primary-950">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50/20 dark:from-dark-950 dark:via-dark-900 dark:to-green-950">
   <app-navbar></app-navbar>
 
   <div class="pt-24 pb-12">
@@ -6,14 +6,14 @@
       
       <!-- Header -->
       <div class="mb-12 animate-fade-in-up">
-        <div class="inline-block px-4 py-2 bg-gradient-luxury text-white rounded-full text-sm font-semibold mb-4">
+        <div class="inline-block px-6 py-2 bg-green-500 text-white rounded-full text-sm font-semibold mb-4 shadow-lg">
           🏘️ Explorar Imóveis
         </div>
-        <h1 class="text-5xl md:text-6xl font-playfair font-bold text-gray-900 dark:text-white mb-3">
-          Descubra o Seu <span class="text-gradient">Imóvel Ideal</span>
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-3">
+          Descubra o Seu <span class="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">Imóvel Ideal</span>
         </h1>
         <p class="text-xl text-gray-600 dark:text-gray-300">
-          <span class="font-bold text-primary-600 dark:text-primary-400">{{ totalProperties }}</span> imóveis disponíveis
+          <span class="font-bold text-green-600 dark:text-green-400">{{ totalProperties }}</span> imóveis disponíveis
         </p>
       </div>
 
@@ -30,7 +30,7 @@
                 [(ngModel)]="filters.city"
                 name="city"
                 placeholder="Ex: Lisboa, Porto..."
-                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-primary-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-green-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
             </div>
 
             <!-- Price Range -->
@@ -41,7 +41,7 @@
                 [(ngModel)]="filters.minPrice"
                 name="minPrice"
                 placeholder="€0"
-                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-primary-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-green-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
             </div>
 
             <div>
@@ -51,7 +51,7 @@
                 [(ngModel)]="filters.maxPrice"
                 name="maxPrice"
                 placeholder="€1.000.000"
-                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-primary-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-green-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
             </div>
 
             <!-- Property Type -->
@@ -60,7 +60,7 @@
               <select
                 [(ngModel)]="filters.propertyType"
                 name="propertyType"
-                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-primary-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-green-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
                 <option [ngValue]="undefined">Todos</option>
                 <option value="Apartment">Apartamento</option>
                 <option value="House">Casa</option>
@@ -76,7 +76,7 @@
               <select
                 [(ngModel)]="filters.minBedrooms"
                 name="minBedrooms"
-                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-primary-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-green-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
                 <option [ngValue]="undefined">Qualquer</option>
                 <option [ngValue]="1">1+</option>
                 <option [ngValue]="2">2+</option>
@@ -91,7 +91,7 @@
               <select
                 [(ngModel)]="filters.transactionType"
                 name="transactionType"
-                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-primary-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-green-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
                 <option [ngValue]="undefined">Todos</option>
                 <option value="Sale">Venda</option>
                 <option value="Rent">Arrendamento</option>
@@ -104,7 +104,7 @@
               <select
                 [(ngModel)]="filters.minBathrooms"
                 name="minBathrooms"
-                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-primary-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                class="w-full px-4 py-3 bg-gradient-to-br from-gray-50 to-green-50/30 dark:from-dark-700 dark:to-dark-800 border-2 border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
                 <option [ngValue]="undefined">Qualquer</option>
                 <option [ngValue]="1">1+</option>
                 <option [ngValue]="2">2+</option>
@@ -116,7 +116,7 @@
             <div class="flex items-end">
               <button
                 type="submit"
-                class="w-full px-6 py-3 bg-gradient-luxury text-white font-bold rounded-xl hover:shadow-glow transition-all duration-300 transform hover:scale-105">
+                class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full transition-all duration-200 shadow-lg">
                 <div class="flex items-center justify-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -133,14 +133,13 @@
       @if (loading) {
         <div class="flex justify-center items-center h-96">
           <div class="relative">
-            <div class="animate-spin rounded-full h-24 w-24 border-4 border-primary-200"></div>
-            <div class="animate-spin rounded-full h-24 w-24 border-4 border-primary-600 border-t-transparent absolute top-0"></div>
+            <div class="animate-spin rounded-full h-24 w-24 border-4 border-green-500 border-t-transparent"></div>
           </div>
         </div>
       } @else if (properties.length === 0) {
         <div class="card-luxury text-center py-24 px-8 border border-gray-100 dark:border-white/10">
-          <div class="w-32 h-32 bg-gradient-to-br from-primary-100 to-purple-100 dark:from-primary-900/50 dark:to-purple-900/50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-16 h-16 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-32 h-32 bg-gradient-to-br from-green-100 to-teal-100 dark:from-green-900/50 dark:to-teal-900/50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-16 h-16 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
           </div>

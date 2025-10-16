@@ -5,6 +5,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { User } from '../../../../core/models/user.model';
+import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
 
 interface AdminStats {
   totalUsers: number;
@@ -21,12 +22,13 @@ interface AdminStats {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AdminSidebarComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class AdminDashboardComponent implements OnInit {
   currentUser: User | null = null;
+  currentDate: Date = new Date();
   loading: boolean = true;
 
   stats: AdminStats = {

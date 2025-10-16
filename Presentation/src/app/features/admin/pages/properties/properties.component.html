@@ -1,44 +1,52 @@
-<div class="min-h-screen bg-gray-50">
+<app-admin-sidebar></app-admin-sidebar>
+
+<div class="ml-72 min-h-screen transition-all duration-300 bg-gradient-to-br from-gray-50 via-white to-green-50/20 dark:from-dark-950 dark:via-dark-900 dark:to-green-950">
   
   <!-- Header -->
-  <div class="bg-white shadow">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="bg-gradient-to-r from-green-800 via-teal-800 to-emerald-800 text-white shadow-xl sticky top-0 z-40">
+    <div class="px-8 py-6">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900">Gestão de Imóveis</h1>
-          <p class="text-gray-600 mt-1">Supervisionar todos os imóveis do sistema</p>
+          <div class="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs font-semibold mb-2">
+            🏠 Gestão de Imóveis
+          </div>
+          <h1 class="text-3xl font-bold mb-1">Imóveis</h1>
+          <p class="text-white/70 text-sm">Supervisionar todos os imóveis do sistema</p>
         </div>
-        <button routerLink="/admin/dashboard" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
-          ← Dashboard
-        </button>
+        <div class="flex items-center gap-4">
+          <div class="text-right">
+            <p class="text-sm font-semibold">Total: {{ properties.length }}</p>
+            <p class="text-xs text-white/60">{{ getApprovedPropertiesCount() }} aprovados</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="px-8 py-8">
     
     <!-- Filters -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 mb-6 border border-gray-100 dark:border-white/10">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         
         <!-- Search -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Pesquisar</label>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">🔍 Pesquisar</label>
           <input 
             type="text" 
             [(ngModel)]="searchTerm"
             (input)="onFilterChange()"
             placeholder="Título ou Cidade..."
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
         </div>
 
         <!-- Status Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">📊 Estado</label>
           <select 
             [(ngModel)]="statusFilter"
             (change)="onFilterChange()"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
             <option value="all">Todos</option>
             <option value="Available">Disponível</option>
             <option value="Reserved">Reservado</option>
@@ -50,11 +58,11 @@
 
         <!-- Type Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">🏢 Tipo</label>
           <select 
             [(ngModel)]="typeFilter"
             (change)="onFilterChange()"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-all">
             <option value="all">Todos</option>
             <option value="Apartment">Apartamento</option>
             <option value="House">Casa</option>
@@ -66,109 +74,194 @@
       </div>
     </div>
 
-    <!-- Properties List -->
+    <!-- Properties Grid/Table -->
     @if (loading) {
-      <div class="bg-white rounded-xl shadow-md p-12 text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mx-auto"></div>
-        <p class="text-gray-600 mt-4">A carregar imóveis...</p>
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-12 text-center border border-gray-100 dark:border-white/10">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent mx-auto"></div>
+        <p class="text-gray-600 dark:text-gray-300 mt-4 font-medium">A carregar imóveis...</p>
       </div>
     } @else if (filteredProperties.length === 0) {
-      <div class="bg-white rounded-xl shadow-md p-12 text-center">
-        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-12 text-center border border-gray-100 dark:border-white/10">
+        <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
         </svg>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum imóvel encontrado</h3>
-        <p class="text-gray-600">Tente ajustar os filtros de pesquisa</p>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhum imóvel encontrado</h3>
+        <p class="text-gray-600 dark:text-gray-400">Tente ajustar os filtros de pesquisa</p>
       </div>
     } @else {
-      <div class="space-y-4">
-        @for (property of filteredProperties; track property.id) {
-          <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-            <div class="flex flex-col md:flex-row">
-              
-              <!-- Property Image -->
-              <div class="md:w-48 h-32 md:h-auto bg-gray-200 flex-shrink-0">
-                @if (property.images && property.images.length > 0) {
-                  <img 
-                    [src]="property.images[0].url" 
-                    [alt]="property.title"
-                    class="w-full h-full object-cover">
-                } @else {
-                  <div class="w-full h-full flex items-center justify-center bg-gray-100">
-                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                  </div>
-                }
-              </div>
+      <!-- Modern Table -->
+      <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-white/10">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gradient-to-r from-gray-50 to-green-50/30 dark:from-dark-900 dark:to-green-950/30 border-b border-gray-200 dark:border-white/10">
+              <tr>
+                <th class="text-left py-4 px-6 text-sm font-bold text-gray-700 dark:text-gray-200">🏠 Imóvel</th>
+                <th class="text-left py-4 px-6 text-sm font-bold text-gray-700 dark:text-gray-200">🏢 Tipo</th>
+                <th class="text-left py-4 px-6 text-sm font-bold text-gray-700 dark:text-gray-200">📍 Localização</th>
+                <th class="text-left py-4 px-6 text-sm font-bold text-gray-700 dark:text-gray-200">📊 Status</th>
+                <th class="text-left py-4 px-6 text-sm font-bold text-gray-700 dark:text-gray-200">💰 Preço</th>
+                <th class="text-left py-4 px-6 text-sm font-bold text-gray-700 dark:text-gray-200">📏 Detalhes</th>
+                <th class="text-left py-4 px-6 text-sm font-bold text-gray-700 dark:text-gray-200">⚡ Ações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+              @for (property of filteredProperties; track property.id) {
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
+                  <!-- Property Info -->
+                  <td class="py-4 px-6">
+                    <div class="flex items-center gap-3">
+                      <div class="w-20 h-16 rounded-xl overflow-hidden shadow-md flex-shrink-0 border-2 border-gray-100 dark:border-white/10">
+                        @if (property.images && property.images.length > 0) {
+                          <img [src]="property.images[0].url" [alt]="property.title" class="w-full h-full object-cover">
+                        } @else {
+                          <div class="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                          </div>
+                        }
+                      </div>
+                      <div class="min-w-0">
+                        <p class="font-bold text-gray-900 dark:text-white truncate">{{ property.title }}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                          <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-full">
+                            {{ property.transactionType === 'Sale' ? '💵 Venda' : '🔑 Arrendamento' }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  
+                  <!-- Type -->
+                  <td class="py-4 px-6">
+                    <span class="text-gray-900 dark:text-white font-semibold">{{ property.propertyType }}</span>
+                  </td>
 
-              <!-- Property Info -->
-              <div class="flex-1 p-5">
-                <div class="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ property.title }}</h3>
-                    <p class="text-sm text-gray-600">{{ property.address.city }}, {{ property.address.district }}</p>
-                  </div>
-                  <div class="flex gap-2">
+                  <!-- Location -->
+                  <td class="py-4 px-6">
+                    <div class="flex items-start gap-2">
+                      <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      </svg>
+                      <div>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ property.address.city }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ property.address.district }}</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Status -->
+                  <td class="py-4 px-6">
                     <span [class]="getStatusBadgeClass(property.status)">
                       {{ property.status }}
                     </span>
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                      {{ getTransactionTypeLabel(property.transactionType) }}
-                    </span>
-                  </div>
-                </div>
+                  </td>
+                  
+                  <!-- Price -->
+                  <td class="py-4 px-6">
+                    <p class="font-bold text-lg text-gray-900 dark:text-white">€{{ property.price.toLocaleString('pt-PT') }}</p>
+                    @if (property.transactionType === 'Rent') {
+                      <p class="text-xs text-gray-500 dark:text-gray-400">/mês</p>
+                    }
+                  </td>
 
-                <!-- Features -->
-                <div class="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                  <span>{{ property.bedrooms }} quartos</span>
-                  <span>•</span>
-                  <span>{{ property.bathrooms }} WC</span>
-                  <span>•</span>
-                  <span>{{ property.area }}m²</span>
-                </div>
+                  <!-- Details -->
+                  <td class="py-4 px-6">
+                    <div class="space-y-1">
+                      <div class="flex items-center gap-1 text-sm">
+                        <span class="font-bold text-gray-900 dark:text-white">{{ property.area }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">m²</span>
+                      </div>
+                      <div class="flex gap-3 text-xs text-gray-600 dark:text-gray-400">
+                        <span class="flex items-center gap-1">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                          </svg>
+                          {{ property.bedrooms }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                          </svg>
+                          {{ property.bathrooms }}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
 
-                <!-- Price & Actions -->
-                <div class="flex items-center justify-between">
-                  <p class="text-2xl font-bold text-primary-600">
-                    €{{ property.price.toLocaleString('pt-PT') }}
-                  </p>
-                  <div class="flex gap-2">
-                    <button 
-                      [routerLink]="['/property', property.id]"
-                      class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors text-sm">
-                      Ver no Site
-                    </button>
-                    <button 
-                      (click)="deleteProperty(property.id, property.title)"
-                      class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors text-sm">
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
+                  <!-- Actions -->
+                  <td class="py-4 px-6">
+                    <div class="flex flex-col gap-2">
+                      <button 
+                        [routerLink]="['/property', property.id]"
+                        class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-bold transition-all shadow-md text-center">
+                        👁️ Ver
+                      </button>
+                      <button class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold transition-all shadow-md text-center">
+                        🗑️ Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Summary Stats -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-        <div class="bg-white rounded-xl shadow-md p-6">
-          <p class="text-sm font-medium text-gray-600 mb-2">Total Exibido</p>
-          <p class="text-2xl font-bold text-gray-900">{{ filteredProperties.length }}</p>
+        <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mb-1">Total Exibido</p>
+              <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ filteredProperties.length }}</p>
+            </div>
+          </div>
         </div>
-        <div class="bg-white rounded-xl shadow-md p-6">
-          <p class="text-sm font-medium text-gray-600 mb-2">Disponíveis</p>
-          <p class="text-2xl font-bold text-green-600">{{ getAvailableCount() }}</p>
+        <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mb-1">Disponíveis</p>
+              <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ getAvailableCount() }}</p>
+            </div>
+          </div>
         </div>
-        <div class="bg-white rounded-xl shadow-md p-6">
-          <p class="text-sm font-medium text-gray-600 mb-2">Reservados</p>
-          <p class="text-2xl font-bold text-yellow-600">{{ getReservedCount() }}</p>
+        <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mb-1">Reservados</p>
+              <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ getReservedCount() }}</p>
+            </div>
+          </div>
         </div>
-        <div class="bg-white rounded-xl shadow-md p-6">
-          <p class="text-sm font-medium text-gray-600 mb-2">Vendidos/Arrendados</p>
-          <p class="text-2xl font-bold text-red-600">{{ getSoldRentedCount() }}</p>
+        <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mb-1">Vendidos</p>
+              <p class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ getSoldRentedCount() }}</p>
+            </div>
+          </div>
         </div>
       </div>
     }

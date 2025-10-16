@@ -3,6 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminDashboardComponent } from './pages/dashboard/dashboard.component';
 import { AdminUsersComponent } from './pages/users/users.component';
 import { AdminPropertiesComponent } from './pages/properties/properties.component';
+import { AdminSettingsComponent } from './pages/settings/settings.component';
+import { AdminClientsComponent } from './pages/clients/clients.component';
+import { AdminAgentsComponent } from './pages/agents/agents.component';
+import { AdminProposalsComponent } from './pages/proposals/proposals.component';
+import { AdminCommentsComponent } from './pages/comments/comments.component';
+import { AdminAnalyticsComponent } from './pages/analytics/analytics.component';
 
 const routes: Routes = [
   {
@@ -11,7 +17,13 @@ const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: AdminDashboardComponent },
       { path: 'users', component: AdminUsersComponent },
+      { path: 'clients', component: AdminClientsComponent },
+      { path: 'agents', component: AdminAgentsComponent },
       { path: 'properties', component: AdminPropertiesComponent },
+      { path: 'proposals', component: AdminProposalsComponent },
+      { path: 'comments', component: AdminCommentsComponent },
+      { path: 'analytics', component: AdminAnalyticsComponent },
+      { path: 'settings', component: AdminSettingsComponent },
     ]
   }
 ];

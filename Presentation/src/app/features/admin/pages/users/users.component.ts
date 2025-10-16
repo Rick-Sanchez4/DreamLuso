@@ -6,11 +6,13 @@ import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../../../../core/services/toast.service';
 import { User, UserRole } from '../../../../core/models/user.model';
 import { environment } from '../../../../../environments/environment';
+import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
+import { UserDetailModalComponent } from '../../components/user-detail-modal/user-detail-modal.component';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AdminSidebarComponent, UserDetailModalComponent],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })
@@ -23,6 +25,10 @@ export class AdminUsersComponent implements OnInit {
   roleFilter: string = 'all';
   statusFilter: string = 'all';
   searchTerm: string = '';
+
+  // Modal state
+  showUserModal: boolean = false;
+  selectedUser: User | null = null;
 
   constructor(
     private http: HttpClient,
@@ -149,6 +155,24 @@ export class AdminUsersComponent implements OnInit {
 
   getInactiveUsersCount(): number {
     return this.filteredUsers.filter(u => !u.isActive).length;
+  }
+
+  viewUserDetails(user: User): void {
+    this.selectedUser = user;
+    this.showUserModal = true;
+  }
+
+  closeUserModal(): void {
+    this.showUserModal = false;
+    this.selectedUser = null;
+  }
+
+  toggleUserStatusFromModal(user: User): void {
+    this.toggleUserStatus(user.id, user.isActive);
+  }
+
+  deleteUserFromModal(user: User): void {
+    this.deleteUser(user.id, `${user.firstName} ${user.lastName}`);
   }
 }
 
