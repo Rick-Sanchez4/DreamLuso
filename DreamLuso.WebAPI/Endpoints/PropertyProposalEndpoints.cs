@@ -14,6 +14,11 @@ public static class PropertyProposalEndpoints
     {
         var proposals = routes.MapGroup("api/proposals").WithTags("PropertyProposals");
 
+        // GET /api/proposals - Listar todas as propostas (Admin)
+        proposals.MapGet("/", Queries.GetProposals)
+            .WithName("GetProposals")
+            .RequireAuthorization();
+
         proposals.MapPost("/", Commands.CreateProposal)
             .WithName("CreateProposal")
             .RequireAuthorization();
@@ -41,6 +46,24 @@ public static class PropertyProposalEndpoints
         proposals.MapPost("/{proposalId:guid}/negotiate", Commands.AddNegotiation)
             .WithName("AddNegotiation")
             .RequireAuthorization();
+    }
+
+    private static class Queries
+    {
+        public static async Task<Results<Ok<GetProposalsResponse>, BadRequest<Error>>> GetProposals(
+            [FromServices] ISender sender,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? status = null,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new GetProposalsQuery(pageNumber, pageSize, status);
+            var result = await sender.Send(query, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value)
+                : TypedResults.BadRequest(result.Error);
+        }
     }
 
     private static class Commands

@@ -6,6 +6,7 @@ public static class RegisterAllEndpoints
     {
         // Account management
         routes.RegisterAccountEndpoints();
+        routes.RegisterUserEndpoints();
         
         // Core entities
         routes.RegisterPropertyEndpoints();
@@ -23,6 +24,9 @@ public static class RegisterAllEndpoints
         routes.RegisterNotificationEndpoints();
         routes.RegisterPropertyProposalEndpoints();
         routes.RegisterCommentEndpoints();
+        
+        // Image Upload
+        routes.RegisterImageUploadEndpoints();
     }
 }
 

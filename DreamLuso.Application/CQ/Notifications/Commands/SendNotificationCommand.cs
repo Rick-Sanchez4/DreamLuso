@@ -5,7 +5,7 @@ using MediatR;
 namespace DreamLuso.Application.CQ.Notifications.Commands;
 
 public record SendNotificationCommand(
-    Guid SenderId,
+    Guid? SenderId,
     Guid RecipientId,
     string Message,
     NotificationType Type,

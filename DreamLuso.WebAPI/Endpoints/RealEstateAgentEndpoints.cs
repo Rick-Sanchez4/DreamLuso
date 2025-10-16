@@ -1,8 +1,10 @@
 using DreamLuso.Application.Common.Responses;
 using DreamLuso.Application.CQ.RealEstateAgents.Commands.CreateAgent;
 using DreamLuso.Application.CQ.RealEstateAgents.Commands.UpdateAgent;
+using DreamLuso.Application.CQ.RealEstateAgents.Commands.ApproveAgent;
 using DreamLuso.Application.CQ.RealEstateAgents.Queries.GetAgents;
 using DreamLuso.Application.CQ.RealEstateAgents.Queries.GetAgentById;
+using DreamLuso.Application.CQ.RealEstateAgents.Queries.GetAgentByUserId;
 using DreamLuso.Application.CQ.RealEstateAgents.Common;
 using DreamLuso.Domain.Model;
 using MediatR;
@@ -29,6 +31,12 @@ public static class RealEstateAgentEndpoints
             .Produces<AgentResponse>(200)
             .Produces<Error>(404);
 
+        // GET /api/agents/user/{userId} - Obter agente por ID de usuário
+        agents.MapGet("/user/{userId:guid}", Queries.GetAgentByUserId)
+            .WithName("GetAgentByUserId")
+            .Produces<AgentResponse>(200)
+            .Produces<Error>(404);
+
         // POST /api/agents - Criar novo agente
         agents.MapPost("/", Commands.CreateAgent)
             .WithName("CreateAgent")
@@ -40,6 +48,13 @@ public static class RealEstateAgentEndpoints
             .WithName("UpdateAgent")
             .Produces<UpdateAgentResponse>(200)
             .Produces<Error>(400);
+
+        // PUT /api/agents/{id}/approve - Aprovar/Rejeitar agente
+        agents.MapPut("/{id:guid}/approve", Commands.ApproveAgent)
+            .WithName("ApproveAgent")
+            .Produces<object>(200)
+            .Produces<Error>(400)
+            .RequireAuthorization();
     }
 
     private static class Commands
@@ -91,6 +106,20 @@ public static class RealEstateAgentEndpoints
                 ? TypedResults.Ok(result.Value!)
                 : TypedResults.BadRequest(result.Error!);
         }
+
+        public static async Task<Results<Ok<object>, BadRequest<Error>>> ApproveAgent(
+            [FromServices] ISender sender,
+            [FromRoute] Guid id,
+            [FromBody] ApproveAgentRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new ApproveAgentCommand(id, request.IsApproved, request.RejectionReason);
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(new { message = "Agente atualizado com sucesso" } as object)
+                : TypedResults.BadRequest(result.Error!);
+        }
     }
 
     private static class Queries
@@ -131,6 +160,21 @@ public static class RealEstateAgentEndpoints
                 ? TypedResults.Ok(result.Value)
                 : TypedResults.NotFound(result.Error);
         }
+
+        public static async Task<Results<Ok<AgentResponse>, NotFound<Error>>> GetAgentByUserId(
+            [FromServices] ISender sender,
+            [FromRoute] Guid userId,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new GetAgentByUserIdQuery(userId);
+            var result = await sender.Send(query, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value)
+                : TypedResults.NotFound(result.Error);
+        }
     }
 }
+
+public record ApproveAgentRequest(bool IsApproved, string? RejectionReason = null);
 

@@ -11,6 +11,16 @@ public class PropertyRepository : Repository<Property>, IPropertyRepository
     {
     }
 
+    public override async Task<IEnumerable<Property>> GetAllAsync()
+    {
+        return await _dbSet
+            .Include(p => p.Address)
+            .Include(p => p.Images)
+            .Include(p => p.RealEstateAgent)
+                .ThenInclude(a => a.User)
+            .ToListAsync();
+    }
+
     public override async Task<Property> SaveAsync(Property property)
     {
         if (property == null)

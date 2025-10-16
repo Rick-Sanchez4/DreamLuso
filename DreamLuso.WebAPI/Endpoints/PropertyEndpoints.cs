@@ -39,6 +39,7 @@ public static class PropertyEndpoints
         // POST /api/properties - Criar novo imóvel
         properties.MapPost("/", Commands.CreateProperty)
             .WithName("CreateProperty")
+            .DisableAntiforgery() // Required for multipart/form-data
             .Produces<CreatePropertyResponse>(201)
             .Produces<Error>(400);
 
@@ -59,7 +60,7 @@ public static class PropertyEndpoints
     {
         public static async Task<Results<CreatedAtRoute<CreatePropertyResponse>, BadRequest<Error>>> CreateProperty(
             [FromServices] ISender sender,
-            [FromBody] CreatePropertyRequest request,
+            [AsParameters] CreatePropertyRequest request,
             CancellationToken cancellationToken = default)
         {
             var command = new CreatePropertyCommand
@@ -94,7 +95,8 @@ public static class PropertyEndpoints
                 HasElevator = request.HasElevator,
                 HasGarage = request.HasGarage,
                 HasPool = request.HasPool,
-                IsFurnished = request.IsFurnished
+                IsFurnished = request.IsFurnished,
+                Images = request.Images
             };
 
             var result = await sender.Send(command, cancellationToken);
@@ -107,7 +109,7 @@ public static class PropertyEndpoints
         public static async Task<Results<Ok<UpdatePropertyResponse>, BadRequest<Error>>> UpdateProperty(
             [FromServices] ISender sender,
             Guid id,
-            [FromBody] UpdatePropertyRequest request,
+            [AsParameters] UpdatePropertyRequest request,
             CancellationToken cancellationToken = default)
         {
             var command = new UpdatePropertyCommand(
@@ -116,7 +118,33 @@ public static class PropertyEndpoints
                 request.Description,
                 request.Price,
                 request.Status,
-                request.Amenities
+                request.Amenities,
+                request.Condominium,
+                request.Size,
+                request.Bedrooms,
+                request.Bathrooms,
+                request.Type,
+                request.TransactionType,
+                request.Street,
+                request.Number,
+                request.Parish,
+                request.Municipality,
+                request.District,
+                request.PostalCode,
+                request.Complement,
+                request.GrossArea,
+                request.LandArea,
+                request.WcCount,
+                request.Floor,
+                request.ParkingSpaces,
+                request.YearBuilt,
+                request.EnergyRating,
+                request.Orientation,
+                request.HasElevator,
+                request.HasGarage,
+                request.HasPool,
+                request.IsFurnished,
+                request.Images
             );
 
             var result = await sender.Send(command, cancellationToken);

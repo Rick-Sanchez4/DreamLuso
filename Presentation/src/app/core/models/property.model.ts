@@ -10,8 +10,14 @@ export interface Property {
   bedrooms: number;
   bathrooms: number;
   address: Address;
+  // Address fields (from API response)
+  street?: string;
+  municipality?: string;
+  district?: string;
+  postalCode?: string;
   images: PropertyImage[];
   realEstateAgentId: string;
+  agentName?: string;
   averageRating?: number;
   totalComments?: number;
   createdAt: Date;
@@ -47,10 +53,14 @@ export enum TransactionType {
 }
 
 export enum PropertyStatus {
-  Available = 'Available',
-  Reserved = 'Reserved',
-  Sold = 'Sold',
-  Rented = 'Rented'
+  Available = 0,
+  Reserved = 1,
+  UnderContract = 2,
+  Sold = 3,
+  Rented = 4,
+  Unavailable = 5,
+  InNegotiation = 6,
+  Inactive = 5  // Map to Unavailable
 }
 
 export interface PropertySearchFilters {

@@ -3,20 +3,26 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProposalService } from '../../../../core/services/proposal.service';
+import { AgentService } from '../../../../core/services/agent.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { ThemeService } from '../../../../core/services/theme.service';
 import { PropertyProposal } from '../../../../core/models/proposal.model';
 import { User } from '../../../../core/models/user.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
+import { AgentSidebarComponent } from '../../components/agent-sidebar/agent-sidebar.component';
 
 @Component({
   selector: 'app-agent-proposals',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AgentSidebarComponent],
   templateUrl: './proposals.component.html',
   styleUrl: './proposals.component.scss'
 })
 export class AgentProposalsComponent implements OnInit {
   currentUser: User | null = null;
+  agentId: string | null = null;
   proposals: PropertyProposal[] = [];
   filteredProposals: PropertyProposal[] = [];
   loading: boolean = true;
@@ -25,29 +31,60 @@ export class AgentProposalsComponent implements OnInit {
   statusFilter: string = 'all';
   searchTerm: string = '';
 
+  // Modals
+  showDetailsModal: boolean = false;
+  showApproveModal: boolean = false;
+  showRejectModal: boolean = false;
+  selectedProposal: PropertyProposal | null = null;
+  rejectionReason: string = '';
+
   constructor(
     private proposalService: ProposalService,
+    private agentService: AgentService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private http: HttpClient,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     if (this.currentUser) {
-      this.loadProposals();
+      this.loadAgentProfile();
     }
   }
 
-  loadProposals(): void {
-    this.loading = true;
-    this.proposalService.getByAgent(this.currentUser!.id).subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.proposals = result.value;
-        this.applyFilters();
-      } else {
-        this.toastService.error('Erro ao carregar propostas');
+  loadAgentProfile(): void {
+    this.agentService.getByUserId(this.currentUser!.id).subscribe({
+      next: (agent: any) => {
+        this.agentId = agent.id;
+        this.loadProposals();
+      },
+      error: (error) => {
+        console.error('Error loading agent profile:', error);
+        this.toastService.error('Erro ao carregar perfil do agente');
+        this.loading = false;
       }
-      this.loading = false;
+    });
+  }
+
+  loadProposals(): void {
+    if (!this.agentId) return;
+    
+    this.loading = true;
+    this.http.get<any>(`${environment.apiUrl}/proposals/agent/${this.agentId}`).subscribe({
+      next: (proposals) => {
+        if (proposals && Array.isArray(proposals)) {
+          this.proposals = proposals;
+          this.applyFilters();
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading proposals:', error);
+        this.toastService.error('Erro ao carregar propostas');
+        this.loading = false;
+      }
     });
   }
 
@@ -66,31 +103,77 @@ export class AgentProposalsComponent implements OnInit {
     this.applyFilters();
   }
 
-  approveProposal(proposalId: string): void {
-    if (!confirm('Tem certeza que deseja aprovar esta proposta?')) {
-      return;
-    }
+  openApproveModal(proposal: PropertyProposal): void {
+    this.selectedProposal = proposal;
+    this.showApproveModal = true;
+  }
 
-    this.proposalService.approve(proposalId).subscribe(result => {
-      if (result.isSuccess) {
-        this.toastService.success('Proposta aprovada com sucesso!');
-        this.loadProposals();
-      } else {
+  openRejectModal(proposal: PropertyProposal): void {
+    this.selectedProposal = proposal;
+    this.rejectionReason = '';
+    this.showRejectModal = true;
+  }
+
+  openDetailsModal(proposal: PropertyProposal): void {
+    this.selectedProposal = proposal;
+    this.showDetailsModal = true;
+  }
+
+  closeAllModals(): void {
+    this.showDetailsModal = false;
+    this.showApproveModal = false;
+    this.showRejectModal = false;
+    this.selectedProposal = null;
+    this.rejectionReason = '';
+  }
+
+  confirmApprove(): void {
+    if (!this.selectedProposal) return;
+
+    this.loading = true;
+    this.proposalService.approve(this.selectedProposal.id).subscribe({
+      next: (result) => {
+        if (result.isSuccess) {
+          this.toastService.success('Proposta aprovada com sucesso!');
+          this.loadProposals();
+          this.closeAllModals();
+        } else {
+          this.toastService.error('Erro ao aprovar proposta');
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error approving proposal:', error);
         this.toastService.error('Erro ao aprovar proposta');
+        this.loading = false;
       }
     });
   }
 
-  rejectProposal(proposalId: string): void {
-    const reason = prompt('Motivo da rejeição (opcional):');
-    if (reason === null) return; // User cancelled
+  confirmReject(): void {
+    if (!this.selectedProposal) return;
 
-    this.proposalService.reject(proposalId, reason || 'Sem motivo especificado').subscribe(result => {
-      if (result.isSuccess) {
-        this.toastService.success('Proposta rejeitada');
-        this.loadProposals();
-      } else {
+    if (!this.rejectionReason.trim()) {
+      this.toastService.error('Por favor, indique o motivo da rejeição');
+      return;
+    }
+
+    this.loading = true;
+    this.proposalService.reject(this.selectedProposal.id, this.rejectionReason).subscribe({
+      next: (result) => {
+        if (result.isSuccess) {
+          this.toastService.success('Proposta rejeitada');
+          this.loadProposals();
+          this.closeAllModals();
+        } else {
+          this.toastService.error('Erro ao rejeitar proposta');
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error rejecting proposal:', error);
         this.toastService.error('Erro ao rejeitar proposta');
+        this.loading = false;
       }
     });
   }

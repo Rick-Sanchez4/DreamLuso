@@ -6,9 +6,8 @@ public class SendNotificationCommandValidator : AbstractValidator<SendNotificati
 {
     public SendNotificationCommandValidator()
     {
-        RuleFor(x => x.SenderId)
-            .NotEmpty().WithMessage("O ID do remetente é obrigatório");
-
+        // SenderId pode ser Guid.Empty para notificações do sistema
+        
         RuleFor(x => x.RecipientId)
             .NotEmpty().WithMessage("O ID do destinatário é obrigatório");
 

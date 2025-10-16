@@ -18,6 +18,7 @@ public class AgentResponse
     public double Rating { get; set; }
     public int ReviewCount { get; set; }
     public bool IsActive { get; set; }
+    public string ApprovalStatus { get; set; } = "Pending";
     public string? Specialization { get; set; }
     public List<string> Certifications { get; set; } = [];
     public List<string> LanguagesSpoken { get; set; } = [];

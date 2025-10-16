@@ -54,17 +54,13 @@ RESPONSE=$(curl -s -X POST "$API_URL/api/accounts/register" \
 if echo "$RESPONSE" | grep -q '"isSuccess":true\|userId\|Admin'; then
     echo "✅ Admin criado com sucesso!"
     echo "$RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$RESPONSE"
-elif echo "$RESPONSE" | grep -q "already exists\|já existe"; then
+elif echo "$RESPONSE" | grep -q "EmailAlreadyExists\|already exists\|já existe\|já está registado"; then
     echo "⚠️  Admin já existe! Continuando..."
 else
-    echo "❌ Erro ao criar Admin:"
+    echo "⚠️  Resposta inesperada ao criar Admin:"
     echo "$RESPONSE"
     echo ""
-    echo "⚠️  Possíveis causas:"
-    echo "   1. Firewall do Azure ainda propagando (aguarde 5 min)"
-    echo "   2. Connection string incorreta"
-    echo "   3. Banco de dados não acessível"
-    exit 1
+    echo "   Continuando mesmo assim..."
 fi
 
 echo ""

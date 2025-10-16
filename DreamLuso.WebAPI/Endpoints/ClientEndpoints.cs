@@ -3,6 +3,7 @@ using DreamLuso.Application.CQ.Clients.Commands.CreateClient;
 using DreamLuso.Application.CQ.Clients.Commands.UpdateClient;
 using DreamLuso.Application.CQ.Clients.Queries.GetClients;
 using DreamLuso.Application.CQ.Clients.Queries.GetClientById;
+using DreamLuso.Application.CQ.Clients.Queries.GetClientByUserId;
 using DreamLuso.Application.CQ.Clients.Common;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -25,6 +26,12 @@ public static class ClientEndpoints
         // GET /api/clients/{id} - Obter cliente por ID
         clients.MapGet("/{id:guid}", Queries.GetClientById)
             .WithName("GetClientById")
+            .Produces<ClientResponse>(200)
+            .Produces<Error>(404);
+
+        // GET /api/clients/user/{userId} - Obter cliente por ID de usuário
+        clients.MapGet("/user/{userId:guid}", Queries.GetClientByUserId)
+            .WithName("GetClientByUserId")
             .Produces<ClientResponse>(200)
             .Produces<Error>(404);
 
@@ -118,6 +125,19 @@ public static class ClientEndpoints
             CancellationToken cancellationToken = default)
         {
             var query = new GetClientByIdQuery { Id = id };
+            var result = await sender.Send(query, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value)
+                : TypedResults.NotFound(result.Error);
+        }
+
+        public static async Task<Results<Ok<ClientResponse>, NotFound<Error>>> GetClientByUserId(
+            [FromServices] ISender sender,
+            [FromRoute] Guid userId,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new GetClientByUserIdQuery(userId);
             var result = await sender.Send(query, cancellationToken);
 
             return result.IsSuccess

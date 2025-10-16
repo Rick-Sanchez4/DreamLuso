@@ -2,10 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ClientService } from '../../../../core/services/client.service';
 import { ProposalService } from '../../../../core/services/proposal.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { PropertyProposal } from '../../../../core/models/proposal.model';
 import { User } from '../../../../core/models/user.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-client-dashboard',
@@ -16,6 +19,7 @@ import { User } from '../../../../core/models/user.model';
 })
 export class ClientDashboardComponent implements OnInit {
   currentUser: User | null = null;
+  clientId: string | null = null;
   myProposals: PropertyProposal[] = [];
   unreadNotifications: number = 0;
   loading: boolean = true;
@@ -24,36 +28,81 @@ export class ClientDashboardComponent implements OnInit {
     totalProposals: 0,
     pendingProposals: 0,
     approvedProposals: 0,
-    scheduledVisits: 0
+    rejectedProposals: 0,
+    totalVisits: 0,
+    scheduledVisits: 0,
+    completedVisits: 0,
+    totalFavorites: 0,
+    totalContracts: 0,
+    activeContracts: 0
   };
 
   constructor(
     private authService: AuthService,
+    private clientService: ClientService,
     private proposalService: ProposalService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     if (this.currentUser) {
-      this.loadDashboardData();
+      this.loadClientProfile();
     }
   }
 
+  loadClientProfile(): void {
+    this.clientService.getByUserId(this.currentUser!.id).subscribe({
+      next: (client: any) => {
+        this.clientId = client.id;
+        this.loadDashboardData();
+      },
+      error: (error) => {
+        console.error('Error loading client profile:', error);
+        this.loading = false;
+      }
+    });
+  }
+
   loadDashboardData(): void {
+    if (!this.clientId) return;
+
     this.loading = true;
 
-    // Load proposals
-    this.proposalService.getByClient(this.currentUser!.id).subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.myProposals = result.value.slice(0, 5); // Latest 5
-        this.stats.totalProposals = result.value.length;
-        this.stats.pendingProposals = result.value.filter(p => p.status === 'Pending' || p.status === 'UnderAnalysis').length;
-        this.stats.approvedProposals = result.value.filter(p => p.status === 'Approved').length;
+    // Load dashboard stats from the new endpoint
+    this.clientService.getDashboardStats(this.clientId).subscribe({
+      next: (stats) => {
+        this.stats = stats;
+        this.loadProposals();
+        this.loadNotifications();
+      },
+      error: (error) => {
+        console.error('Error loading dashboard stats:', error);
+        this.loading = false;
       }
-      this.loading = false;
     });
+  }
 
+  loadProposals(): void {
+    if (!this.clientId) return;
+
+    // Load client's proposals (últimos 5)
+    this.http.get<any>(`${environment.apiUrl}/proposals/client/${this.clientId}`).subscribe({
+      next: (proposals) => {
+        if (proposals && Array.isArray(proposals)) {
+          this.myProposals = proposals.slice(0, 5);
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading proposals:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  loadNotifications(): void {
     // Load unread notifications
     this.notificationService.getUnreadCount(this.currentUser!.id).subscribe(result => {
       if (result.isSuccess && result.value) {

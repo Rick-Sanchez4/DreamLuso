@@ -22,7 +22,8 @@ export class PropertyCardComponent {
 
   getStatusBadgeClass(): string {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm';
-    switch (this.property.status) {
+    const statusStr = String(this.property.status);
+    switch (statusStr) {
       case 'Available':
         return `${baseClass} bg-green-500/90 text-white`;
       case 'Reserved':

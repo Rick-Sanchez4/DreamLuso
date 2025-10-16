@@ -27,6 +27,9 @@ internal class UnitOfWork : IUnitOfWork
     public INotificationRepository NotificationRepository { get; }
     public IPropertyProposalRepository PropertyProposalRepository { get; }
     public ICommentRepository CommentRepository { get; }
+    
+    // Services
+    public IFileStorageService FileStorageService { get; }
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -39,7 +42,8 @@ internal class UnitOfWork : IUnitOfWork
         IContractRepository contractRepository,
         INotificationRepository notificationRepository,
         IPropertyProposalRepository propertyProposalRepository,
-        ICommentRepository commentRepository)
+        ICommentRepository commentRepository,
+        IFileStorageService fileStorageService)
     {
         _context = context;
         UserRepository = userRepository;
@@ -52,6 +56,7 @@ internal class UnitOfWork : IUnitOfWork
         NotificationRepository = notificationRepository;
         PropertyProposalRepository = propertyProposalRepository;
         CommentRepository = commentRepository;
+        FileStorageService = fileStorageService;
     }
 
     public async Task<int> CommitAsync(CancellationToken cancellationToken = default)

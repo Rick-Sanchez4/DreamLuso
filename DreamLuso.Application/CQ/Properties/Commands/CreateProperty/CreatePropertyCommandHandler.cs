@@ -2,6 +2,7 @@ using DreamLuso.Application.Common.Responses;
 using DreamLuso.Domain.Core.Uow;
 using DreamLuso.Domain.Model;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace DreamLuso.Application.CQ.Properties.Commands.CreateProperty;
@@ -72,10 +73,38 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             DateListed = DateTime.UtcNow
         };
 
+        // Save images if provided
+        if (request.Images != null && request.Images.Count > 0)
+        {
+            for (int i = 0; i < request.Images.Count; i++)
+            {
+                var imageFile = request.Images[i];
+                
+                // Save file and get filename
+                var fileName = await _unitOfWork.FileStorageService.SaveFileAsync(imageFile, cancellationToken);
+                
+                // Create NEW PropertyImage entity
+                var propertyImage = new PropertyImage
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyId = property.Id,
+                    ImageUrl = fileName,
+                    IsPrimary = i == 0,
+                    DisplayOrder = i,
+                    Type = ImageType.Exterior,
+                    CreatedAt = DateTime.UtcNow
+                };
+                
+                // Add to repository to ensure correct tracking
+                await _unitOfWork.PropertyImageRepository.SaveAsync(propertyImage);
+            }
+        }
+
         var savedProperty = await _unitOfWork.PropertyRepository.SaveAsync(property);
         await _unitOfWork.CommitAsync(cancellationToken);
 
-        _logger.LogInformation("Imóvel criado com sucesso: {PropertyId}, {PropertyTitle}", savedProperty.Id, property.Title);
+        _logger.LogInformation("Imóvel criado com sucesso: {PropertyId}, {PropertyTitle} com {ImageCount} imagens", 
+            savedProperty.Id, property.Title, property.Images.Count);
 
         var response = new CreatePropertyResponse
         {

@@ -11,6 +11,18 @@ public class PropertyProposalRepository : Repository<PropertyProposal>, IPropert
     {
     }
 
+    public override async Task<PropertyProposal?> GetByIdAsync(Guid id)
+    {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
+        return await _dbSet
+            .Include(p => p.Property)
+            .Include(p => p.Client)
+                .ThenInclude(c => c.User)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
     public override async Task<PropertyProposal> SaveAsync(PropertyProposal proposal)
     {
         if (proposal == null)

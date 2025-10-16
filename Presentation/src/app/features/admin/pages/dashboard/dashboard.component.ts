@@ -18,6 +18,8 @@ interface AdminStats {
   pendingProposals: number;
   totalContracts: number;
   monthlyRevenue: number;
+  averageContractValue: number;
+  conversionRate: number;
 }
 
 @Component({
@@ -41,7 +43,9 @@ export class AdminDashboardComponent implements OnInit {
     totalProposals: 0,
     pendingProposals: 0,
     totalContracts: 0,
-    monthlyRevenue: 0
+    monthlyRevenue: 0,
+    averageContractValue: 0,
+    conversionRate: 0
   };
 
   recentActivity: any[] = [];
@@ -62,27 +66,14 @@ export class AdminDashboardComponent implements OnInit {
   loadDashboardData(): void {
     this.loading = true;
 
-    // Load admin statistics
-    this.http.get<any>(`${environment.apiUrl}/dashboard/admin`).subscribe({
-      next: (result) => {
-        if (result.isSuccess && result.value) {
-          this.stats = result.value;
-        }
+    // Load admin statistics from the real endpoint
+    this.http.get<AdminStats>(`${environment.apiUrl}/dashboard/admin`).subscribe({
+      next: (stats) => {
+        this.stats = stats;
         this.loading = false;
       },
-      error: () => {
-        // Mock data for development
-        this.stats = {
-          totalUsers: 156,
-          totalClients: 98,
-          totalAgents: 12,
-          totalProperties: 234,
-          activeProperties: 187,
-          totalProposals: 45,
-          pendingProposals: 12,
-          totalContracts: 89,
-          monthlyRevenue: 125000
-        };
+      error: (error) => {
+        console.error('Error loading dashboard stats:', error);
         this.loading = false;
       }
     });

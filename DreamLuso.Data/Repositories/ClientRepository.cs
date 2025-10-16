@@ -11,6 +11,13 @@ public class ClientRepository : Repository<Client>, IClientRepository
     {
     }
 
+    public override async Task<IEnumerable<Client>> GetAllAsync()
+    {
+        return await _dbSet
+            .Include(c => c.User)
+            .ToListAsync();
+    }
+
     public override async Task<Client> SaveAsync(Client client)
     {
         if (client == null)

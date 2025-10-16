@@ -11,6 +11,13 @@ public class RealEstateAgentRepository : Repository<RealEstateAgent>, IRealEstat
     {
     }
 
+    public override async Task<IEnumerable<RealEstateAgent>> GetAllAsync()
+    {
+        return await _dbSet
+            .Include(a => a.User)
+            .ToListAsync();
+    }
+
     public override async Task<RealEstateAgent> SaveAsync(RealEstateAgent agent)
     {
         if (agent == null)

@@ -1,5 +1,6 @@
 using MediatR;
 using DreamLuso.Application.Common.Responses;
+using DreamLuso.Application.CQ.Notifications.Commands;
 using DreamLuso.Domain.Core.Uow;
 using DreamLuso.Domain.Model;
 using Microsoft.Extensions.Logging;
@@ -9,11 +10,16 @@ namespace DreamLuso.Application.CQ.PropertyVisits.Commands.ScheduleVisit;
 public class ScheduleVisitCommandHandler : IRequestHandler<ScheduleVisitCommand, Result<ScheduleVisitResponse, Success, Error>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ISender _sender;
     private readonly ILogger<ScheduleVisitCommandHandler> _logger;
 
-    public ScheduleVisitCommandHandler(IUnitOfWork unitOfWork, ILogger<ScheduleVisitCommandHandler> logger)
+    public ScheduleVisitCommandHandler(
+        IUnitOfWork unitOfWork,
+        ISender sender,
+        ILogger<ScheduleVisitCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
+        _sender = sender;
         _logger = logger;
     }
 
@@ -77,6 +83,33 @@ public class ScheduleVisitCommandHandler : IRequestHandler<ScheduleVisitCommand,
 
         _logger.LogInformation("Visita agendada com sucesso: {VisitId}, Imóvel: {PropertyId}, Data: {Date}", 
             savedVisit.Id, request.PropertyId, request.VisitDate);
+
+        // Send notification to client
+        var clientNotification = $"📅 Visita agendada! Sua visita ao imóvel '{((Property)property).Title}' foi agendada para {request.VisitDate:dd/MM/yyyy} às {request.TimeSlot}. " +
+                                 $"O agente {((RealEstateAgent)agent).User.Name.FullName} entrará em contato.";
+        
+        await _sender.Send(new SendNotificationCommand(
+            SenderId: Guid.Empty,
+            RecipientId: ((Client)client).UserId,
+            Message: clientNotification,
+            Type: NotificationType.Visit,
+            Priority: NotificationPriority.Medium,
+            ReferenceId: savedVisit.Id,
+            ReferenceType: "VisitScheduled"
+        ), cancellationToken);
+
+        // Send notification to agent
+        var agentNotification = $"📅 Nova visita agendada! Cliente {((Client)client).User.Name.FullName} agendou visita ao imóvel '{((Property)property).Title}' para {request.VisitDate:dd/MM/yyyy} às {request.TimeSlot}.";
+        
+        await _sender.Send(new SendNotificationCommand(
+            SenderId: Guid.Empty,
+            RecipientId: ((RealEstateAgent)agent).UserId,
+            Message: agentNotification,
+            Type: NotificationType.Visit,
+            Priority: NotificationPriority.Medium,
+            ReferenceId: savedVisit.Id,
+            ReferenceType: "VisitScheduled"
+        ), cancellationToken);
 
         var response = new ScheduleVisitResponse(
             savedVisit.Id,

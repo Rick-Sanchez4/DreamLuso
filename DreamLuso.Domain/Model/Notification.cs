@@ -7,7 +7,7 @@ namespace DreamLuso.Domain.Model;
 public class Notification : AuditableEntity, IEntity<Guid>
 {
     public Guid Id { get; set; }
-    public Guid SenderId { get; set; }
+    public Guid? SenderId { get; set; } // Nullable for system notifications
     public User? Sender { get; set; }
     public Guid RecipientId { get; set; }
     public User? Recipient { get; set; }
@@ -28,7 +28,7 @@ public class Notification : AuditableEntity, IEntity<Guid>
 
     [SetsRequiredMembers]
     public Notification(
-        Guid senderId,
+        Guid? senderId,
         Guid recipientId,
         string message,
         NotificationType type,

@@ -57,7 +57,7 @@
         @for (client of filteredClients; track client.id) {
           <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10 hover:shadow-2xl transition-all">
             <!-- Avatar -->
-            <div class="flex items-center gap-4 mb-4">
+            <div class="flex items-center gap-4 mb-4 cursor-pointer hover:opacity-80 transition-opacity" (click)="viewClientDetails(client)">
               <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-teal-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                 {{ client.name.charAt(0) }}
               </div>

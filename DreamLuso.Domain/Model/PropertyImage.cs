@@ -1,5 +1,6 @@
 using DreamLuso.Domain.Common;
 using DreamLuso.Domain.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace DreamLuso.Domain.Model;
 
@@ -7,7 +8,10 @@ public class PropertyImage : AuditableEntity, IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid PropertyId { get; set; }
-    public required Property Property { get; set; }
+    
+    [JsonIgnore]
+    public Property Property { get; set; } = null!;
+    
     public required string ImageUrl { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }

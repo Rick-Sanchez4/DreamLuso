@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
         <div class="bg-white dark:bg-dark-800 rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
           
           <!-- Header -->
-          <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-3xl">
+          <div class="sticky top-0 bg-gradient-to-r from-green-600 to-teal-600 text-white p-6 rounded-t-3xl">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
                 <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl font-bold">
@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
                   <h2 class="text-2xl font-bold">{{ agent.name }}</h2>
                   <div class="flex items-center gap-2 mt-1">
                     @if (agent.isActive) {
-                      <span class="px-3 py-1 bg-green-500/30 backdrop-blur-sm rounded-full text-xs font-bold">✅ Aprovado</span>
+                      <span class="px-3 py-1 bg-emerald-500/30 backdrop-blur-sm rounded-full text-xs font-bold">✅ Aprovado</span>
                     } @else {
                       <span class="px-3 py-1 bg-orange-500/30 backdrop-blur-sm rounded-full text-xs font-bold">⏳ Pendente</span>
                     }
@@ -81,8 +81,48 @@ import { CommonModule } from '@angular/common';
               </div>
             }
 
+            <!-- License & Professional Info -->
+            @if (agent.licenseNumber || agent.specialization) {
+              <div class="bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-teal-100 dark:border-teal-800/30">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  Informações Profissionais
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  @if (agent.licenseNumber) {
+                    <div class="flex items-center gap-3 p-3 bg-white/50 dark:bg-white/5 rounded-xl">
+                      <div class="w-10 h-10 bg-teal-100 dark:bg-teal-900/40 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Licença AMI</p>
+                        <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ agent.licenseNumber }}</p>
+                      </div>
+                    </div>
+                  }
+                  @if (agent.specialization) {
+                    <div class="flex items-center gap-3 p-3 bg-white/50 dark:bg-white/5 rounded-xl">
+                      <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Especialização</p>
+                        <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ agent.specialization }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
             <!-- Contact Info -->
-            <div class="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800/30">
+            <div class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800/30">
               <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -134,14 +174,11 @@ import { CommonModule } from '@angular/common';
               </div>
             } @else {
               <div class="flex gap-3">
-                <button class="flex-1 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all">
+                <button class="flex-1 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all shadow-lg">
                   📧 Enviar Email
                 </button>
-                <button class="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all">
-                  📞 Ligar
-                </button>
-                <button class="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-full transition-all">
-                  🏠 Ver Imóveis
+                <button class="flex-1 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all shadow-lg">
+                  🏠 Ver Imóveis ({{ agent.properties }})
                 </button>
               </div>
             }

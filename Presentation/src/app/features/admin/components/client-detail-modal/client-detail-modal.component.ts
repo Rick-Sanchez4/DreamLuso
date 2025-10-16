@@ -93,11 +93,8 @@ import { CommonModule } from '@angular/common';
 
             <!-- Actions -->
             <div class="flex gap-3">
-              <button class="flex-1 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all">
+              <button class="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all">
                 📧 Enviar Email
-              </button>
-              <button class="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all">
-                📞 Ligar
               </button>
             </div>
           </div>

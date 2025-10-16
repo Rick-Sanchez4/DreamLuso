@@ -21,11 +21,27 @@ export class AdminAgentsComponent implements OnInit {
   pendingAgents: any[] = [];
   loading: boolean = true;
   searchTerm: string = '';
-  showPending: boolean = true;
+  showPending: boolean = false; // Show approved agents by default
 
   // Modal state
   showAgentModal: boolean = false;
   selectedAgent: any = null;
+
+  // Computed stats
+  get totalProperties(): number {
+    return this.agents.reduce((sum, a) => sum + (a.properties || a.totalListings || 0), 0);
+  }
+
+  get totalSales(): number {
+    return this.agents.reduce((sum, a) => sum + (a.sales || a.totalSales || 0), 0);
+  }
+
+  get averageRating(): number {
+    const agentsWithRating = this.agents.filter(a => a.rating > 0);
+    if (agentsWithRating.length === 0) return 0;
+    const sum = agentsWithRating.reduce((total, a) => total + a.rating, 0);
+    return Math.round((sum / agentsWithRating.length) * 100) / 100;
+  }
 
   constructor(
     private http: HttpClient,
@@ -45,13 +61,15 @@ export class AdminAgentsComponent implements OnInit {
         if (result && result.agents) {
           this.agents = result.agents.map((a: any) => ({
             id: a.id,
-            name: a.user?.fullName || 'Agente',
-            email: a.user?.email || '',
-            phone: a.user?.phone || '',
-            properties: a.totalProperties || 0,
+            name: a.fullName || 'Agente',
+            email: a.email || '',
+            phone: a.phone || 'Não informado',
+            licenseNumber: a.licenseNumber || '',
+            specialization: a.specialization || '',
+            properties: a.totalListings || 0,
             sales: a.totalSales || 0,
-            rating: a.averageRating || 0,
-            isActive: a.user?.isActive || false
+            rating: a.rating || 0,
+            isActive: a.isActive || false
           }));
         } else {
           this.useMockData();
@@ -77,6 +95,7 @@ export class AdminAgentsComponent implements OnInit {
   }
 
   updateLists(): void {
+    // IsActive = false means pending approval, IsActive = true means approved
     this.pendingAgents = this.agents.filter(a => !a.isActive);
     const baseList = this.showPending ? this.pendingAgents : this.agents.filter(a => a.isActive);
     this.filteredAgents = [...baseList];

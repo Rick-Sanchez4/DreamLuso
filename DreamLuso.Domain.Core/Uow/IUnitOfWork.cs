@@ -17,6 +17,9 @@ public interface IUnitOfWork : IDisposable
     INotificationRepository NotificationRepository { get; }
     IPropertyProposalRepository PropertyProposalRepository { get; }
     ICommentRepository CommentRepository { get; }
+    
+    // Services
+    IFileStorageService FileStorageService { get; }
 
     Task<int> CommitAsync(CancellationToken cancellationToken = default);
     Task RollbackAsync();

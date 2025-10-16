@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers(); // Para usar Controllers (PropertyController)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -104,6 +105,9 @@ app.RegisterEndpoints();
 
 // Health Check Endpoint
 app.MapHealthChecks("/health");
+
+// Map Controllers (PropertyController)
+app.MapControllers();
 
 app.Run();
 

@@ -58,12 +58,23 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   loadPropertyDetails(id: string): void {
-    this.propertyService.getById(id).subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.property = result.value;
-        this.proposalValue = result.value.price;
+    this.propertyService.getById(id).subscribe({
+      next: (property) => {
+        this.property = property;
+        this.proposalValue = property.price;
+        
+        // Initialize images array if undefined
+        if (!this.property.images) {
+          this.property.images = [];
+        }
+        
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading property:', error);
+        this.loading = false;
+        this.toastService.error('Erro ao carregar imóvel');
       }
-      this.loading = false;
     });
   }
 

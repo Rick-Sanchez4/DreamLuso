@@ -23,6 +23,12 @@ public class GetAgentsQueryHandler : IRequestHandler<GetAgentsQuery, Result<GetA
         var allAgents = await _unitOfWork.RealEstateAgentRepository.GetAllAsync();
         var agents = allAgents.Cast<RealEstateAgent>().AsQueryable();
 
+        // Get all properties to count per agent
+        var allProperties = await _unitOfWork.PropertyRepository.GetAllAsync();
+        var propertiesCount = allProperties.Cast<Property>()
+            .GroupBy(p => p.RealEstateAgentId)
+            .ToDictionary(g => g.Key, g => g.Count());
+
         // Apply filters
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
@@ -71,7 +77,7 @@ public class GetAgentsQueryHandler : IRequestHandler<GetAgentsQuery, Result<GetA
                 OfficePhone = a.OfficePhone,
                 CommissionRate = a.CommissionRate,
                 TotalSales = a.TotalSales,
-                TotalListings = a.TotalListings,
+                TotalListings = propertiesCount.GetValueOrDefault(a.Id, 0), // Calculate from actual properties
                 TotalRevenue = a.TotalRevenue,
                 Rating = a.Rating,
                 ReviewCount = a.ReviewCount,
@@ -79,7 +85,8 @@ public class GetAgentsQueryHandler : IRequestHandler<GetAgentsQuery, Result<GetA
                 Specialization = a.Specialization,
                 Certifications = a.Certifications,
                 LanguagesSpoken = a.LanguagesSpoken.Select(l => l.ToString()).ToList(),
-                CreatedAt = a.CreatedAt
+                CreatedAt = a.CreatedAt,
+                ApprovalStatus = a.IsActive ? "Approved" : "Pending"
             }),
             TotalCount = totalCount,
             PageNumber = request.PageNumber,

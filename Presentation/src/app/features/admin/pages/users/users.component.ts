@@ -53,27 +53,15 @@ export class AdminUsersComponent implements OnInit {
 
   loadUsers(): void {
     this.loading = true;
-    this.http.get<any>(`${environment.apiUrl}/users`).subscribe({
-      next: (result) => {
-        if (result.isSuccess && result.value) {
-          this.users = result.value;
-          this.applyFilters();
-        }
+    this.http.get<any[]>(`${environment.apiUrl}/users`).subscribe({
+      next: (users) => {
+        this.users = users || [];
+        this.applyFilters();
         this.loading = false;
       },
-      error: () => {
-        // Mock data for development
-        this.users = [
-          {
-            id: '1',
-            firstName: 'Admin',
-            lastName: 'Sistema',
-            email: 'admin@dreamluso.pt',
-            role: UserRole.Admin,
-            isActive: true,
-            profileImageUrl: ''
-          }
-        ];
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.users = [];
         this.applyFilters();
         this.loading = false;
       }

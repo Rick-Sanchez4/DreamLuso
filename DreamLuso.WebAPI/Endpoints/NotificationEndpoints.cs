@@ -37,6 +37,7 @@ public static class NotificationEndpoints
 
     private static class Commands
     {
+        [Authorize]
         public static async Task<Results<Ok<IEnumerable<NotificationResponse>>, NotFound<Error>>> GetUserNotifications(
             [FromServices] ISender sender,
             [FromRoute] Guid userId,
@@ -50,6 +51,7 @@ public static class NotificationEndpoints
                 : TypedResults.NotFound(result.Error!);
         }
 
+        [Authorize]
         public static async Task<Results<Ok<UnreadNotificationCountResponse>, NotFound<Error>>> GetUnreadCount(
             [FromServices] ISender sender,
             [FromRoute] Guid userId,
@@ -63,6 +65,7 @@ public static class NotificationEndpoints
                 : TypedResults.NotFound(result.Error!);
         }
 
+        [Authorize]
         public static async Task<Results<Ok<Guid>, BadRequest<Error>>> SendNotification(
             [FromServices] ISender sender,
             [FromBody] SendNotificationCommand command,
@@ -75,6 +78,7 @@ public static class NotificationEndpoints
                 : TypedResults.BadRequest(result.Error!);
         }
 
+        [Authorize]
         public static async Task<Results<Ok<object>, BadRequest<Error>>> MarkAsRead(
             [FromServices] ISender sender,
             [FromRoute] Guid notificationId,
@@ -88,6 +92,7 @@ public static class NotificationEndpoints
                 : TypedResults.BadRequest(result.Error!);
         }
 
+        [Authorize]
         public static async Task<Results<Ok<object>, BadRequest<Error>>> MarkAllAsRead(
             [FromServices] ISender sender,
             [FromRoute] Guid userId,

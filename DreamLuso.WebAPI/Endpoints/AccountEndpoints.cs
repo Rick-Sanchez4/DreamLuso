@@ -4,6 +4,7 @@ using DreamLuso.Application.CQ.Accounts.Commands.RefreshToken;
 using DreamLuso.Application.CQ.Accounts.Commands.ChangePassword;
 using DreamLuso.Application.CQ.Accounts.Commands.UpdateUserProfile;
 using DreamLuso.Application.CQ.Accounts.Commands.UploadProfileImage;
+using DreamLuso.Application.CQ.Accounts.Commands.ToggleUserStatus;
 using DreamLuso.Application.CQ.Accounts.Queries.GetUserProfile;
 using DreamLuso.Application.Common.Responses;
 using MediatR;
@@ -54,6 +55,13 @@ public static class AccountEndpoints
         // POST /api/accounts/change-password - Alterar senha
         accounts.MapPost("/change-password", Commands.ChangePassword)
                 .WithName("ChangePassword")
+                .Produces<object>(200)
+                .Produces<Error>(400)
+                .RequireAuthorization();
+
+        // PUT /api/accounts/{userId}/toggle-status - Ativar/Desativar conta (Admin only)
+        accounts.MapPut("/{userId:guid}/toggle-status", Commands.ToggleUserStatus)
+                .WithName("ToggleUserStatus")
                 .Produces<object>(200)
                 .Produces<Error>(400)
                 .RequireAuthorization();
@@ -136,6 +144,22 @@ public static class AccountEndpoints
                 ? TypedResults.Ok(new { message = "Senha alterada com sucesso" } as object)
                 : TypedResults.BadRequest(result.Error!);
         }
+
+        [Authorize]
+        public static async Task<Results<Ok<object>, BadRequest<Error>>> ToggleUserStatus(
+            [FromServices] ISender sender,
+            [FromRoute] Guid userId,
+            [FromBody] ToggleUserStatusRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new ToggleUserStatusCommand(userId, request.IsActive);
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(new { message = "Status do usuário atualizado com sucesso" } as object)
+                : TypedResults.BadRequest(result.Error!);
+        }
     }
 }
 
+public record ToggleUserStatusRequest(bool IsActive);

@@ -39,11 +39,12 @@ export class AdminClientsComponent implements OnInit {
         if (result && result.clients) {
           this.clients = result.clients.map((c: any) => ({
             id: c.id,
-            name: c.user?.fullName || 'Cliente',
-            email: c.user?.email || '',
-            phone: c.user?.phone || '',
-            properties: 0, // TODO: Get from API
-            status: 'active'
+            name: c.fullName || 'Cliente',
+            email: c.email || '',
+            phone: c.phone || 'Não informado',
+            nif: c.nif || '',
+            properties: 0, // TODO: Get from API when available
+            status: c.isActive ? 'active' : 'inactive'
           }));
         } else {
           this.useMockData();

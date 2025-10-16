@@ -7,6 +7,8 @@ import { Property, PropertySearchFilters, PropertyType, TransactionType } from '
 import { PropertyCardComponent } from '../../../../shared/components/property-card/property-card.component';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-properties',
@@ -23,7 +25,8 @@ export class PropertiesComponent implements OnInit {
 
   constructor(
     private propertyService: PropertyService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -40,23 +43,29 @@ export class PropertiesComponent implements OnInit {
   loadProperties(): void {
     this.loading = true;
     
-    if (Object.keys(this.filters).length > 0) {
-      this.propertyService.search(this.filters).subscribe(result => {
-        if (result.isSuccess && result.value) {
-          this.properties = result.value;
-          this.totalProperties = result.value.length;
+    // Build query string from filters
+    let queryParams = 'pageSize=100';
+    if (this.filters.city) queryParams += `&municipality=${this.filters.city}`;
+    if (this.filters.minPrice) queryParams += `&minPrice=${this.filters.minPrice}`;
+    if (this.filters.maxPrice) queryParams += `&maxPrice=${this.filters.maxPrice}`;
+    if (this.filters.propertyType) queryParams += `&type=${this.filters.propertyType}`;
+    if (this.filters.minBedrooms) queryParams += `&minBedrooms=${this.filters.minBedrooms}`;
+    
+    this.http.get<any>(`${environment.apiUrl}/properties?${queryParams}`).subscribe({
+      next: (result) => {
+        if (result && result.properties) {
+          this.properties = result.properties;
+          this.totalProperties = result.totalCount || result.properties.length;
         }
         this.loading = false;
-      });
-    } else {
-      this.propertyService.getAll().subscribe(result => {
-        if (result.isSuccess && result.value) {
-          this.properties = result.value;
-          this.totalProperties = result.value.length;
-        }
+      },
+      error: (error) => {
+        console.error('Error loading properties:', error);
+        this.properties = [];
+        this.totalProperties = 0;
         this.loading = false;
-      });
-    }
+      }
+    });
   }
 
   applyFilters(): void {

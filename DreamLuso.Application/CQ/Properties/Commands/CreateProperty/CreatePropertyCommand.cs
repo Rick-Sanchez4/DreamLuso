@@ -1,5 +1,6 @@
 using DreamLuso.Application.Common.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace DreamLuso.Application.CQ.Properties.Commands.CreateProperty;
 
@@ -40,6 +41,9 @@ public class CreatePropertyCommand : IRequest<Result<CreatePropertyResponse, Suc
     public bool HasGarage { get; init; }
     public bool HasPool { get; init; }
     public bool IsFurnished { get; init; }
+    
+    // Images
+    public List<IFormFile>? Images { get; init; }
 }
 
 public class CreatePropertyResponse

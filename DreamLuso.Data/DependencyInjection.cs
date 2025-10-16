@@ -1,4 +1,5 @@
 using DreamLuso.Data.Context;
+using DreamLuso.Data.Infrastructure;
 using DreamLuso.Data.Interceptors;
 using DreamLuso.Data.Repositories;
 using DreamLuso.Data.Uow;
@@ -43,6 +44,9 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IPropertyProposalRepository, PropertyProposalRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
+        
+        // Register services
+        services.AddScoped<IFileStorageService, FileStorageService>();
 
         // Register Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -68,8 +68,8 @@ export class AuthService {
 
     return this.http.post<any>(`${this.apiUrl}/accounts/refresh-token`, { refreshToken }).pipe(
       tap(response => {
-        if (response?.token) {
-          this.setTokens(response.token, response.refreshToken);
+        if (response?.token || response?.accessToken) {
+          this.setTokens(response.token || response.accessToken, response.refreshToken);
         }
       }),
       map(response => ({ isSuccess: true, value: response } as Result<LoginResponse>)),

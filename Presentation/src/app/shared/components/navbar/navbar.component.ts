@@ -19,6 +19,7 @@ export class NavbarComponent implements OnInit {
   notifications: Notification[] = [];
   unreadCount: number = 0;
   showNotifications: boolean = false;
+  isPublicRoute: boolean = true;
 
   constructor(
     private authService: AuthService,
@@ -28,6 +29,16 @@ export class NavbarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Determine initial route context
+    this.isPublicRoute = this.checkIsPublic(this.router.url);
+
+    // Update on navigation
+    this.router.events.subscribe((evt) => {
+      if ((evt as any).url) {
+        this.isPublicRoute = this.checkIsPublic((evt as any).url);
+      }
+    });
+
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       if (user) {
@@ -109,6 +120,11 @@ export class NavbarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  private checkIsPublic(url: string): boolean {
+    // Consider admin/agent/client areas as private; rest is public
+    return !/^\/(admin|agent|client)\b/.test(url);
   }
 
   getNotificationClass(notification: Notification): string {
