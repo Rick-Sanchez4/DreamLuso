@@ -37,7 +37,7 @@
             [(ngModel)]="searchTerm"
             (input)="onFilterChange()"
             placeholder="Nome ou Email..."
-            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
         </div>
 
         <!-- Role Filter -->
@@ -46,7 +46,7 @@
           <select 
             [(ngModel)]="roleFilter"
             (change)="onFilterChange()"
-            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all cursor-pointer">
             <option value="all">Todos</option>
             <option value="Admin">Administrador</option>
             <option value="RealEstateAgent">Agente</option>
@@ -60,7 +60,7 @@
           <select 
             [(ngModel)]="statusFilter"
             (change)="onFilterChange()"
-            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+            class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all cursor-pointer">
             <option value="all">Todos</option>
             <option value="active">Ativo</option>
             <option value="inactive">Inativo</option>
