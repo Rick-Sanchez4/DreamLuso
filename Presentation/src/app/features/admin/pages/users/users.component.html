@@ -222,3 +222,17 @@
   (deleteUserEvent)="deleteUserFromModal($event)">
 </app-user-detail-modal>
 
+<!-- Confirmation Modal -->
+@if (confirmModalData) {
+  <app-confirmation-modal
+    [isOpen]="showConfirmModal"
+    [title]="confirmModalData.title"
+    [message]="confirmModalData.message"
+    [type]="confirmModalData.type"
+    [confirmText]="confirmModalData.confirmText"
+    [cancelText]="confirmModalData.cancelText"
+    (confirm)="onConfirmAction()"
+    (cancel)="closeConfirmModal()">
+  </app-confirmation-modal>
+}
+

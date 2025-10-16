@@ -8,11 +8,12 @@ import { User, UserRole } from '../../../../core/models/user.model';
 import { environment } from '../../../../../environments/environment';
 import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
 import { UserDetailModalComponent } from '../../components/user-detail-modal/user-detail-modal.component';
+import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AdminSidebarComponent, UserDetailModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, AdminSidebarComponent, UserDetailModalComponent, ConfirmationModalComponent],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })
@@ -29,6 +30,17 @@ export class AdminUsersComponent implements OnInit {
   // Modal state
   showUserModal: boolean = false;
   selectedUser: User | null = null;
+
+  // Confirmation modal state
+  showConfirmModal: boolean = false;
+  confirmModalData: {
+    title: string;
+    message: string;
+    type: 'warning' | 'danger' | 'info';
+    confirmText: string;
+    cancelText: string;
+    action: () => void;
+  } | null = null;
 
   constructor(
     private http: HttpClient,
@@ -89,35 +101,67 @@ export class AdminUsersComponent implements OnInit {
 
   toggleUserStatus(userId: string, currentStatus: boolean): void {
     const action = currentStatus ? 'desativar' : 'ativar';
-    if (!confirm(`Tem certeza que deseja ${action} este usuário?`)) {
-      return;
-    }
-
-    this.http.put(`${environment.apiUrl}/users/${userId}/toggle-status`, {}).subscribe({
-      next: () => {
-        this.toastService.success(`Usuário ${action}do com sucesso!`);
-        this.loadUsers();
-      },
-      error: () => {
-        this.toastService.error('Erro ao alterar estado do usuário');
+    this.showConfirmationModal(
+      currentStatus ? '⏸ Desativar Usuário' : '▶️ Ativar Usuário',
+      `Tem certeza que deseja ${action} este usuário? ${currentStatus ? 'Ele não poderá acessar o sistema.' : 'Ele poderá voltar a acessar o sistema.'}`,
+      'warning',
+      currentStatus ? 'Sim, Desativar' : 'Sim, Ativar',
+      () => {
+        this.http.put(`${environment.apiUrl}/users/${userId}/toggle-status`, {}).subscribe({
+          next: () => {
+            this.toastService.success(`Usuário ${action}do com sucesso!`);
+            this.loadUsers();
+          },
+          error: () => {
+            this.toastService.error('Erro ao alterar estado do usuário');
+          }
+        });
       }
-    });
+    );
   }
 
   deleteUser(userId: string, userName: string): void {
-    if (!confirm(`Tem certeza que deseja ELIMINAR "${userName}"? Esta ação é irreversível!`)) {
-      return;
-    }
-
-    this.http.delete(`${environment.apiUrl}/users/${userId}`).subscribe({
-      next: () => {
-        this.toastService.success('Usuário eliminado com sucesso!');
-        this.loadUsers();
-      },
-      error: () => {
-        this.toastService.error('Erro ao eliminar usuário');
+    this.showConfirmationModal(
+      '🗑️ Eliminar Usuário',
+      `Tem certeza que deseja ELIMINAR "${userName}"? Esta ação é IRREVERSÍVEL e todos os dados serão perdidos permanentemente!`,
+      'danger',
+      'Sim, Eliminar',
+      () => {
+        this.http.delete(`${environment.apiUrl}/users/${userId}`).subscribe({
+          next: () => {
+            this.toastService.success('Usuário eliminado com sucesso!');
+            this.loadUsers();
+          },
+          error: () => {
+            this.toastService.error('Erro ao eliminar usuário');
+          }
+        });
       }
-    });
+    );
+  }
+
+  showConfirmationModal(title: string, message: string, type: 'warning' | 'danger' | 'info', confirmText: string, action: () => void): void {
+    this.confirmModalData = {
+      title,
+      message,
+      type,
+      confirmText,
+      cancelText: 'Cancelar',
+      action
+    };
+    this.showConfirmModal = true;
+  }
+
+  onConfirmAction(): void {
+    if (this.confirmModalData?.action) {
+      this.confirmModalData.action();
+    }
+    this.closeConfirmModal();
+  }
+
+  closeConfirmModal(): void {
+    this.showConfirmModal = false;
+    this.confirmModalData = null;
   }
 
   getRoleBadgeClass(role: string): string {
