@@ -1,6 +1,6 @@
 <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-  <!-- Glassmorphism Background -->
-  <div class="absolute inset-0 bg-gradient-to-r from-white/10 via-white/5 to-white/10 backdrop-blur-xl border-b border-white/20"></div>
+  <!-- Glassmorphism Background - Adapts to theme -->
+  <div class="absolute inset-0 bg-white/80 dark:bg-gradient-to-r dark:from-white/10 dark:via-white/5 dark:to-white/10 backdrop-blur-xl border-b border-gray-200 dark:border-white/20"></div>
   
   <!-- Subtle gradient line at bottom -->
   <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent"></div>
@@ -10,33 +10,33 @@
       
       <!-- Logo -->
       <div class="flex-shrink-0 cursor-pointer group" (click)="navigateTo('/')">
-        <h1 class="text-2xl font-bold text-white transition-all duration-300">
-          <span class="group-hover:text-green-300 transition-colors">Dream</span><span class="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">Luso</span>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-all duration-300">
+          <span class="group-hover:text-green-600 dark:group-hover:text-green-300 transition-colors">Dream</span><span class="bg-gradient-to-r from-green-500 to-teal-500 dark:from-green-400 dark:to-teal-400 bg-clip-text text-transparent">Luso</span>
         </h1>
       </div>
 
       <!-- Main Menu -->
       <div class="hidden md:flex items-center space-x-2">
-        <a (click)="navigateTo('/properties')" class="group px-4 py-2 text-white/90 hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-white/10 backdrop-blur-sm">
+        <a (click)="navigateTo('/properties')" class="group px-4 py-2 text-gray-700 dark:text-white/90 hover:text-gray-900 dark:hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-gray-100 dark:hover:bg-white/10 backdrop-blur-sm">
           <span class="relative">
             Imóveis
             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-green-500 group-hover:w-full transition-all duration-300"></span>
           </span>
         </a>
-        <a (click)="navigateTo('/properties?type=Sale')" class="group px-4 py-2 text-white/90 hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-white/10 backdrop-blur-sm">
+        <a (click)="navigateTo('/properties?type=Sale')" class="group px-4 py-2 text-gray-700 dark:text-white/90 hover:text-gray-900 dark:hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-gray-100 dark:hover:bg-white/10 backdrop-blur-sm">
           <span class="relative">
             Comprar
             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-green-500 group-hover:w-full transition-all duration-300"></span>
           </span>
         </a>
-        <a (click)="navigateTo('/properties?type=Rent')" class="group px-4 py-2 text-white/90 hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-white/10 backdrop-blur-sm">
+        <a (click)="navigateTo('/properties?type=Rent')" class="group px-4 py-2 text-gray-700 dark:text-white/90 hover:text-gray-900 dark:hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-gray-100 dark:hover:bg-white/10 backdrop-blur-sm">
           <span class="relative">
             Arrendar
             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-green-500 group-hover:w-full transition-all duration-300"></span>
           </span>
         </a>
         @if (currentUser) {
-          <a (click)="navigateToDashboard()" class="group px-4 py-2 text-white/90 hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-white/10 backdrop-blur-sm">
+          <a (click)="navigateToDashboard()" class="group px-4 py-2 text-gray-700 dark:text-white/90 hover:text-gray-900 dark:hover:text-white cursor-pointer transition-all font-medium rounded-full hover:bg-gray-100 dark:hover:bg-white/10 backdrop-blur-sm">
             <span class="relative">
               Dashboard
               <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-green-500 group-hover:w-full transition-all duration-300"></span>
@@ -51,7 +51,7 @@
         <!-- Dark Mode Toggle -->
         <button 
           (click)="themeService.toggleTheme()" 
-          class="p-2.5 text-white/90 hover:text-white rounded-full hover:bg-white/10 transition-all backdrop-blur-sm"
+          class="p-2.5 text-gray-700 dark:text-white/90 hover:text-gray-900 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-all backdrop-blur-sm"
           title="Alternar tema">
           @if (themeService.isDarkMode()) {
             <!-- Sun icon for light mode -->
@@ -68,10 +68,10 @@
 
         @if (!currentUser) {
           <!-- Not Logged In -->
-          <button (click)="navigateTo('/register')" class="px-5 py-2.5 text-white border-2 border-white/30 rounded-full hover:bg-white/10 hover:border-white/50 transition-all font-medium backdrop-blur-sm">
+          <button (click)="navigateTo('/register')" class="px-5 py-2.5 text-gray-700 dark:text-white border-2 border-gray-300 dark:border-white/30 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 hover:border-gray-400 dark:hover:border-white/50 transition-all font-medium backdrop-blur-sm">
             Registar
           </button>
-          <button (click)="navigateTo('/login')" class="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-full font-semibold transition-all duration-200">
+          <button (click)="navigateTo('/login')" class="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-full font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
             Entrar
           </button>
         } @else {
@@ -81,7 +81,7 @@
           <div class="relative">
             <button 
               (click)="toggleNotifications()"
-              class="relative p-3 text-white/90 hover:text-white rounded-full hover:bg-white/10 transition-all backdrop-blur-sm group">
+              class="relative p-3 text-gray-700 dark:text-white/90 hover:text-gray-900 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-all backdrop-blur-sm group">
               <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
               </svg>
@@ -170,17 +170,17 @@
 
           <!-- User Profile -->
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center text-white font-bold overflow-hidden shadow-lg ring-2 ring-white/20">
+            <div class="w-11 h-11 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center text-white font-bold overflow-hidden shadow-lg ring-2 ring-gray-200 dark:ring-white/20">
               @if (currentUser.profileImageUrl) {
                 <img [src]="currentUser.profileImageUrl" [alt]="currentUser.firstName || 'User'" class="w-full h-full object-cover">
               } @else {
                 <span class="text-sm">{{ currentUser.firstName?.[0] || 'U' }}{{ currentUser.lastName?.[0] || '' }}</span>
               }
             </div>
-            <span class="hidden lg:block text-white font-medium">
+            <span class="hidden lg:block text-gray-900 dark:text-white font-medium">
               {{ currentUser.firstName || '' }} {{ currentUser.lastName || '' }}
             </span>
-            <button (click)="logout()" class="p-2 text-white/90 hover:text-red-400 rounded-xl hover:bg-white/10 transition-all" title="Sair">
+            <button (click)="logout()" class="p-2 text-gray-700 dark:text-white/90 hover:text-red-500 dark:hover:text-red-400 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-all" title="Sair">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
               </svg>
