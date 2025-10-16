@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { User } from '../../../../core/models/user.model';
 import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 interface AdminStats {
   totalUsers: number;
@@ -47,7 +48,8 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit(): void {

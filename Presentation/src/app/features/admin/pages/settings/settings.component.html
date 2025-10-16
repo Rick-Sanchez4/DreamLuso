@@ -13,6 +13,21 @@
           <h1 class="text-3xl font-bold mb-1">Configurações do Sistema</h1>
           <p class="text-white/70 text-sm">Gerir definições e parâmetros globais</p>
         </div>
+        <!-- Theme Toggle -->
+        <button 
+          (click)="themeService.toggleTheme()" 
+          class="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all backdrop-blur-sm group"
+          title="Alternar tema">
+          @if (themeService.isDarkMode()) {
+            <svg class="w-5 h-5 text-white group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          } @else {
+            <svg class="w-5 h-5 text-white group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          }
+        </button>
       </div>
     </div>
   </div>
@@ -23,22 +38,32 @@
       
       <!-- Settings Categories -->
       <div class="lg:col-span-1">
-        <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10">
+        <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-white/10 sticky top-24">
           <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Categorias</h2>
           <div class="space-y-2">
-            <button class="w-full text-left px-4 py-3 bg-green-500/20 border-l-4 border-green-500 rounded-lg text-gray-900 dark:text-white font-semibold">
+            <button 
+              (click)="setActiveCategory('general')"
+              [class]="isActiveCategory('general') ? 'w-full text-left px-4 py-3 bg-green-500/20 border-l-4 border-green-500 rounded-lg text-gray-900 dark:text-white font-semibold transition-all' : 'w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300 transition-all'">
               ⚙️ Geral
             </button>
-            <button class="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300">
+            <button 
+              (click)="setActiveCategory('security')"
+              [class]="isActiveCategory('security') ? 'w-full text-left px-4 py-3 bg-green-500/20 border-l-4 border-green-500 rounded-lg text-gray-900 dark:text-white font-semibold transition-all' : 'w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300 transition-all'">
               🔐 Segurança
             </button>
-            <button class="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300">
+            <button 
+              (click)="setActiveCategory('notifications')"
+              [class]="isActiveCategory('notifications') ? 'w-full text-left px-4 py-3 bg-green-500/20 border-l-4 border-green-500 rounded-lg text-gray-900 dark:text-white font-semibold transition-all' : 'w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300 transition-all'">
               📧 Notificações
             </button>
-            <button class="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300">
+            <button 
+              (click)="setActiveCategory('payments')"
+              [class]="isActiveCategory('payments') ? 'w-full text-left px-4 py-3 bg-green-500/20 border-l-4 border-green-500 rounded-lg text-gray-900 dark:text-white font-semibold transition-all' : 'w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300 transition-all'">
               💰 Pagamentos
             </button>
-            <button class="w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300">
+            <button 
+              (click)="setActiveCategory('personalization')"
+              [class]="isActiveCategory('personalization') ? 'w-full text-left px-4 py-3 bg-green-500/20 border-l-4 border-green-500 rounded-lg text-gray-900 dark:text-white font-semibold transition-all' : 'w-full text-left px-4 py-3 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg text-gray-700 dark:text-gray-300 transition-all'">
               🎨 Personalização
             </button>
           </div>
@@ -48,48 +73,197 @@
       <!-- Settings Content -->
       <div class="lg:col-span-2">
         <div class="bg-white/90 dark:bg-dark-800/90 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-gray-100 dark:border-white/10">
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Configurações Gerais</h2>
           
-          <div class="space-y-6">
-            
-            <!-- Site Name -->
-            <div>
-              <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Nome do Site</label>
-              <input 
-                type="text" 
-                value="DreamLuso"
-                class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">
-            </div>
-
-            <!-- Site Description -->
-            <div>
-              <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Descrição</label>
-              <textarea 
-                rows="3"
-                class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">Plataforma de imóveis em Portugal</textarea>
-            </div>
-
-            <!-- Maintenance Mode -->
-            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+          <!-- General Settings -->
+          @if (activeCategory === 'general') {
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">⚙️ Configurações Gerais</h2>
+            <div class="space-y-6">
               <div>
-                <p class="font-bold text-gray-900 dark:text-white">Modo de Manutenção</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Desabilitar o site temporariamente</p>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Nome do Site</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="siteName"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" class="sr-only peer">
-                <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
-              </label>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Descrição</label>
+                <textarea 
+                  rows="3"
+                  [(ngModel)]="siteDescription"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500"></textarea>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+                <div>
+                  <p class="font-bold text-gray-900 dark:text-white">Modo de Manutenção</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Desabilitar o site temporariamente</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="maintenanceMode" class="sr-only peer">
+                  <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                </label>
+              </div>
             </div>
+          }
 
-            <!-- Actions -->
-            <div class="flex gap-4 pt-6">
-              <button class="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all shadow-lg">
-                💾 Salvar Alterações
-              </button>
-              <button class="px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold rounded-full transition-all">
-                ↩️ Cancelar
-              </button>
+          <!-- Security Settings -->
+          @if (activeCategory === 'security') {
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">🔐 Configurações de Segurança</h2>
+            <div class="space-y-6">
+              <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+                <div>
+                  <p class="font-bold text-gray-900 dark:text-white">Autenticação de Dois Fatores</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Adicionar camada extra de segurança</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="twoFactorAuth" class="sr-only peer">
+                  <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                </label>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Timeout de Sessão (minutos)</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="sessionTimeout"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Expiração de Senha (dias)</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="passwordExpiry"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">
+              </div>
             </div>
+          }
+
+          <!-- Notification Settings -->
+          @if (activeCategory === 'notifications') {
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">📧 Configurações de Notificações</h2>
+            <div class="space-y-6">
+              <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+                <div>
+                  <p class="font-bold text-gray-900 dark:text-white">Notificações por Email</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Receber atualizações via email</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="emailNotifications" class="sr-only peer">
+                  <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+                <div>
+                  <p class="font-bold text-gray-900 dark:text-white">Notificações por SMS</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Receber alertas via SMS</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="smsNotifications" class="sr-only peer">
+                  <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+                <div>
+                  <p class="font-bold text-gray-900 dark:text-white">Notificações Push</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Receber notificações push no browser</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="pushNotifications" class="sr-only peer">
+                  <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                </label>
+              </div>
+            </div>
+          }
+
+          <!-- Payment Settings -->
+          @if (activeCategory === 'payments') {
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">💰 Configurações de Pagamento</h2>
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Moeda Padrão</label>
+                <select 
+                  [(ngModel)]="currency"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 cursor-pointer">
+                  <option value="EUR">Euro (EUR)</option>
+                  <option value="USD">Dólar (USD)</option>
+                  <option value="GBP">Libra (GBP)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Taxa de IVA (%)</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="taxRate"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Métodos de Pagamento Disponíveis</label>
+                <div class="space-y-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+                  <label class="flex items-center gap-3">
+                    <input type="checkbox" checked class="w-5 h-5 text-green-500 bg-gray-100 border-gray-300 rounded focus:ring-green-500">
+                    <span class="text-gray-900 dark:text-white">💳 Cartão de Crédito/Débito</span>
+                  </label>
+                  <label class="flex items-center gap-3">
+                    <input type="checkbox" checked class="w-5 h-5 text-green-500 bg-gray-100 border-gray-300 rounded focus:ring-green-500">
+                    <span class="text-gray-900 dark:text-white">📱 MB WAY</span>
+                  </label>
+                  <label class="flex items-center gap-3">
+                    <input type="checkbox" checked class="w-5 h-5 text-green-500 bg-gray-100 border-gray-300 rounded focus:ring-green-500">
+                    <span class="text-gray-900 dark:text-white">🏦 Transferência Bancária</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Personalization Settings -->
+          @if (activeCategory === 'personalization') {
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">🎨 Configurações de Personalização</h2>
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Tema Padrão</label>
+                <select 
+                  [(ngModel)]="theme"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 cursor-pointer">
+                  <option value="light">☀️ Claro</option>
+                  <option value="dark">🌙 Escuro</option>
+                  <option value="auto">🔄 Automático</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Idioma</label>
+                <select 
+                  [(ngModel)]="language"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500 cursor-pointer">
+                  <option value="pt">🇵🇹 Português</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="fr">🇫🇷 Français</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Itens por Página</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="itemsPerPage"
+                  min="10"
+                  max="100"
+                  step="10"
+                  class="w-full px-4 py-3 bg-white dark:bg-dark-700 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-green-500">
+              </div>
+            </div>
+          }
+
+          <!-- Actions (shown for all categories) -->
+          <div class="flex gap-4 pt-6 mt-6 border-t border-gray-200 dark:border-white/10">
+            <button 
+              (click)="saveSettings()"
+              class="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-all shadow-lg">
+              💾 Salvar Alterações
+            </button>
+            <button 
+              (click)="cancelChanges()"
+              class="px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold rounded-full transition-all">
+              ↩️ Cancelar
+            </button>
           </div>
         </div>
       </div>
