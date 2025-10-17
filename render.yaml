@@ -1,6 +1,6 @@
 services:
   # PostgreSQL Database
-  - type: pg
+  - type: postgresql
     name: dreamluso-db
     plan: free
     region: frankfurt
