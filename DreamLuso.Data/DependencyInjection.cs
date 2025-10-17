@@ -21,8 +21,14 @@ public static class DependencyInjection
         
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
-            var connectionString = configuration.GetConnectionString("DreamLusoDB") 
-                ?? throw new InvalidOperationException("Connection string 'DreamLusoDB' not found.");
+            var connectionString = configuration.GetConnectionString("DreamLusoDB");
+            
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Connection string 'DreamLusoDB' not found or is empty. " +
+                    "Please configure ConnectionStrings__DreamLusoDB environment variable.");
+            }
             
             // Detectar o provider baseado na connection string ou variável de ambiente
             var databaseProvider = configuration["DatabaseProvider"] ?? DetectProvider(connectionString);
