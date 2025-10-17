@@ -18,13 +18,11 @@ services:
       - key: ASPNETCORE_URLS
         value: http://+:8080
       - key: ConnectionStrings__DreamLusoDB
-        fromDatabase:
-          name: dreamluso-db
-          property: connectionString
+        value: postgresql://dreamluso_db_user:AkjQS3UI1PN9eJbb5bcxgmhTIlGzMZ5R@dpg-d3p1laili9vc73cof6cg-a/dreamluso_db
       - key: DatabaseProvider
         value: PostgreSQL
       - key: JwtSettings__Key
-        generateValue: true
+        value: YHJpcvOI6k/SzVLo4bYfIhG1mlvDLcM8voe4bkVrrks=
       - key: JwtSettings__Issuer
         value: DreamLusoAPI
       - key: JwtSettings__Audience
