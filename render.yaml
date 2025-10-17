@@ -1,10 +1,10 @@
-services:
-  # PostgreSQL Database
-  - type: postgresql
-    name: dreamluso-db
+databases:
+  - name: dreamluso-db
     plan: free
     region: frankfurt
+    postgresVersion: 15
 
+services:
   # Backend API (.NET 8)
   - type: web
     name: dreamluso-api
