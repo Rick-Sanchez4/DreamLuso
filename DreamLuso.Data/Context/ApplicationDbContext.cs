@@ -30,8 +30,13 @@ public class ApplicationDbContext : DbContext
         // Aplicar configurações
         modelBuilder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
 
-        // Schema padrão
-        modelBuilder.HasDefaultSchema("DreamLuso");
+        // Schema padrão (apenas para SQL Server)
+        // PostgreSQL usa "public" por padrão
+        var provider = Database.ProviderName;
+        if (provider != null && provider.Contains("SqlServer"))
+        {
+            modelBuilder.HasDefaultSchema("DreamLuso");
+        }
 
         base.OnModelCreating(modelBuilder);
     }

@@ -1,28 +1,57 @@
-**/.classpath
-**/.dockerignore
-**/.env
-**/.git
-**/.gitignore
-**/.project
-**/.settings
-**/.toolstarget
-**/.vs
-**/.vscode
-**/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/azds.yaml
-**/bin
-**/charts
-**/docker-compose*
-**/Dockerfile*
-**/node_modules
-**/npm-debug.log
-**/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
-LICENSE
-README.md
-**/.idea
-**/Migrations
+# Git
+.git
+.gitignore
+.gitattributes
 
+# CI/CD
+.github
+.vscode
+.vs
+
+# Documentation
+*.md
+!README.md
+
+# Build artifacts
+**/bin
+**/obj
+**/out
+**/publish
+
+# Node modules (Angular)
+**/node_modules
+**/dist
+Presentation/
+
+# Database files
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Test projects
+**/*Tests
+**/*.Tests
+
+# User-specific files
+**/*.user
+**/*.suo
+**/.DS_Store
+
+# Logs
+**/*.log
+
+# Environment files
+.env
+.env.*
+
+# Docker
+docker-compose.*
+Dockerfile*
+!Dockerfile
+
+# Scripts
+scripts/
+external/
+
+# wwwroot uploads (will be created at runtime)
+wwwroot/images/properties/*

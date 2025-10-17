@@ -8,6 +8,7 @@ using DreamLuso.Domain.Core.Uow;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace DreamLuso.Data;
 
@@ -23,10 +24,35 @@ public static class DependencyInjection
             var connectionString = configuration.GetConnectionString("DreamLusoDB") 
                 ?? throw new InvalidOperationException("Connection string 'DreamLusoDB' not found.");
             
-            options.UseSqlServer(connectionString, sqlOptions =>
+            // Detectar o provider baseado na connection string ou variável de ambiente
+            var databaseProvider = configuration["DatabaseProvider"] ?? DetectProvider(connectionString);
+            
+            switch (databaseProvider.ToLower())
             {
-                sqlOptions.CommandTimeout(30);
-            });
+                case "postgresql":
+                case "postgres":
+                    options.UseNpgsql(connectionString, npgsqlOptions =>
+                    {
+                        npgsqlOptions.CommandTimeout(30);
+                        npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "public");
+                    });
+                    break;
+                    
+                case "sqlite":
+                    options.UseSqlite(connectionString, sqliteOptions =>
+                    {
+                        sqliteOptions.CommandTimeout(30);
+                    });
+                    break;
+                    
+                case "sqlserver":
+                default:
+                    options.UseSqlServer(connectionString, sqlOptions =>
+                    {
+                        sqlOptions.CommandTimeout(30);
+                    });
+                    break;
+            }
             
             // Add interceptor
             var auditInterceptor = serviceProvider.GetRequiredService<AuditableEntityInterceptor>();
@@ -52,6 +78,19 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
+    }
+    
+    private static string DetectProvider(string connectionString)
+    {
+        // Detectar provider baseado na connection string
+        if (connectionString.Contains("Host=") || connectionString.Contains("Server=") && connectionString.Contains("Database=") && !connectionString.Contains("TrustServerCertificate"))
+            return "postgresql";
+        
+        if (connectionString.Contains("Data Source=") && connectionString.EndsWith(".db"))
+            return "sqlite";
+        
+        // Default: SQL Server
+        return "sqlserver";
     }
 }
 
