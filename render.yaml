@@ -2,13 +2,10 @@ services:
   # PostgreSQL Database
   - type: pserv
     name: dreamluso-db
-    env: docker
     plan: free
     region: frankfurt
-    databases:
-      - name: dreamluso
-        databaseName: dreamluso_db
-        user: dreamluso_user
+    databaseName: dreamluso_db
+    databaseUser: dreamluso_user
 
   # Backend API (.NET 8)
   - type: web
@@ -35,17 +32,6 @@ services:
         value: DreamLusoAPI
       - key: JwtSettings__Audience
         value: DreamLusoClient
-      - key: AppSettings__BaseUrl
-        sync: false
     healthCheckPath: /health
     autoDeploy: true
-    buildFilter:
-      paths:
-        - DreamLuso.WebAPI/**
-        - DreamLuso.Application/**
-        - DreamLuso.Data/**
-        - DreamLuso.Domain/**
-        - DreamLuso.Domain.Core/**
-        - DreamLuso.Security/**
-        - DreamLuso.IoC/**
 
