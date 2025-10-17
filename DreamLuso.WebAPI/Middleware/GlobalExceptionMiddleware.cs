@@ -9,11 +9,13 @@ public class GlobalExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionMiddleware> _logger;
+    private readonly IHostEnvironment _environment;
 
-    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
+    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger, IHostEnvironment environment)
     {
         _next = next;
         _logger = logger;
+        _environment = environment;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -24,12 +26,13 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ocorreu um erro não tratado");
-            await HandleExceptionAsync(context, ex);
+            _logger.LogError(ex, "Ocorreu um erro não tratado: {Message}. StackTrace: {StackTrace}", 
+                ex.Message, ex.StackTrace);
+            await HandleExceptionAsync(context, ex, _environment);
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception, IHostEnvironment environment)
     {
         context.Response.ContentType = "application/json";
 
@@ -65,11 +68,16 @@ public class GlobalExceptionMiddleware
         }
         else
         {
-            response = new
+            var errorDetails = new
             {
                 statusCode = (int)HttpStatusCode.InternalServerError,
-                message = "Ocorreu um erro interno no servidor"
+                message = "Ocorreu um erro interno no servidor",
+                // Include detailed error in Production for debugging (remove later)
+                detail = exception.Message,
+                stackTrace = environment.IsProduction() ? exception.StackTrace : null
             };
+            
+            response = errorDetails;
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
         }
 
