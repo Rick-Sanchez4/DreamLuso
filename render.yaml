@@ -2,7 +2,6 @@ databases:
   - name: dreamluso-db
     plan: free
     region: frankfurt
-    postgresVersion: 15
 
 services:
   # Backend API (.NET 8)
