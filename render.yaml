@@ -4,8 +4,6 @@ services:
     name: dreamluso-db
     plan: free
     region: frankfurt
-    databaseName: dreamluso_db
-    databaseUser: dreamluso_user
 
   # Backend API (.NET 8)
   - type: web
