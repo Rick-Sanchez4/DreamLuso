@@ -89,7 +89,8 @@ public static class DependencyInjection
     private static string DetectProvider(string connectionString)
     {
         // Detectar provider baseado na connection string
-        if (connectionString.Contains("Host=") || connectionString.Contains("Server=") && connectionString.Contains("Database=") && !connectionString.Contains("TrustServerCertificate"))
+        if (connectionString.StartsWith("postgresql://") || connectionString.Contains("Host=") || 
+            (connectionString.Contains("Server=") && connectionString.Contains("Database=") && !connectionString.Contains("TrustServerCertificate")))
             return "postgresql";
         
         if (connectionString.Contains("Data Source=") && connectionString.EndsWith(".db"))
