@@ -88,14 +88,20 @@ try
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         
         logger.LogInformation("Applying database migrations...");
+        
+        // Ensure database exists
+        dbContext.Database.EnsureCreated();
+        
+        // Apply migrations
         dbContext.Database.Migrate();
+        
         logger.LogInformation("Database migrations applied successfully.");
     }
 }
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred while applying database migrations.");
+    logger.LogError(ex, "An error occurred while applying database migrations: {Error}", ex.Message);
     // Don't throw - let the app start anyway
 }
 
