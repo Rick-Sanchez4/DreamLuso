@@ -37,6 +37,10 @@ public class ApplicationDbContext : DbContext
         {
             modelBuilder.HasDefaultSchema("DreamLuso");
         }
+        else if (provider != null && provider.Contains("PostgreSQL"))
+        {
+            modelBuilder.HasDefaultSchema("public");
+        }
 
         base.OnModelCreating(modelBuilder);
     }
