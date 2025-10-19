@@ -130,6 +130,35 @@ app.RegisterEndpoints();
 // Health Check Endpoint
 app.MapHealthChecks("/health");
 
+// Temporary migration endpoint
+app.MapPost("/migrate", async (IServiceProvider serviceProvider) =>
+{
+    try
+    {
+        using var scope = serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<DreamLuso.Data.Context.ApplicationDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
+        logger.LogInformation("Applying database migrations via endpoint...");
+        
+        // Ensure database exists
+        await dbContext.Database.EnsureCreatedAsync();
+        
+        // Apply migrations
+        await dbContext.Database.MigrateAsync();
+        
+        logger.LogInformation("Database migrations applied successfully via endpoint.");
+        
+        return Results.Ok(new { message = "Migrations applied successfully" });
+    }
+    catch (Exception ex)
+    {
+        var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error applying migrations via endpoint: {Error}", ex.Message);
+        return Results.Problem($"Error applying migrations: {ex.Message}");
+    }
+});
+
 // Map Controllers (PropertyController)
 app.MapControllers();
 
