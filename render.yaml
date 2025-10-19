@@ -22,7 +22,7 @@ services:
       - key: DatabaseProvider
         value: PostgreSQL
       - key: JwtSettings__Key
-        value: YHJpcvOI6k/SzVLo4bYfIhG1mlvDLcM8voe4bkVrrks=
+        value: 0zKcZFfNBjy0tIfsegXTVcYZEWH7ueQqO2RoUyW98JeJbFwznay6cXlBb56d54+X78OsMmek4BdcZyj8ITPvpw==
       - key: JwtSettings__Issuer
         value: DreamLusoAPI
       - key: JwtSettings__Audience
