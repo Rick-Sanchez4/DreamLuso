@@ -50,7 +50,7 @@ public class TokenService : ITokenService
         }
 
         // Create credentials
-        var credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
+        var credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature);
 
         // Describe the token
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -91,7 +91,7 @@ public class TokenService : ITokenService
         
         var jwtSecurityToken = securityToken as JwtSecurityToken;
         if (jwtSecurityToken == null || 
-            !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512Signature, StringComparison.InvariantCultureIgnoreCase))
+            !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature, StringComparison.InvariantCultureIgnoreCase))
         {
             throw new SecurityTokenException("Token inválido");
         }
