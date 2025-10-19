@@ -30,6 +30,12 @@ public static class DependencyInjection
                     "Please configure ConnectionStrings__DreamLusoDB environment variable.");
             }
             
+            // Converter connection string do formato postgresql:// para formato tradicional se necessário
+            if (connectionString.StartsWith("postgresql://"))
+            {
+                connectionString = ConvertPostgresUrlToConnectionString(connectionString);
+            }
+            
             // Detectar o provider baseado na connection string ou variável de ambiente
             var databaseProvider = configuration["DatabaseProvider"] ?? DetectProvider(connectionString);
             
@@ -84,6 +90,32 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
+    }
+    
+    private static string ConvertPostgresUrlToConnectionString(string postgresUrl)
+    {
+        // Converter postgresql://user:password@host:port/database para formato tradicional
+        // Exemplo: postgresql://user:pass@host:5432/db -> Host=host;Port=5432;Database=db;Username=user;Password=pass
+        
+        var uri = new Uri(postgresUrl);
+        var connectionString = $"Host={uri.Host};";
+        
+        if (uri.Port != -1)
+            connectionString += $"Port={uri.Port};";
+        
+        if (!string.IsNullOrEmpty(uri.AbsolutePath) && uri.AbsolutePath.Length > 1)
+            connectionString += $"Database={uri.AbsolutePath.Substring(1)};";
+        
+        if (!string.IsNullOrEmpty(uri.UserInfo))
+        {
+            var userInfo = uri.UserInfo.Split(':');
+            if (userInfo.Length >= 1)
+                connectionString += $"Username={userInfo[0]};";
+            if (userInfo.Length >= 2)
+                connectionString += $"Password={userInfo[1]};";
+        }
+        
+        return connectionString;
     }
     
     private static string DetectProvider(string connectionString)
