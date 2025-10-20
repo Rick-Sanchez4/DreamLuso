@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # SQL Server Database Local
+  dreamluso-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dreamluso-sqlserver-local
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=DreamLuso2025!
+      - MSSQL_PID=Developer
+      - MSSQL_TCP_PORT=1433
+    ports:
+      - "1433:1433"
+    volumes:
+      - dreamluso-sqlserver-data:/var/opt/mssql
+      - ./scripts/init-sqlserver.sql:/docker-entrypoint-initdb.d/init-sqlserver.sql
+    networks:
+      - dreamluso-local-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'DreamLuso2025!' -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # Azure Data Studio (opcional - interface web para SQL Server)
+  dreamluso-azuredatastudio:
+    image: mcr.microsoft.com/azure-data-studio:latest
+    container_name: dreamluso-azuredatastudio-local
+    environment:
+      - DISPLAY=:0
+    ports:
+      - "8081:8080"
+    volumes:
+      - dreamluso-azuredatastudio-data:/root/.azuredatastudio
+    networks:
+      - dreamluso-local-network
+    depends_on:
+      dreamluso-sqlserver:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # DreamLuso API (opcional - pode rodar localmente)
+  dreamluso-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dreamluso-api-local
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Local
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DreamLusoDB=Server=dreamluso-sqlserver;Database=DreamLusoDB;User Id=sa;Password=DreamLuso2025!;TrustServerCertificate=True;MultipleActiveResultSets=True;
+      - DatabaseProvider=SqlServer
+    ports:
+      - "5149:80"
+    depends_on:
+      dreamluso-sqlserver:
+        condition: service_healthy
+    networks:
+      - dreamluso-local-network
+    volumes:
+      - ./DreamLuso.WebAPI/wwwroot:/app/wwwroot
+    restart: unless-stopped
+
+networks:
+  dreamluso-local-network:
+    driver: bridge
+
+volumes:
+  dreamluso-sqlserver-data:
+    driver: local
+  dreamluso-azuredatastudio-data:
+    driver: local
