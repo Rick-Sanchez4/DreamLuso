@@ -117,24 +117,7 @@ catch (Exception ex)
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Handle OPTIONS requests for CORS preflight
-app.Use(async (context, next) =>
-{
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.Headers.Add("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
-        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
-        context.Response.Headers.Add("Access-Control-Max-Age", "86400");
-        context.Response.StatusCode = 200;
-        await context.Response.WriteAsync(string.Empty);
-        return;
-    }
-    await next();
-});
-
-// CORS must be before other middleware
+// CORS must be before other middleware - handles OPTIONS preflight automatically
 app.UseCors("AllowAngularApp");
 
 // Global exception handling
