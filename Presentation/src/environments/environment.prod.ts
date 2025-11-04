@@ -14,6 +14,6 @@
 
 export const environment = {
   production: true,
-  apiUrl: 'https://dreamluso-api.onrender.com/api' // ← Atualize com URL do ngrok quando disponível
+  apiUrl: 'https://lifelong-jamal-scarless.ngrok-free.dev/api'
 };
 
