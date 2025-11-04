@@ -1,19 +1,17 @@
-// ⚠️ IMPORTANTE: Atualize esta URL quando iniciar o ngrok!
+// ⚠️ IMPORTANTE: Atualize esta URL com a URL real do Render após o deploy!
 // 
 // Passos:
-// 1. Inicie o backend local: ./start-backend.sh
-// 2. Inicie o ngrok: ./start-ngrok.sh
-// 3. Copie a URL do ngrok (ex: https://abc123.ngrok-free.app)
-// 4. Atualize apiUrl abaixo com a URL do ngrok
-// 5. Faça commit e push para o Vercel fazer redeploy
+// 1. Faça o deploy no Render
+// 2. Copie a URL do serviço (ex: https://dreamluso-api.onrender.com)
+// 3. Atualize apiUrl abaixo com a URL do Render
+// 4. Faça commit e push para o Vercel fazer redeploy
 //
-// Exemplo: apiUrl: 'https://abc123.ngrok-free.app/api'
+// Exemplo: apiUrl: 'https://dreamluso-api.onrender.com/api'
 //
-// TEMPORÁRIO: Usando URL placeholder para permitir build
-// Atualize com a URL real do ngrok antes de usar
+// TEMPORÁRIO: Usando URL placeholder - ATUALIZE COM A URL REAL DO RENDER!
 
 export const environment = {
   production: true,
-  apiUrl: 'https://lifelong-jamal-scarless.ngrok-free.dev/api'
+  apiUrl: 'https://dreamluso-api.onrender.com/api' // ← ATUALIZE COM A URL REAL DO RENDER
 };
 

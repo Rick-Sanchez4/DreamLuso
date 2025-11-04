@@ -7,6 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure port for Render (Render sets PORT environment variable)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://+:{port}");
+
 // Add services to the container.
 builder.Services.AddControllers(); // Para usar Controllers (PropertyController)
 builder.Services.AddEndpointsApiExplorer();
