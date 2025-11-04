@@ -46,7 +46,7 @@ public class RejectProposalCommandHandler : IRequestHandler<RejectProposalComman
             notificationMessage += "Sinta-se à vontade para fazer uma nova proposta ou explorar outros imóveis.";
             
             var notificationCommand = new SendNotificationCommand(
-                SenderId: Guid.Empty, // System notification
+                SenderId: null, // System notification
                 RecipientId: client.UserId,
                 Message: notificationMessage,
                 Type: NotificationType.Proposal,

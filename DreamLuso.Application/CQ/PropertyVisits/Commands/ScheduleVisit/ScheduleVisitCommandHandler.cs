@@ -89,7 +89,7 @@ public class ScheduleVisitCommandHandler : IRequestHandler<ScheduleVisitCommand,
                                  $"O agente {((RealEstateAgent)agent).User.Name.FullName} entrará em contato.";
         
         await _sender.Send(new SendNotificationCommand(
-            SenderId: Guid.Empty,
+            SenderId: null,
             RecipientId: ((Client)client).UserId,
             Message: clientNotification,
             Type: NotificationType.Visit,
@@ -102,7 +102,7 @@ public class ScheduleVisitCommandHandler : IRequestHandler<ScheduleVisitCommand,
         var agentNotification = $"📅 Nova visita agendada! Cliente {((Client)client).User.Name.FullName} agendou visita ao imóvel '{((Property)property).Title}' para {request.VisitDate:dd/MM/yyyy} às {request.TimeSlot}.";
         
         await _sender.Send(new SendNotificationCommand(
-            SenderId: Guid.Empty,
+            SenderId: null,
             RecipientId: ((RealEstateAgent)agent).UserId,
             Message: agentNotification,
             Type: NotificationType.Visit,

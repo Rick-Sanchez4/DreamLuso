@@ -47,7 +47,7 @@ public class ApproveAgentCommandHandler : IRequestHandler<ApproveAgentCommand, R
                                  $"Agora você pode começar a listar propriedades e atender clientes.";
             
             var notificationCommand = new SendNotificationCommand(
-                SenderId: Guid.Empty, // System notification
+                SenderId: null, // System notification
                 RecipientId: user.Id,
                 Message: approvalMessage,
                 Type: NotificationType.SystemAlert,
@@ -75,7 +75,7 @@ public class ApproveAgentCommandHandler : IRequestHandler<ApproveAgentCommand, R
             rejectionMessage += "Entre em contato com o suporte para mais informações.";
             
             var notificationCommand = new SendNotificationCommand(
-                SenderId: Guid.Empty, // System notification
+                SenderId: null, // System notification
                 RecipientId: user.Id,
                 Message: rejectionMessage,
                 Type: NotificationType.SystemAlert,

@@ -50,7 +50,7 @@ public class TokenService : ITokenService
         }
 
         // Create credentials
-        var credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature);
+        var credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
 
         // Describe the token
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -77,26 +77,25 @@ public class TokenService : ITokenService
 
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
-        var tokenValidationParameters = new TokenValidationParameters
+        try
         {
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = _key,
-            ValidateLifetime = false // Don't validate lifetime for expired tokens
-        };
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = false,
+                ValidateLifetime = false // Don't validate lifetime for expired tokens
+            };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-        
-        var jwtSecurityToken = securityToken as JwtSecurityToken;
-        if (jwtSecurityToken == null || 
-            !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature, StringComparison.InvariantCultureIgnoreCase))
-        {
-            throw new SecurityTokenException("Token inválido");
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            
+            return principal;
         }
-
-        return principal;
+        catch (Exception ex)
+        {
+            throw new SecurityTokenException($"Token inválido: {ex.Message}");
+        }
     }
 }
 

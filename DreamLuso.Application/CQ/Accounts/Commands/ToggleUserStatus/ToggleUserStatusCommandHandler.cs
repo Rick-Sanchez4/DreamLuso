@@ -42,9 +42,9 @@ public class ToggleUserStatusCommandHandler : IRequestHandler<ToggleUserStatusCo
                 ? $"✅ Sua conta foi ativada! Bem-vindo de volta ao DreamLuso."
                 : $"⚠️ Sua conta foi desativada. Entre em contato com o suporte para mais informações.";
 
-            // System notification (SenderId = Empty Guid for system messages)
+            // System notification (SenderId = null for system messages)
             var notificationCommand = new SendNotificationCommand(
-                SenderId: Guid.Empty, // System notification
+                SenderId: null, // System notification
                 RecipientId: user.Id,
                 Message: notificationMessage,
                 Type: NotificationType.SystemAlert,

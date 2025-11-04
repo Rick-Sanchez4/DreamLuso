@@ -55,7 +55,8 @@ var configOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigin
 var defaultOrigins = new[] { 
     "http://localhost:4200",
     "https://dream-luso.vercel.app",
-    "https://dreamluso.onrender.com"
+    "https://dreamluso.onrender.com",
+    "https://lifelong-jamal-scarless.ngrok-free.dev"
 };
 
 var allowedOrigins = !string.IsNullOrEmpty(corsOriginsEnv)

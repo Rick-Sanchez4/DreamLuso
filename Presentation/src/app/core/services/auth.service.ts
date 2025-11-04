@@ -62,14 +62,19 @@ export class AuthService {
 
   refreshAccessToken(): Observable<Result<LoginResponse>> {
     const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      return of({ isSuccess: false, error: { code: 'NO_REFRESH_TOKEN', description: 'No refresh token available' } } as Result<LoginResponse>);
+    const accessToken = this.getAccessToken();
+    
+    if (!refreshToken || !accessToken) {
+      return of({ isSuccess: false, error: { code: 'NO_TOKENS', description: 'No tokens available' } } as Result<LoginResponse>);
     }
 
-    return this.http.post<any>(`${this.apiUrl}/accounts/refresh-token`, { refreshToken }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/accounts/refresh-token`, { 
+      accessToken: accessToken,
+      refreshToken: refreshToken 
+    }).pipe(
       tap(response => {
-        if (response?.token || response?.accessToken) {
-          this.setTokens(response.token || response.accessToken, response.refreshToken);
+        if (response?.accessToken && response?.refreshToken) {
+          this.setTokens(response.accessToken, response.refreshToken);
         }
       }),
       map(response => ({ isSuccess: true, value: response } as Result<LoginResponse>)),

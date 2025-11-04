@@ -25,11 +25,19 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 
     public async Task<Result<RefreshTokenResponse, Success, Error>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        // Validate access token structure (without validating expiry)
-        var principal = _tokenService.GetPrincipalFromExpiredToken(request.AccessToken);
-        if (principal == null)
+        try
         {
-            _logger.LogWarning("Token de acesso inválido");
+            // Validate access token structure (without validating expiry)
+            var principal = _tokenService.GetPrincipalFromExpiredToken(request.AccessToken);
+            if (principal == null)
+            {
+                _logger.LogWarning("Token de acesso inválido");
+                return Error.InvalidToken;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao validar token de acesso: {Message}", ex.Message);
             return Error.InvalidToken;
         }
 

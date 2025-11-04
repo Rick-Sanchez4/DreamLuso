@@ -120,28 +120,17 @@ fi
 
 # Iniciar ngrok em background
 log "Iniciando ngrok..."
-ngrok http 5149 > ngrok.log 2>&1 &
+ngrok http --url=lifelong-jamal-scarless.ngrok-free.dev 5149 > ngrok.log 2>&1 &
 NGROK_PID=$!
 echo $NGROK_PID > ngrok.pid
 
 log "Aguardando ngrok iniciar..."
 sleep 5
 
-# Obter URL do ngrok via API
-log "Obtendo URL do ngrok..."
-for i in {1..10}; do
-    NGROK_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*"' | head -1 | cut -d'"' -f4 || echo "")
-    if [ ! -z "$NGROK_URL" ]; then
-        break
-    fi
-    sleep 1
-done
-
-if [ -z "$NGROK_URL" ]; then
-    error "Não foi possível obter URL do ngrok. Verifique ngrok.log"
-    cat ngrok.log
-    exit 1
-fi
+# Usar domínio fixo do ngrok
+NGROK_URL="https://lifelong-jamal-scarless.ngrok-free.dev"
+log "Usando domínio ngrok: $NGROK_URL"
+sleep 3
 
 success "✅ ngrok rodando: $NGROK_URL"
 echo "$NGROK_URL" > .ngrok_url

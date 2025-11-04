@@ -95,7 +95,7 @@ export class AdminUsersComponent implements OnInit {
       'warning',
       currentStatus ? 'Sim, Desativar' : 'Sim, Ativar',
       () => {
-        this.http.put(`${environment.apiUrl}/users/${userId}/toggle-status`, {}).subscribe({
+        this.http.put(`${environment.apiUrl}/users/${userId}/toggle-status`, { isActive: !currentStatus }).subscribe({
           next: () => {
             this.toastService.success(`Usuário ${action}do com sucesso!`);
             this.loadUsers();

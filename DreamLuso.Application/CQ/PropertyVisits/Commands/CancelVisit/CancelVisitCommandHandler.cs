@@ -64,7 +64,7 @@ public class CancelVisitCommandHandler : IRequestHandler<CancelVisitCommand, Res
             // Notify client
             var clientNotification = $"❌ Visita cancelada. Sua visita ao imóvel '{((Property)property).Title}' agendada para {visit.VisitDate:dd/MM/yyyy} foi cancelada.{cancellationMsg}";
             await _sender.Send(new SendNotificationCommand(
-                SenderId: Guid.Empty,
+                SenderId: null,
                 RecipientId: ((Client)client).UserId,
                 Message: clientNotification,
                 Type: NotificationType.Visit,
@@ -76,7 +76,7 @@ public class CancelVisitCommandHandler : IRequestHandler<CancelVisitCommand, Res
             // Notify agent
             var agentNotification = $"❌ Visita cancelada. A visita do cliente {((Client)client).User.Name.FullName} ao imóvel '{((Property)property).Title}' foi cancelada.{cancellationMsg}";
             await _sender.Send(new SendNotificationCommand(
-                SenderId: Guid.Empty,
+                SenderId: null,
                 RecipientId: ((RealEstateAgent)agent).UserId,
                 Message: agentNotification,
                 Type: NotificationType.Visit,

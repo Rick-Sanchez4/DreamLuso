@@ -85,3 +85,5 @@ logs/
 *.db-shm
 *.db-wal
 
+vscode.appimage
+vscode.appimage
