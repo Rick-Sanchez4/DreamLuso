@@ -47,12 +47,28 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 });
 
-// CORS Configuration
+// CORS Configuration - prioritize environment variable, then config, then defaults
 var corsOriginsEnv = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+var configOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() 
+    ?? Array.Empty<string>();
+
+var defaultOrigins = new[] { 
+    "http://localhost:4200",
+    "https://dream-luso.vercel.app",
+    "https://dreamluso.onrender.com"
+};
+
 var allowedOrigins = !string.IsNullOrEmpty(corsOriginsEnv)
     ? corsOriginsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-    : builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() 
-        ?? new[] { "http://localhost:4200" };
+    : configOrigins.Length > 0 
+        ? configOrigins 
+        : defaultOrigins;
+
+// Ensure Vercel domain is always included
+if (!allowedOrigins.Contains("https://dream-luso.vercel.app"))
+{
+    allowedOrigins = allowedOrigins.Concat(new[] { "https://dream-luso.vercel.app" }).ToArray();
+}
 
 builder.Services.AddCors(options =>
 {
@@ -64,6 +80,17 @@ builder.Services.AddCors(options =>
               .AllowCredentials()
               .SetPreflightMaxAge(TimeSpan.FromSeconds(86400)); // Cache preflight for 24 hours
     });
+    
+    // Add a more permissive policy for development (optional - can be removed in production)
+    if (builder.Environment.IsDevelopment())
+    {
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    }
 });
 
 // Add application services
@@ -118,7 +145,15 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 // CORS must be before other middleware - handles OPTIONS preflight automatically
-app.UseCors("AllowAngularApp");
+// Use default policy in development, specific policy in production
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(); // Uses default policy
+}
+else
+{
+    app.UseCors("AllowAngularApp"); // Uses specific policy with credentials
+}
 
 // Global exception handling
 app.UseMiddleware<GlobalExceptionMiddleware>();
