@@ -48,8 +48,11 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 // CORS Configuration
-var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() 
-    ?? new[] { "http://localhost:4200" };
+var corsOriginsEnv = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+var allowedOrigins = !string.IsNullOrEmpty(corsOriginsEnv)
+    ? corsOriginsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    : builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() 
+        ?? new[] { "http://localhost:4200" };
 
 builder.Services.AddCors(options =>
 {
