@@ -1,7 +1,9 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://dreamluso-api.onrender.com/api'
-  // Se a API estiver rodando local, use ngrok ou similar para expor
-  // apiUrl: 'https://seu-ngrok-url.ngrok.io/api'
+  // API URL pode ser configurada via variável de ambiente no Vercel
+  // Se não definida, usa ngrok ou outra URL pública
+  apiUrl: (typeof process !== 'undefined' && process.env['NG_APP_API_URL']) 
+    ? process.env['NG_APP_API_URL'] + '/api'
+    : 'https://dreamluso-api.onrender.com/api'
 };
 
