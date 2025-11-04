@@ -4,18 +4,21 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProposalService } from '../../../../core/services/proposal.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ClientService } from '../../../../core/services/client.service';
 import { PropertyProposal } from '../../../../core/models/proposal.model';
 import { User } from '../../../../core/models/user.model';
+import { ClientSidebarComponent } from '../../components/client-sidebar/client-sidebar.component';
 
 @Component({
   selector: 'app-client-proposals',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ClientSidebarComponent],
   templateUrl: './proposals.component.html',
   styleUrl: './proposals.component.scss'
 })
 export class ClientProposalsComponent implements OnInit {
   currentUser: User | null = null;
+  clientId: string | null = null;
   proposals: PropertyProposal[] = [];
   filteredProposals: PropertyProposal[] = [];
   loading: boolean = true;
@@ -27,19 +30,33 @@ export class ClientProposalsComponent implements OnInit {
 
   constructor(
     private proposalService: ProposalService,
-    private authService: AuthService
+    private authService: AuthService,
+    private clientService: ClientService
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     if (this.currentUser) {
-      this.loadProposals();
+      this.loadClientProfile();
     }
   }
 
+  loadClientProfile(): void {
+    this.clientService.getByUserId(this.currentUser!.id).subscribe({
+      next: (client: any) => {
+        this.clientId = client?.id || null;
+        this.loadProposals();
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
   loadProposals(): void {
+    if (!this.clientId) return;
     this.loading = true;
-    this.proposalService.getByClient(this.currentUser!.id).subscribe(result => {
+    this.proposalService.getByClient(this.clientId).subscribe(result => {
       if (result.isSuccess && result.value) {
         this.proposals = result.value;
         this.applyFilters();

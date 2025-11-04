@@ -7,11 +7,12 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { User, UpdateProfileRequest } from '../../../../core/models/user.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { ClientSidebarComponent } from '../../components/client-sidebar/client-sidebar.component';
 
 @Component({
   selector: 'app-client-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ClientSidebarComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })

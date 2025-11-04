@@ -9,11 +9,13 @@ import { PropertyProposal } from '../../../../core/models/proposal.model';
 import { User } from '../../../../core/models/user.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { ClientSidebarComponent } from '../../components/client-sidebar/client-sidebar.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-client-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ClientSidebarComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -42,7 +44,8 @@ export class ClientDashboardComponent implements OnInit {
     private clientService: ClientService,
     private proposalService: ProposalService,
     private notificationService: NotificationService,
-    private http: HttpClient
+    private http: HttpClient,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit(): void {

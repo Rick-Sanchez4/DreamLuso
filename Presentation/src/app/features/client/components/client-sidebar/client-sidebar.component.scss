@@ -1,0 +1,9 @@
+aside {
+  &.collapsed {
+    .active {
+      border-left-width: 0 !important;
+    }
+  }
+}
+
+

@@ -1,0 +1,119 @@
+<app-client-sidebar></app-client-sidebar>
+
+<div class="ml-72 min-h-screen transition-all duration-300 bg-gradient-to-br from-gray-50 via-white to-green-50/20 dark:from-dark-950 dark:via-dark-900 dark:to-green-950">
+  <div class="bg-gradient-to-r from-green-800 via-teal-800 to-emerald-800 dark:from-green-950 dark:via-teal-950 dark:to-emerald-950 text-white shadow-xl sticky top-0 z-40">
+    <div class="px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs font-semibold mb-2">📅 Minhas Visitas</div>
+          <h1 class="text-3xl font-bold">Minhas Visitas</h1>
+          <p class="text-white/70 text-sm">Acompanhe as visitas agendadas e concluídas</p>
+        </div>
+        <button routerLink="/client/dashboard" class="px-4 py-2 text-white/80 hover:text-white transition-colors">
+          ← Voltar ao Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-8 py-8">
+
+    <div class="bg-white dark:bg-dark-800 dark:border dark:border-white/10 rounded-xl shadow-md p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pesquisar</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onFilterChange()"
+            placeholder="Imóvel, agente..."
+            class="w-full px-4 py-2 border border-gray-300 dark:border-white/10 bg-white dark:bg-dark-750 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+          <select 
+            [(ngModel)]="statusFilter"
+            (change)="onFilterChange()"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-white/10 bg-white dark:bg-dark-750 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            <option value="all">Todos</option>
+            <option value="Pending">Pendente</option>
+            <option value="Confirmed">Confirmada</option>
+            <option value="Completed">Concluída</option>
+            <option value="Cancelled">Cancelada</option>
+            <option value="NoShow">Faltou</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      @if (loading) {
+        <div class="bg-white dark:bg-dark-800 dark:border dark:border-white/10 rounded-xl shadow-md p-12 text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-500 border-t-transparent mx-auto"></div>
+          <p class="text-gray-600 mt-4">A carregar visitas...</p>
+        </div>
+      } @else if (filteredVisits.length === 0) {
+        <div class="bg-white dark:bg-dark-800 dark:border dark:border-white/10 rounded-xl shadow-md p-12 text-center">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhuma visita encontrada</h3>
+          <p class="text-gray-600 mb-4">Quando agendar visitas, elas aparecerão aqui</p>
+        </div>
+      } @else {
+        @for (visit of filteredVisits; track visit.id) {
+          <div class="bg-white dark:bg-dark-800 dark:border dark:border-white/10 rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+            <div class="p-6">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ visit.propertyTitle || 'Imóvel' }}</h3>
+                  <div class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                      {{ visit.scheduledDate | date: 'dd/MM/yyyy HH:mm' }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {{ visit.duration }} min
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A1 1 0 016 17h12a1 1 0 01.879.515l3 5.196A1 1 0 0121 24H3a1 1 0 01-.879-1.485l3-5.196z"/>
+                      </svg>
+                      {{ visit.agentName || 'Agente' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-3">
+                  <span [class]="getStatusBadgeClass(visit.status)">
+                    {{ visit.status }}
+                  </span>
+                </div>
+              </div>
+              @if (visit.notes) {
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <span class="font-medium">Notas:</span> {{ visit.notes }}
+                  </p>
+                </div>
+              }
+              @if (visit.feedback) {
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <span class="font-medium">Feedback:</span> {{ visit.feedback }}
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+
