@@ -1,4 +1,5 @@
 services:
+  # Backend API
   - type: web
     name: dreamluso-api
     runtime: docker
@@ -23,6 +24,17 @@ services:
       - key: JwtSettings__RefreshTokenExpirationInDays
         value: 7
       - key: CORS_ALLOWED_ORIGINS
-        value: https://dream-luso.vercel.app,https://dreamluso.onrender.com
+        value: https://dream-luso.vercel.app,https://dreamluso-frontend.onrender.com,https://dreamluso-api.onrender.com
     healthCheckPath: /health
+
+  # Frontend Angular
+  - type: web
+    name: dreamluso-frontend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Presentation/Dockerfile
+    dockerContext: ./Presentation
+    envVars:
+      - key: NODE_ENV
+        value: production
 
