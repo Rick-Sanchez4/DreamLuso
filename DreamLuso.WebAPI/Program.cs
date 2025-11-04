@@ -61,7 +61,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromSeconds(86400)); // Cache preflight for 24 hours
     });
 });
 
@@ -81,6 +82,10 @@ builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+// Log CORS configuration on startup
+var corsLogger = app.Services.GetRequiredService<ILogger<Program>>();
+corsLogger.LogInformation("CORS Allowed Origins: {Origins}", string.Join(", ", allowedOrigins));
 
 // Apply migrations automatically on startup
 try
@@ -112,15 +117,33 @@ catch (Exception ex)
 app.UseSwagger();
 app.UseSwaggerUI();
 
+// Handle OPTIONS requests for CORS preflight
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+        context.Response.Headers.Add("Access-Control-Max-Age", "86400");
+        context.Response.StatusCode = 200;
+        await context.Response.WriteAsync(string.Empty);
+        return;
+    }
+    await next();
+});
+
+// CORS must be before other middleware
+app.UseCors("AllowAngularApp");
+
 // Global exception handling
 app.UseMiddleware<GlobalExceptionMiddleware>();
-
-// CORS
-app.UseCors("AllowAngularApp");
 
 // Static Files (for serving uploaded images)
 app.UseStaticFiles();
 
+// HTTPS redirection (after CORS)
 app.UseHttpsRedirection();
 
 // Authentication & Authorization
