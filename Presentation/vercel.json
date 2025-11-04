@@ -1,8 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:prod",
+  "buildCommand": "npm ci && npm run build:prod",
   "outputDirectory": "dist/DreamLuso.Angular/browser",
   "devCommand": "npm run start",
+  "installCommand": "npm ci",
   "framework": "angular",
   "rewrites": [
     {
