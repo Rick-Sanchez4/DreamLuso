@@ -8,15 +8,14 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
-        // Build configuration
+        // Sempre usar a mesma configuração local da WebAPI (SQL Server localhost\SQLEXPRESS)
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("../DreamLuso.WebAPI/appsettings.Development.json", optional: true)
-            .AddJsonFile("../DreamLuso.WebAPI/appsettings.json", optional: true)
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.Development.json", optional: true)
             .Build();
 
-        var connectionString = configuration.GetConnectionString("DreamLusoDB") 
-            ?? "Server=localhost;Database=DreamLusoDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;";
+        var connectionString = configuration.GetConnectionString("DreamLusoDB");
+          
 
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         optionsBuilder.UseSqlServer(connectionString);

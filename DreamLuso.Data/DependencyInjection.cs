@@ -8,7 +8,6 @@ using DreamLuso.Domain.Core.Uow;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace DreamLuso.Data;
 
@@ -21,6 +20,7 @@ public static class DependencyInjection
         
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
+<<<<<<< Updated upstream
             var connectionString = configuration.GetConnectionString("DreamLusoDB") 
                 ?? throw new InvalidOperationException("Connection string 'DreamLusoDB' not found.");
             
@@ -53,6 +53,22 @@ public static class DependencyInjection
                     });
                     break;
             }
+=======
+            var connectionString = configuration.GetConnectionString("DreamLusoDB");
+            
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Connection string 'DreamLusoDB' not found or is empty. " +
+                    "Please configure ConnectionStrings__DreamLusoDB environment variable.");
+            }
+            
+            // Sempre usar SQL Server local
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.CommandTimeout(30);
+            });
+>>>>>>> Stashed changes
             
             // Add interceptor
             var auditInterceptor = serviceProvider.GetRequiredService<AuditableEntityInterceptor>();
@@ -79,6 +95,7 @@ public static class DependencyInjection
 
         return services;
     }
+<<<<<<< Updated upstream
     
     private static string DetectProvider(string connectionString)
     {
@@ -92,5 +109,7 @@ public static class DependencyInjection
         // Default: SQL Server
         return "sqlserver";
     }
+=======
+>>>>>>> Stashed changes
 }
 
