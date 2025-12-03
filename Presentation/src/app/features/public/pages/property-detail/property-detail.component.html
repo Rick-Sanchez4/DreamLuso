@@ -107,8 +107,31 @@
               <div class="mb-8">
                 <div class="flex items-start justify-between mb-6">
                   <div class="flex-1">
-                    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-3 leading-tight">{{ property.title }}</h1>
-                    <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-dark-900/50 px-4 py-2 rounded-xl inline-flex">
+                    <div class="flex items-center gap-3 mb-3">
+                      <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white leading-tight flex-1">{{ property.title }}</h1>
+                      @if (isAuthenticated) {
+                        <button
+                          (click)="toggleFavorite()"
+                          [disabled]="favoriteLoading"
+                          class="p-3 rounded-full transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                          [ngClass]="isFavorited 
+                            ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg' 
+                            : 'bg-gray-200 dark:bg-dark-700 hover:bg-gray-300 dark:hover:bg-dark-600 text-gray-700 dark:text-gray-300'"
+                          [title]="isFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
+                          @if (favoriteLoading) {
+                            <svg class="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
+                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          } @else {
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                            </svg>
+                          }
+                        </button>
+                      }
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-dark-900/50 px-4 py-2 rounded-xl">
                       <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                       </svg>

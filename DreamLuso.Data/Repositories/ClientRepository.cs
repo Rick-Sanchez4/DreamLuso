@@ -73,4 +73,21 @@ public class ClientRepository : Repository<Client>, IClientRepository
         _dbSet.Update(client);
         return client;
     }
+
+    public async Task<Client?> GetByIdWithFavoritesAsync(Guid id)
+    {
+        if (id == Guid.Empty)
+            throw new ArgumentException("ID cannot be empty", nameof(id));
+
+        return await _dbSet
+            .Include(c => c.User)
+            .Include(c => c.FavoriteProperties)
+                .ThenInclude(p => p.Address)
+            .Include(c => c.FavoriteProperties)
+                .ThenInclude(p => p.Images)
+            .Include(c => c.FavoriteProperties)
+                .ThenInclude(p => p.RealEstateAgent)
+                    .ThenInclude(a => a.User)
+            .FirstOrDefaultAsync(c => c.Id == id);
+    }
 }

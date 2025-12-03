@@ -8,7 +8,6 @@ using DreamLuso.Domain.Core.Uow;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace DreamLuso.Data;
 
@@ -132,4 +131,3 @@ public static class DependencyInjection
         return "sqlserver";
     }
 }
-

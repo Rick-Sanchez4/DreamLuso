@@ -102,6 +102,7 @@ docker compose -f docker-compose.sqlserver.yml down -v
 - ✅ Notificações
 - ✅ Upload de imagens
 - ✅ Dashboard administrativo
+- ✅ **Sistema de Favoritos** (NOVO)
 
 ## 🔧 Requisitos
 
@@ -119,6 +120,6 @@ Em caso de problemas:
 
 ---
 
-**Última atualização:** $(date)  
+**Última atualização:** 2025-01-27  
 **Versão:** 1.0.0  
 **Status:** ✅ Pronto para uso

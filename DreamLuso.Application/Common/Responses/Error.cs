@@ -50,6 +50,8 @@ public sealed record Error(string Code, string Description)
     public static readonly Error PropertyUnavailable = new("PropertyUnavailable", "O imóvel não está disponível");
     public static readonly Error PropertyAlreadySold = new("PropertyAlreadySold", "O imóvel já foi vendido");
     public static readonly Error PropertyAlreadyRented = new("PropertyAlreadyRented", "O imóvel já foi arrendado");
+    public static readonly Error PropertyAlreadyFavorited = new("PropertyAlreadyFavorited", "O imóvel já está nos favoritos");
+    public static readonly Error PropertyNotFavorited = new("PropertyNotFavorited", "O imóvel não está nos favoritos");
 
     // PropertyVisit Errors
     public static readonly Error VisitNotFound = new("VisitNotFound", "Visita não encontrada");

@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { PropertyService } from '../../../../core/services/property.service';
 import { CommentService } from '../../../../core/services/comment.service';
 import { ProposalService } from '../../../../core/services/proposal.service';
+import { FavoriteService } from '../../../../core/services/favorite.service';
+import { ClientService } from '../../../../core/services/client.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Property } from '../../../../core/models/property.model';
@@ -37,6 +39,11 @@ export class PropertyDetailComponent implements OnInit {
   proposalValue: number = 0;
   proposalNotes: string = '';
   
+  // Favorites
+  clientId: string | null = null;
+  isFavorited: boolean = false;
+  favoriteLoading: boolean = false;
+  
   currentImageIndex: number = 0;
 
   constructor(
@@ -44,6 +51,8 @@ export class PropertyDetailComponent implements OnInit {
     private propertyService: PropertyService,
     private commentService: CommentService,
     private proposalService: ProposalService,
+    private favoriteService: FavoriteService,
+    private clientService: ClientService,
     private authService: AuthService,
     private toastService: ToastService
   ) {}
@@ -54,7 +63,45 @@ export class PropertyDetailComponent implements OnInit {
       this.loadPropertyDetails(propertyId);
       this.loadComments(propertyId);
       this.loadRating(propertyId);
+      
+      // Load client profile if authenticated
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser) {
+        this.loadClientProfile();
+      }
     }
+  }
+
+  loadClientProfile(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) return;
+
+    this.clientService.getByUserId(currentUser.id).subscribe({
+      next: (client: any) => {
+        this.clientId = client?.id || null;
+        if (this.clientId && this.property) {
+          this.checkIfFavorited();
+        }
+      },
+      error: (error: any) => {
+        console.error('Error loading client profile:', error);
+      }
+    });
+  }
+
+  checkIfFavorited(): void {
+    if (!this.clientId || !this.property) return;
+
+    this.favoriteService.getFavorites(this.clientId).subscribe({
+      next: (result: any) => {
+        if (result.isSuccess && result.value) {
+          this.isFavorited = result.value.some((p: any) => p.id === this.property?.id);
+        }
+      },
+      error: (error: any) => {
+        console.error('Error checking favorites:', error);
+      }
+    });
   }
 
   loadPropertyDetails(id: string): void {
@@ -69,8 +116,13 @@ export class PropertyDetailComponent implements OnInit {
         }
         
         this.loading = false;
+        
+        // Check if favorited after property is loaded
+        if (this.clientId) {
+          this.checkIfFavorited();
+        }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading property:', error);
         this.loading = false;
         this.toastService.error('Erro ao carregar imóvel');
@@ -79,7 +131,7 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   loadComments(propertyId: string): void {
-    this.commentService.getPropertyComments(propertyId).subscribe(result => {
+    this.commentService.getPropertyComments(propertyId).subscribe((result: any) => {
       if (result.isSuccess && result.value) {
         this.comments = result.value;
       }
@@ -87,7 +139,7 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   loadRating(propertyId: string): void {
-    this.commentService.getPropertyRating(propertyId).subscribe(result => {
+    this.commentService.getPropertyRating(propertyId).subscribe((result: any) => {
       if (result.isSuccess && result.value) {
         this.rating = result.value;
       }
@@ -113,7 +165,7 @@ export class PropertyDetailComponent implements OnInit {
       rating: this.newRating > 0 ? this.newRating : undefined
     };
 
-    this.commentService.create(commentRequest).subscribe(result => {
+    this.commentService.create(commentRequest).subscribe((result: any) => {
       if (result.isSuccess) {
         this.toastService.success('Comentário adicionado com sucesso!');
         this.newComment = '';
@@ -144,7 +196,7 @@ export class PropertyDetailComponent implements OnInit {
       additionalNotes: this.proposalNotes
     };
 
-    this.proposalService.create(proposalRequest).subscribe(result => {
+    this.proposalService.create(proposalRequest).subscribe((result: any) => {
       if (result.isSuccess) {
         this.toastService.success('Proposta enviada com sucesso!');
         this.showProposalForm = false;
@@ -155,7 +207,7 @@ export class PropertyDetailComponent implements OnInit {
   }
 
   incrementHelpful(commentId: string): void {
-    this.commentService.incrementHelpful(commentId).subscribe(result => {
+    this.commentService.incrementHelpful(commentId).subscribe((result: any) => {
       if (result.isSuccess) {
         this.loadComments(this.property!.id);
       }
@@ -195,6 +247,59 @@ export class PropertyDetailComponent implements OnInit {
   getStarPercentage(star: number): number {
     if (!this.rating || this.rating.totalComments === 0) return 0;
     return (this.getStarCount(star) / this.rating.totalComments) * 100;
+  }
+
+  toggleFavorite(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      this.toastService.warning('Faça login para adicionar aos favoritos');
+      return;
+    }
+
+    if (!this.clientId) {
+      this.toastService.warning('Perfil de cliente não encontrado');
+      return;
+    }
+
+    if (!this.property) return;
+
+    this.favoriteLoading = true;
+
+    if (this.isFavorited) {
+      this.favoriteService.removeFavorite(this.clientId, this.property.id).subscribe({
+        next: (result: any) => {
+          this.favoriteLoading = false;
+          if (result.isSuccess) {
+            this.isFavorited = false;
+            this.toastService.success('Removido dos favoritos');
+          } else {
+            this.toastService.error('Erro ao remover dos favoritos');
+          }
+        },
+        error: (error: any) => {
+          this.favoriteLoading = false;
+          console.error('Error removing favorite:', error);
+          this.toastService.error('Erro ao remover dos favoritos');
+        }
+      });
+    } else {
+      this.favoriteService.addFavorite(this.clientId, this.property.id).subscribe({
+        next: (result: any) => {
+          this.favoriteLoading = false;
+          if (result.isSuccess) {
+            this.isFavorited = true;
+            this.toastService.success('Adicionado aos favoritos');
+          } else {
+            this.toastService.error('Erro ao adicionar aos favoritos');
+          }
+        },
+        error: (error: any) => {
+          this.favoriteLoading = false;
+          console.error('Error adding favorite:', error);
+          this.toastService.error('Erro ao adicionar aos favoritos');
+        }
+      });
+    }
   }
 }
 
