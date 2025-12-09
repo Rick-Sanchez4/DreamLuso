@@ -97,7 +97,24 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
+        policy.SetIsOriginAllowed(origin =>
+        {
+            if (string.IsNullOrEmpty(origin))
+                return false;
+            
+            // Remove barra final se houver
+            var normalizedOrigin = origin.TrimEnd('/');
+            
+            // Permite origens específicas configuradas
+            if (allowedOrigins.Contains(normalizedOrigin) || allowedOrigins.Contains(origin))
+                return true;
+            
+            // Permite qualquer subdomínio do Vercel (incluindo previews)
+            if (normalizedOrigin.EndsWith(".vercel.app"))
+                return true;
+            
+            return false;
+        })
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
