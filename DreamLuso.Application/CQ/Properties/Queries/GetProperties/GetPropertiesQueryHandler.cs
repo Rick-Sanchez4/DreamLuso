@@ -4,6 +4,7 @@ using DreamLuso.Domain.Core.Uow;
 using DreamLuso.Domain.Model;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace DreamLuso.Application.CQ.Properties.Queries.GetProperties;
 
@@ -20,29 +21,30 @@ public class GetPropertiesQueryHandler : IRequestHandler<GetPropertiesQuery, Res
 
     public async Task<Result<GetPropertiesResponse, Success, Error>> Handle(GetPropertiesQuery request, CancellationToken cancellationToken)
     {
-        // If AgentId is provided, filter by agent and show all properties (including reserved/under contract)
-        // Otherwise, filter only active and available properties for public search
-        IQueryable<Property> properties;
-        
-        if (request.AgentId.HasValue)
+        try
         {
-            // For agent view: show all properties (including reserved/under contract/sold/rented)
-            var agentProperties = await _unitOfWork.PropertyRepository.GetByAgentIdAsync(request.AgentId.Value);
-            properties = agentProperties.Cast<Property>().AsQueryable();
-        }
-        else
-        {
-            // For public view: filter only active and available properties
-            var allProperties = await _unitOfWork.PropertyRepository.GetAllAsync();
-            properties = allProperties
-                .Cast<Property>()
-                .Where(p => p.IsActive && 
-                           p.Status != PropertyStatus.Sold && 
-                           p.Status != PropertyStatus.Rented &&
-                           p.Status != PropertyStatus.Reserved &&
-                           p.Status != PropertyStatus.UnderContract)
-                .AsQueryable();
-        }
+            // If AgentId is provided, filter by agent and show all properties (including reserved/under contract)
+            // Otherwise, filter only active and available properties for public search
+            IQueryable<Property> properties;
+            
+            if (request.AgentId.HasValue)
+            {
+                // For agent view: show all properties (including reserved/under contract/sold/rented)
+                var agentProperties = await _unitOfWork.PropertyRepository.GetByAgentIdAsync(request.AgentId.Value);
+                properties = agentProperties.AsQueryable();
+            }
+            else
+            {
+                // For public view: filter only active and available properties
+                var allProperties = await _unitOfWork.PropertyRepository.GetAllAsync();
+                properties = allProperties
+                    .Where(p => p.IsActive && 
+                               p.Status != PropertyStatus.Sold && 
+                               p.Status != PropertyStatus.Rented &&
+                               p.Status != PropertyStatus.Reserved &&
+                               p.Status != PropertyStatus.UnderContract)
+                    .AsQueryable();
+            }
 
         // Apply filters
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -101,52 +103,58 @@ public class GetPropertiesQueryHandler : IRequestHandler<GetPropertiesQuery, Res
             properties = properties.Where(p => (int)p.TransactionType == request.TransactionType.Value);
         }
 
-        // Get total count
-        var totalCount = properties.Count();
+            // Get total count before pagination
+            var totalCount = properties.Count();
 
-        // Apply pagination
-        var paginatedProperties = properties
-            .OrderByDescending(p => p.CreatedAt)
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToList();
+            // Apply pagination and materialize
+            var paginatedProperties = properties
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
 
-        var response = new GetPropertiesResponse
-        {
-            Properties = paginatedProperties.Select(p => new PropertyResponse
+            var response = new GetPropertiesResponse
             {
-                Id = p.Id,
-                Title = p.Title,
-                Description = p.Description,
-                Price = p.Price,
-                Size = p.Size,
-                Bedrooms = p.Bedrooms,
-                Bathrooms = p.Bathrooms,
-                Type = p.Type.ToString(),
-                Status = p.Status.ToString(),
-                TransactionType = p.TransactionType.ToString(),
-                EnergyRating = p.EnergyRating,
-                YearBuilt = p.YearBuilt,
-                IsFeatured = p.IsFeatured,
-                ViewCount = p.ViewCount,
-                Street = p.Address?.Street ?? "",
-                Municipality = p.Address?.Municipality ?? "",
-                District = p.Address?.District ?? "",
-                PostalCode = p.Address?.PostalCode ?? "",
-                AgentId = p.RealEstateAgentId,
-                AgentName = p.RealEstateAgent?.User?.Name?.FullName ?? "Agente não encontrado",
-                ImageUrls = p.Images.Select(img => img.ImageUrl).ToList(),
-                CreatedAt = p.CreatedAt
-            }),
-            TotalCount = totalCount,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize,
-            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize)
-        };
+                Properties = paginatedProperties.Select(p => new PropertyResponse
+                {
+                    Id = p.Id,
+                    Title = p.Title ?? "",
+                    Description = p.Description ?? "",
+                    Price = p.Price,
+                    Size = p.Size,
+                    Bedrooms = p.Bedrooms,
+                    Bathrooms = p.Bathrooms,
+                    Type = p.Type.ToString(),
+                    Status = p.Status.ToString(),
+                    TransactionType = p.TransactionType.ToString(),
+                    EnergyRating = p.EnergyRating,
+                    YearBuilt = p.YearBuilt,
+                    IsFeatured = p.IsFeatured,
+                    ViewCount = p.ViewCount,
+                    Street = p.Address?.Street ?? "",
+                    Municipality = p.Address?.Municipality ?? "",
+                    District = p.Address?.District ?? "",
+                    PostalCode = p.Address?.PostalCode ?? "",
+                    AgentId = p.RealEstateAgentId,
+                    AgentName = p.RealEstateAgent?.User?.Name?.FullName ?? "Agente não encontrado",
+                    ImageUrls = p.Images?.Select(img => img?.ImageUrl ?? "").Where(url => !string.IsNullOrEmpty(url)).ToList() ?? new List<string>(),
+                    CreatedAt = p.CreatedAt
+                }),
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize)
+            };
 
-        _logger.LogInformation("Listados {Count} imóveis de um total de {Total}", paginatedProperties.Count, totalCount);
+            _logger.LogInformation("Listados {Count} imóveis de um total de {Total}", paginatedProperties.Count, totalCount);
 
-        return response;
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao listar imóveis: {Message}", ex.Message);
+            return new Error("GetPropertiesError", $"Erro ao listar imóveis: {ex.Message}");
+        }
     }
 }
 
