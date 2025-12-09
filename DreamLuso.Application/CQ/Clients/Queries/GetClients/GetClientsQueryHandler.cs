@@ -28,8 +28,8 @@ public class GetClientsQueryHandler : IRequestHandler<GetClientsQuery, Result<Ge
         {
             var searchLower = request.SearchTerm.ToLower();
             clients = clients.Where(c =>
-                c.User.Name.FullName.ToLower().Contains(searchLower) ||
-                c.User.Email.ToLower().Contains(searchLower) ||
+                (c.User != null && c.User.Name != null && c.User.Name.FullName.ToLower().Contains(searchLower)) ||
+                (c.User != null && c.User.Email != null && c.User.Email.ToLower().Contains(searchLower)) ||
                 (c.Nif != null && c.Nif.Contains(searchLower)));
         }
 
@@ -54,9 +54,9 @@ public class GetClientsQueryHandler : IRequestHandler<GetClientsQuery, Result<Ge
             {
                 Id = c.Id,
                 UserId = c.UserId,
-                FullName = c.User.Name.FullName,
-                Email = c.User.Email,
-                Phone = c.User.Phone,
+                FullName = c.User?.Name?.FullName ?? "Nome não disponível",
+                Email = c.User?.Email ?? "",
+                Phone = c.User?.Phone ?? "",
                 Nif = c.Nif,
                 CitizenCard = c.CitizenCard,
                 Type = c.Type.ToString(),

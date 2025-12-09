@@ -1,5 +1,9 @@
-using DreamLuso.Application.CQ.Notifications.Commands;
-using DreamLuso.Application.CQ.Notifications.Queries;
+using DreamLuso.Application.CQ.Notifications.Commands.SendNotification;
+using DreamLuso.Application.CQ.Notifications.Commands.MarkNotificationAsRead;
+using DreamLuso.Application.CQ.Notifications.Commands.MarkAllNotificationsAsRead;
+using DreamLuso.Application.CQ.Notifications.Queries.GetUserNotifications;
+using DreamLuso.Application.CQ.Notifications.Queries.GetUnreadNotificationCount;
+using DreamLuso.Application.CQ.Notifications.Common;
 using DreamLuso.Application.Common.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

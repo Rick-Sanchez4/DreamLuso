@@ -23,6 +23,7 @@ public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfile
         // Update Name value object
         user.Name = new Name(request.FirstName, request.LastName);
         user.Phone = request.PhoneNumber;
+        user.Address = request.Address;
         user.DateOfBirth = request.DateOfBirth;
 
         await _unitOfWork.CommitAsync(cancellationToken);

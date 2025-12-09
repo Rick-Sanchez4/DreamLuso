@@ -9,6 +9,7 @@ public class User : AuditableEntity, IEntity<Guid>
     public required Name Name { get; set; }
     public required string Email { get; set; }
     public string? Phone { get; set; }
+    public string? Address { get; set; }
     public byte[]? PasswordHash { get; set; }
     public byte[]? PasswordSalt { get; set; }
     public UserRole Role { get; set; }

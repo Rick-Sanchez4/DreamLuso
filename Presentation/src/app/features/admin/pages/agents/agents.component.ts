@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
 import { AgentDetailModalComponent } from '../../components/agent-detail-modal/agent-detail-modal.component';
+import { AgentService } from '../../../../core/services/agent.service';
 import { environment } from '../../../../../environments/environment';
 import { ToastService } from '../../../../core/services/toast.service';
 
@@ -45,6 +46,7 @@ export class AdminAgentsComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
+    private agentService: AgentService,
     private toastService: ToastService
   ) {}
 
@@ -55,29 +57,50 @@ export class AdminAgentsComponent implements OnInit {
   loadAgents(): void {
     this.loading = true;
     
-    // Try to load from API
-    this.http.get<any>(`${environment.apiUrl}/agents`).subscribe({
+    // Try to load from API - get all agents (including pending)
+    this.http.get<any>(`${environment.apiUrl}/agents?pageSize=100`).subscribe({
       next: (result) => {
-        if (result && result.agents) {
-          this.agents = result.agents.map((a: any) => ({
-            id: a.id,
-            name: a.fullName || 'Agente',
+        console.log('Agents API response:', result);
+        
+        // Handle different response formats
+        let agentsArray: any[] = [];
+        
+        if (result && Array.isArray(result)) {
+          // Direct array response
+          agentsArray = result;
+        } else if (result && result.agents && Array.isArray(result.agents)) {
+          // Response with agents property
+          agentsArray = result.agents;
+        } else if (result && result.value && Array.isArray(result.value)) {
+          // Result<T> format
+          agentsArray = result.value;
+        }
+        
+        if (agentsArray.length > 0) {
+          this.agents = agentsArray.map((a: any) => ({
+            id: a.id || a.agentId,
+            name: a.fullName || a.name || 'Agente',
             email: a.email || '',
-            phone: a.phone || 'Não informado',
+            phone: a.phone || a.officePhone || 'Não informado',
             licenseNumber: a.licenseNumber || '',
             specialization: a.specialization || '',
-            properties: a.totalListings || 0,
-            sales: a.totalSales || 0,
+            properties: a.totalListings || a.properties || 0,
+            sales: a.totalSales || a.sales || 0,
             rating: a.rating || 0,
-            isActive: a.isActive || false
+            isActive: a.isActive !== undefined ? a.isActive : (a.approvalStatus === 'Approved' || false)
           }));
+          
+          console.log('Mapped agents:', this.agents);
+          console.log('Pending agents count:', this.agents.filter(a => !a.isActive).length);
         } else {
+          console.warn('No agents found in response, using mock data');
           this.useMockData();
         }
         this.updateLists();
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading agents:', error);
         this.useMockData();
         this.updateLists();
         this.loading = false;
@@ -97,8 +120,13 @@ export class AdminAgentsComponent implements OnInit {
   updateLists(): void {
     // IsActive = false means pending approval, IsActive = true means approved
     this.pendingAgents = this.agents.filter(a => !a.isActive);
+    console.log('Update lists - Total agents:', this.agents.length);
+    console.log('Update lists - Pending agents:', this.pendingAgents.length);
+    console.log('Update lists - Show pending:', this.showPending);
+    
     const baseList = this.showPending ? this.pendingAgents : this.agents.filter(a => a.isActive);
     this.filteredAgents = [...baseList];
+    console.log('Update lists - Filtered agents:', this.filteredAgents.length);
   }
 
   onSearch(): void {
@@ -140,25 +168,55 @@ export class AdminAgentsComponent implements OnInit {
     this.rejectAgent(agent.id);
   }
 
-  approveAgent(agentId: number): void {
-    // TODO: Call API to approve agent (set isActive = true)
-    const agent = this.agents.find(a => a.id === agentId);
-    if (agent) {
-      agent.isActive = true;
-      this.updateLists();
-      this.toastService.success('Agente aprovado com sucesso!');
-    }
-  }
-
-  rejectAgent(agentId: number): void {
-    if (!confirm('Tem certeza que deseja rejeitar este agente?')) {
+  approveAgent(agentId: string | number): void {
+    const agentIdStr = String(agentId);
+    const agent = this.agents.find(a => String(a.id) === agentIdStr);
+    
+    if (!agent) {
+      this.toastService.error('Agente não encontrado');
       return;
     }
+
+    this.agentService.approveAgent(agentIdStr).subscribe({
+      next: () => {
+        agent.isActive = true;
+        this.updateLists();
+        this.toastService.success('Agente aprovado com sucesso!');
+        this.closeAgentModal();
+      },
+      error: (error: any) => {
+        console.error('Error approving agent:', error);
+        this.toastService.error(error?.error?.description || 'Erro ao aprovar agente');
+      }
+    });
+  }
+
+  rejectAgent(agentId: string | number): void {
+    const agentIdStr = String(agentId);
+    const agent = this.agents.find(a => String(a.id) === agentIdStr);
     
-    // TODO: Call API to reject/delete agent
-    this.agents = this.agents.filter(a => a.id !== agentId);
-    this.updateLists();
-    this.toastService.success('Agente rejeitado!');
+    if (!agent) {
+      this.toastService.error('Agente não encontrado');
+      return;
+    }
+
+    const rejectionReason = prompt('Motivo da rejeição (opcional):');
+    if (rejectionReason === null) {
+      return; // User cancelled
+    }
+
+    this.agentService.rejectAgent(agentIdStr, rejectionReason || undefined).subscribe({
+      next: () => {
+        agent.isActive = false;
+        this.updateLists();
+        this.toastService.success('Agente rejeitado!');
+        this.closeAgentModal();
+      },
+      error: (error: any) => {
+        console.error('Error rejecting agent:', error);
+        this.toastService.error(error?.error?.description || 'Erro ao rejeitar agente');
+      }
+    });
   }
 }
 

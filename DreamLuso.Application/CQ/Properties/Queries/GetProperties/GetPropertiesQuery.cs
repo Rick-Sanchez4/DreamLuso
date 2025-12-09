@@ -15,7 +15,10 @@ public class GetPropertiesQuery : IRequest<Result<GetPropertiesResponse, Success
     public decimal? MaxPrice { get; set; }
     public string? Municipality { get; set; }
     public int? MinBedrooms { get; set; }
+    public int? MinBathrooms { get; set; }
     public bool? FeaturedOnly { get; set; }
+    public int? TransactionType { get; set; }
+    public Guid? AgentId { get; set; }
 }
 
 public class GetPropertiesResponse

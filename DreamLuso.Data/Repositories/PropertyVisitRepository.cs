@@ -39,10 +39,17 @@ public class PropertyVisitRepository : Repository<PropertyVisit>, IPropertyVisit
             throw new ArgumentException("Client ID cannot be empty", nameof(clientId));
 
         return await _dbSet
-            .Include(pv => pv.Property).ThenInclude(p => p.Address)
-            .Include(pv => pv.RealEstateAgent).ThenInclude(a => a.User)
+            .Include(pv => pv.Property)
+                .ThenInclude(p => p.Address)
+            .Include(pv => pv.Client)
+                .ThenInclude(c => c.User)
+                    .ThenInclude(u => u.Name)
+            .Include(pv => pv.RealEstateAgent)
+                .ThenInclude(a => a.User)
+                    .ThenInclude(u => u.Name)
             .Where(pv => pv.ClientId == clientId)
             .OrderByDescending(pv => pv.VisitDate)
+            .AsSplitQuery()
             .ToListAsync();
     }
 
@@ -52,10 +59,17 @@ public class PropertyVisitRepository : Repository<PropertyVisit>, IPropertyVisit
             throw new ArgumentException("Agent ID cannot be empty", nameof(agentId));
 
         return await _dbSet
-            .Include(pv => pv.Property).ThenInclude(p => p.Address)
-            .Include(pv => pv.Client).ThenInclude(c => c.User)
+            .Include(pv => pv.Property)
+                .ThenInclude(p => p.Address)
+            .Include(pv => pv.Client)
+                .ThenInclude(c => c.User)
+                    .ThenInclude(u => u.Name)
+            .Include(pv => pv.RealEstateAgent)
+                .ThenInclude(a => a.User)
+                    .ThenInclude(u => u.Name)
             .Where(pv => pv.RealEstateAgentId == agentId)
             .OrderByDescending(pv => pv.VisitDate)
+            .AsSplitQuery()
             .ToListAsync();
     }
 

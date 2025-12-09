@@ -42,9 +42,15 @@ public static class PropertyVisitEndpoints
             .Produces<ScheduleVisitResponse>(201)
             .Produces<Error>(400);
 
-        // PUT /api/visits/confirm - Confirmar visita
-        visits.MapPut("/confirm", Commands.ConfirmVisit)
-            .WithName("ConfirmVisit")
+        // PUT /api/visits/confirm - Confirmar visita (por token)
+        visits.MapPut("/confirm", Commands.ConfirmVisitByToken)
+            .WithName("ConfirmVisitByToken")
+            .Produces<ConfirmVisitResponse>(200)
+            .Produces<Error>(400);
+
+        // PUT /api/visits/{id}/confirm - Confirmar visita (por ID)
+        visits.MapPut("/{id:guid}/confirm", Commands.ConfirmVisitById)
+            .WithName("ConfirmVisitById")
             .Produces<ConfirmVisitResponse>(200)
             .Produces<Error>(400);
 
@@ -78,12 +84,25 @@ public static class PropertyVisitEndpoints
                 : TypedResults.BadRequest(result.Error!);
         }
 
-        public static async Task<Results<Ok<ConfirmVisitResponse>, BadRequest<Error>>> ConfirmVisit(
+        public static async Task<Results<Ok<ConfirmVisitResponse>, BadRequest<Error>>> ConfirmVisitByToken(
             [FromServices] ISender sender,
             [FromBody] ConfirmVisitRequest request,
             CancellationToken cancellationToken = default)
         {
-            var command = new ConfirmVisitCommand(request.ConfirmationToken);
+            var command = new ConfirmVisitCommand(ConfirmationToken: request.ConfirmationToken);
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<ConfirmVisitResponse>, BadRequest<Error>>> ConfirmVisitById(
+            [FromServices] ISender sender,
+            Guid id,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new ConfirmVisitCommand(VisitId: id);
             var result = await sender.Send(command, cancellationToken);
 
             return result.IsSuccess

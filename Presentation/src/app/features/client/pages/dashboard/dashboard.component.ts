@@ -58,11 +58,52 @@ export class ClientDashboardComponent implements OnInit {
   loadClientProfile(): void {
     this.clientService.getByUserId(this.currentUser!.id).subscribe({
       next: (client: any) => {
-        this.clientId = client.id;
-        this.loadDashboardData();
+        if (client && client.id) {
+          this.clientId = client.id;
+          this.loadDashboardData();
+        } else {
+          console.error('Client profile not found or invalid');
+          this.loading = false;
+        }
       },
       error: (error) => {
         console.error('Error loading client profile:', error);
+        // If 404, try to create the client profile automatically
+        if (error.status === 404) {
+          console.warn('Client profile not found. Creating automatically...');
+          this.createClientProfile();
+        } else {
+          this.loading = false;
+        }
+      }
+    });
+  }
+
+  createClientProfile(): void {
+    // Create client profile with default values
+    const createRequest = {
+      userId: this.currentUser!.id,
+      type: 0, // Individual (ClientType.Individual = 0)
+      nif: null,
+      citizenCard: null,
+      minBudget: null,
+      maxBudget: null,
+      preferredContactMethod: null
+    };
+
+    this.http.post<any>(`${environment.apiUrl}/clients`, createRequest).subscribe({
+      next: (response: any) => {
+        if (response && (response.clientId || response.id)) {
+          this.clientId = response.clientId || response.id;
+          console.log('Client profile created successfully');
+          this.loadDashboardData();
+        } else {
+          console.error('Failed to create client profile');
+          this.loading = false;
+        }
+      },
+      error: (error) => {
+        console.error('Error creating client profile:', error);
         this.loading = false;
       }
     });
@@ -90,16 +131,19 @@ export class ClientDashboardComponent implements OnInit {
   loadProposals(): void {
     if (!this.clientId) return;
 
-    // Load client's proposals (últimos 5)
-    this.http.get<any>(`${environment.apiUrl}/proposals/client/${this.clientId}`).subscribe({
-      next: (proposals) => {
-        if (proposals && Array.isArray(proposals)) {
-          this.myProposals = proposals.slice(0, 5);
+    // Load client's proposals (últimos 5) - usar o serviço para consistência
+    this.proposalService.getByClient(this.clientId).subscribe({
+      next: (result) => {
+        if (result.isSuccess && result.value) {
+          this.myProposals = result.value.slice(0, 5);
+        } else {
+          this.myProposals = [];
         }
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading proposals:', error);
+        this.myProposals = [];
         this.loading = false;
       }
     });
@@ -118,17 +162,21 @@ export class ClientDashboardComponent implements OnInit {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold';
     switch (status) {
       case 'Pending':
-        return `${baseClass} bg-yellow-100 text-yellow-800`;
+        return `${baseClass} bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300`;
       case 'UnderAnalysis':
-        return `${baseClass} bg-blue-100 text-blue-800`;
+        return `${baseClass} bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300`;
       case 'InNegotiation':
-        return `${baseClass} bg-purple-100 text-purple-800`;
+        return `${baseClass} bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300`;
       case 'Approved':
-        return `${baseClass} bg-green-100 text-green-800`;
+        return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300`;
       case 'Rejected':
-        return `${baseClass} bg-red-100 text-red-800`;
+        return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300`;
+      case 'Cancelled':
+        return `${baseClass} bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300`;
+      case 'Completed':
+        return `${baseClass} bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300`;
       default:
-        return `${baseClass} bg-gray-100 text-gray-800`;
+        return `${baseClass} bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300`;
     }
   }
 }

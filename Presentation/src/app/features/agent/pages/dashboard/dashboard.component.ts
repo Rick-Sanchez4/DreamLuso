@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AgentService } from '../../../../core/services/agent.service';
 import { PropertyService } from '../../../../core/services/property.service';
@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { AgentSidebarComponent } from '../../components/agent-sidebar/agent-sidebar.component';
 import { ThemeService } from '../../../../core/services/theme.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
@@ -53,7 +54,9 @@ export class AgentDashboardComponent implements OnInit, OnDestroy {
     private proposalService: ProposalService,
     private visitService: VisitService,
     private http: HttpClient,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    private toastService: ToastService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -79,10 +82,19 @@ export class AgentDashboardComponent implements OnInit, OnDestroy {
     this.agentService.getByUserId(this.currentUser!.id).subscribe({
       next: (agent: any) => {
         this.agentId = agent.id;
+        if (!agent.isActive) {
+          this.toastService.warning('O seu perfil de agente está pendente de aprovação. Algumas funcionalidades podem estar limitadas.');
+        }
         this.loadDashboardData();
       },
       error: (error) => {
         console.error('Error loading agent profile:', error);
+        const errorMsg = error.error?.description || error.message || 'Erro desconhecido';
+        if (error.status === 404) {
+          this.toastService.error('Perfil de agente não encontrado. Por favor, contacte o suporte.');
+        } else {
+          this.toastService.error(`Erro ao carregar perfil do agente: ${errorMsg}`);
+        }
         this.loading = false;
       }
     });
@@ -162,9 +174,13 @@ export class AgentDashboardComponent implements OnInit, OnDestroy {
           this.upcomingVisits = visits
             .filter(v => 
               (v.status === 'Pending' || v.status === 'Confirmed') &&
-              new Date(v.scheduledDate) >= now
+              v.visitDate && new Date(v.visitDate) >= now
             )
-            .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
+            .sort((a, b) => {
+              const dateA = a.visitDate ? new Date(a.visitDate).getTime() : 0;
+              const dateB = b.visitDate ? new Date(b.visitDate).getTime() : 0;
+              return dateA - dateB;
+            })
             .slice(0, 5);
         }
         this.loading = false;
@@ -214,6 +230,11 @@ export class AgentDashboardComponent implements OnInit, OnDestroy {
       default:
         return `${baseClass} bg-gray-100 text-gray-800`;
     }
+  }
+
+  viewPropertyDetails(propertyId: string): void {
+    // Navigate to property details page (public page)
+    this.router.navigate(['/property', propertyId]);
   }
 }
 

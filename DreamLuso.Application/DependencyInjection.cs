@@ -23,8 +23,22 @@ public static class DependencyInjection
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
         
         // Add File Upload Service
-        var uploadPath = Path.Combine(environment.WebRootPath ?? environment.ContentRootPath, "uploads");
-        var baseUrl = configuration["AppSettings:BaseUrl"] ?? "http://localhost:5000";
+        // Use wwwroot/images as base path for static file serving
+        var uploadPath = Path.Combine(environment.WebRootPath ?? environment.ContentRootPath, "images");
+        var baseUrl = configuration["AppSettings:BaseUrl"] ?? "http://localhost:5149";
+        
+        // Ensure required directories exist
+        var profilesPath = Path.Combine(uploadPath, "profiles");
+        var propertiesPath = Path.Combine(uploadPath, "properties");
+        if (!Directory.Exists(profilesPath))
+        {
+            Directory.CreateDirectory(profilesPath);
+        }
+        if (!Directory.Exists(propertiesPath))
+        {
+            Directory.CreateDirectory(propertiesPath);
+        }
+        
         services.AddSingleton<IFileUploadService>(sp => 
             new FileUploadService(
                 sp.GetRequiredService<ILogger<FileUploadService>>(), 

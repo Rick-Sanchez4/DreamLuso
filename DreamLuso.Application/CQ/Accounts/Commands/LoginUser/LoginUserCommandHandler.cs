@@ -43,6 +43,13 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
         if (!user.IsActive)
         {
             _logger.LogWarning("Tentativa de login numa conta inativa: {Email}", request.Email);
+            
+            // Provide more specific message for RealEstateAgents awaiting approval
+            if (user.Role == UserRole.RealEstateAgent)
+            {
+                return new Error("UserInactive", "A sua conta está aguardando aprovação do administrador. Você receberá uma notificação quando sua conta for aprovada.");
+            }
+            
             return Error.UserInactive;
         }
 

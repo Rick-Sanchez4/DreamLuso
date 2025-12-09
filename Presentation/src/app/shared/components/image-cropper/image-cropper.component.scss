@@ -1,0 +1,55 @@
+// Image Cropper Component Styles
+
+.crop-container {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #10b981;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #10b981;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+.dark input[type="range"]::-webkit-slider-runnable-track {
+  background: #374151;
+}
+
+.dark input[type="range"]::-moz-range-track {
+  background: #374151;
+}

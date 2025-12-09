@@ -88,45 +88,78 @@ export class AgentVisitsComponent implements OnInit {
       return matchesStatus && matchesSearch;
     });
 
-    // Sort by scheduled date (closest first)
-    this.filteredVisits.sort((a, b) => 
-      new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime()
-    );
+    // Sort by visit date (closest first)
+    this.filteredVisits.sort((a, b) => {
+      const dateA = a.visitDate ? new Date(a.visitDate).getTime() : 0;
+      const dateB = b.visitDate ? new Date(b.visitDate).getTime() : 0;
+      return dateA - dateB;
+    });
   }
 
   onFilterChange(): void {
     this.applyFilters();
   }
 
-  confirmVisit(visitId: string): void {
-    if (!confirm('Tem certeza que deseja confirmar esta visita?')) {
-      return;
-    }
+  showConfirmModal: boolean = false;
+  showCancelModal: boolean = false;
+  selectedVisitId: string | null = null;
+  cancellationReason: string = '';
 
-    this.visitService.confirmVisit({ visitId }).subscribe({
+  confirmVisit(visitId: string): void {
+    this.selectedVisitId = visitId;
+    this.showConfirmModal = true;
+  }
+
+  closeConfirmModal(): void {
+    this.showConfirmModal = false;
+    this.selectedVisitId = null;
+  }
+
+  confirmVisitAction(): void {
+    if (!this.selectedVisitId) return;
+
+    this.visitService.confirmVisit({ visitId: this.selectedVisitId }).subscribe({
       next: () => {
         this.toastService.success('Visita confirmada com sucesso!');
+        this.closeConfirmModal();
         this.loadVisits();
       },
       error: (error) => {
         console.error('Error confirming visit:', error);
-        this.toastService.error('Erro ao confirmar visita');
+        const errorMsg = error.error?.description || error.error?.message || 'Erro ao confirmar visita';
+        this.toastService.error(errorMsg);
       }
     });
   }
 
   cancelVisit(visitId: string): void {
-    const reason = prompt('Motivo do cancelamento:');
-    if (reason === null) return;
+    this.selectedVisitId = visitId;
+    this.cancellationReason = '';
+    this.showCancelModal = true;
+  }
 
-    this.visitService.cancelVisit({ visitId, reason }).subscribe({
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+    this.selectedVisitId = null;
+    this.cancellationReason = '';
+  }
+
+  confirmCancelVisit(): void {
+    if (!this.selectedVisitId || !this.cancellationReason.trim()) {
+      this.toastService.warning('Por favor, forneça um motivo para o cancelamento');
+      return;
+    }
+
+    this.visitService.cancelVisit({ visitId: this.selectedVisitId, reason: this.cancellationReason.trim() }).subscribe({
       next: () => {
         this.toastService.success('Visita cancelada');
+        this.closeCancelModal();
         this.loadVisits();
       },
       error: (error) => {
         console.error('Error cancelling visit:', error);
-        this.toastService.error('Erro ao cancelar visita');
+        const errorMsg = error.error?.description || error.error?.message || 'Erro ao cancelar visita';
+        this.toastService.error(errorMsg);
       }
     });
   }
@@ -142,11 +175,43 @@ export class AgentVisitsComponent implements OnInit {
         return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400`;
       case 'Cancelled':
         return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400`;
+      case 'Rescheduled':
+        return `${baseClass} bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400`;
       case 'NoShow':
         return `${baseClass} bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400`;
       default:
-        return `${baseClass} bg-gray-100 text-gray-800`;
+        return `${baseClass} bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400`;
     }
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'Pending': return 'Pendente';
+      case 'Confirmed': return 'Confirmada';
+      case 'Completed': return 'Concluída';
+      case 'Cancelled': return 'Cancelada';
+      case 'Rescheduled': return 'Reagendada';
+      case 'NoShow': return 'Faltou';
+      default: return status;
+    }
+  }
+
+  getTimeSlotLabel(timeSlot: string): string {
+    switch (timeSlot) {
+      case 'Morning_9AM_11AM': return '09:00 - 11:00';
+      case 'Morning_11AM_1PM': return '11:00 - 13:00';
+      case 'Afternoon_2PM_4PM': return '14:00 - 16:00';
+      case 'Afternoon_4PM_6PM': return '16:00 - 18:00';
+      case 'Evening_6PM_8PM': return '18:00 - 20:00';
+      default: return timeSlot;
+    }
+  }
+
+  formatVisitDateTime(visit: PropertyVisit): string {
+    if (!visit.visitDate) return '';
+    const date = new Date(visit.visitDate);
+    const timeSlot = this.getTimeSlotLabel(visit.timeSlot || '');
+    return `${date.toLocaleDateString('pt-PT')} às ${timeSlot}`;
   }
 
   getStatusIcon(status: string): string {
@@ -165,26 +230,15 @@ export class AgentVisitsComponent implements OnInit {
   }
 
   isUpcoming(visit: PropertyVisit): boolean {
-    return new Date(visit.scheduledDate) >= new Date();
+    if (!visit.visitDate) return false;
+    const visitDate = new Date(visit.visitDate);
+    return visitDate >= new Date();
   }
 
   isPast(visit: PropertyVisit): boolean {
-    return new Date(visit.scheduledDate) < new Date();
-  }
-
-  formatDate(date: Date): string {
-    const visitDate = new Date(date);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    if (visitDate.toDateString() === today.toDateString()) {
-      return 'Hoje';
-    } else if (visitDate.toDateString() === tomorrow.toDateString()) {
-      return 'Amanhã';
-    } else {
-      return visitDate.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' });
-    }
+    if (!visit.visitDate) return false;
+    const visitDate = new Date(visit.visitDate);
+    return visitDate < new Date();
   }
 }
 

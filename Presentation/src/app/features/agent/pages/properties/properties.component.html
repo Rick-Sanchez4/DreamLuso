@@ -71,9 +71,11 @@
             <option value="all">Todos</option>
             <option value="Available">Disponível</option>
             <option value="Reserved">Reservado</option>
+            <option value="UnderContract">Em Contrato</option>
             <option value="Sold">Vendido</option>
             <option value="Rented">Arrendado</option>
-            <option value="Inactive">Inativo</option>
+            <option value="Unavailable">Indisponível</option>
+            <option value="InNegotiation">Em Negociação</option>
           </select>
         </div>
 
@@ -241,6 +243,18 @@
                 </div>
               </div>
             </div>
+          </div>
+        }
+
+        <!-- Pagination -->
+        @if (paginationInfo.totalPages > 1) {
+          <div class="mt-8">
+            <app-pagination
+              [paginationInfo]="paginationInfo"
+              [showPageSizeSelector]="true"
+              (pageChange)="onPageChange($event)"
+              (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
           </div>
         }
       </div>

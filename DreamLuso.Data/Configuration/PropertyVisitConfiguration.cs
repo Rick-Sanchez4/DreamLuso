@@ -50,12 +50,14 @@ internal class PropertyVisitConfiguration : IEntityTypeConfiguration<PropertyVis
         builder.HasOne(pv => pv.Client)
             .WithMany(c => c.PropertyVisits)
             .HasForeignKey(pv => pv.ClientId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
         builder.HasOne(pv => pv.RealEstateAgent)
             .WithMany(a => a.PropertyVisits)
             .HasForeignKey(pv => pv.RealEstateAgentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
         // Indexes
         builder.HasIndex(pv => pv.PropertyId);

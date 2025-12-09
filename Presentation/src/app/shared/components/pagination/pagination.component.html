@@ -1,0 +1,71 @@
+@if (paginationInfo.totalPages > 1 || showPageSizeSelector) {
+  <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+    <!-- Page Info -->
+    <div class="text-sm text-gray-600 dark:text-gray-400">
+      Mostrando <span class="font-semibold text-gray-900 dark:text-white">{{ startItem }}</span>
+      a <span class="font-semibold text-gray-900 dark:text-white">{{ endItem }}</span>
+      de <span class="font-semibold text-gray-900 dark:text-white">{{ paginationInfo.totalCount }}</span>
+      resultados
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="flex items-center gap-2">
+      <!-- Previous Button -->
+      <button
+        (click)="previousPage()"
+        [disabled]="!hasPrevious"
+        class="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <!-- Page Numbers -->
+      <div class="flex items-center gap-1">
+        @for (page of pages; track page) {
+          @if (isEllipsis(page)) {
+            <span class="px-2 text-gray-500 dark:text-gray-400">...</span>
+          } @else {
+            <button
+              (click)="goToPage(page)"
+              [class.bg-green-600]="page === paginationInfo.pageNumber"
+              [class.text-white]="page === paginationInfo.pageNumber"
+              [class.bg-white]="page !== paginationInfo.pageNumber"
+              [class.text-gray-700]="page !== paginationInfo.pageNumber"
+              [class.dark:bg-dark-800]="page !== paginationInfo.pageNumber"
+              [class.dark:text-gray-300]="page !== paginationInfo.pageNumber"
+              class="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
+              {{ page }}
+            </button>
+          }
+        }
+      </div>
+
+      <!-- Next Button -->
+      <button
+        (click)="nextPage()"
+        [disabled]="!hasNext"
+        class="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Page Size Selector -->
+    @if (showPageSizeSelector) {
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-gray-600 dark:text-gray-400">Por página:</label>
+        <select
+          [value]="paginationInfo.pageSize"
+          (change)="onPageSizeChange($event)"
+          class="px-3 py-2 text-sm border border-gray-300 dark:border-dark-700 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          @for (size of pageSizeOptions; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </div>
+    }
+  </div>
+}
+

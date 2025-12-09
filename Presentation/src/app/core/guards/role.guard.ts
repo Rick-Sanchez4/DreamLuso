@@ -13,7 +13,7 @@ export class RoleGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    const expectedRoles = route.data['roles'] as UserRole[];
+    const expectedRoles = route.data['roles'] as string[];
     const currentUser = this.authService.getCurrentUser();
 
     if (!currentUser) {
@@ -21,8 +21,9 @@ export class RoleGuard implements CanActivate {
       return false;
     }
 
-    if (expectedRoles && !expectedRoles.includes(currentUser.role)) {
-      this.router.navigate(['/unauthorized']);
+    if (expectedRoles && expectedRoles.length > 0 && !expectedRoles.includes(currentUser.role)) {
+      // Redirect to home page if user doesn't have required role
+      this.router.navigate(['/']);
       return false;
     }
 

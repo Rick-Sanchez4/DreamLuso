@@ -11,6 +11,7 @@ export interface PropertyProposal {
   paymentMethod?: string;
   intendedMoveDate?: Date;
   additionalNotes?: string;
+  rejectionReason?: string;
   createdAt: Date;
   negotiations: ProposalNegotiation[];
 }

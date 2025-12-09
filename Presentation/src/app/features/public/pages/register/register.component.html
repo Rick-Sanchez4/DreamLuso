@@ -130,16 +130,18 @@
           </label>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label class="relative flex items-center p-5 border-2 rounded-3xl cursor-pointer transition-all hover:scale-[1.02]"
-                   [class.border-green-500]="userData.role === 'Client'"
-                   [class.bg-green-500/20]="userData.role === 'Client'"
-                   [class.border-white/30]="userData.role !== 'Client'"
-                   [class.bg-white/10]="userData.role !== 'Client'">
+                   [class.border-green-500]="userData.role === UserRole.Client"
+                   [class.bg-green-500/20]="userData.role === UserRole.Client"
+                   [class.border-white/30]="userData.role !== UserRole.Client"
+                   [class.bg-white/10]="userData.role !== UserRole.Client"
+                   (click)="userData.role = UserRole.Client">
               <input
                 type="radio"
                 name="role"
-                [(ngModel)]="userData.role"
-                value="Client"
-                class="sr-only">
+                [checked]="userData.role === UserRole.Client"
+                [value]="UserRole.Client"
+                class="sr-only"
+                (change)="userData.role = UserRole.Client">
               <div class="flex items-center gap-4 w-full">
                 <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-teal-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
                   <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +152,7 @@
                   <p class="font-bold text-white text-base">Cliente</p>
                   <p class="text-sm text-white/70">Procurar e comprar imóveis</p>
                 </div>
-                @if (userData.role === 'Client') {
+                @if (userData.role === UserRole.Client) {
                   <div class="flex-shrink-0">
                     <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -161,16 +163,18 @@
             </label>
 
             <label class="relative flex items-center p-5 border-2 rounded-3xl cursor-pointer transition-all hover:scale-[1.02]"
-                   [class.border-green-500]="userData.role === 'RealEstateAgent'"
-                   [class.bg-green-500/20]="userData.role === 'RealEstateAgent'"
-                   [class.border-white/30]="userData.role !== 'RealEstateAgent'"
-                   [class.bg-white/10]="userData.role !== 'RealEstateAgent'">
+                   [class.border-green-500]="userData.role === UserRole.RealEstateAgent"
+                   [class.bg-green-500/20]="userData.role === UserRole.RealEstateAgent"
+                   [class.border-white/30]="userData.role !== UserRole.RealEstateAgent"
+                   [class.bg-white/10]="userData.role !== UserRole.RealEstateAgent"
+                   (click)="userData.role = UserRole.RealEstateAgent">
               <input
                 type="radio"
                 name="role"
-                [(ngModel)]="userData.role"
-                value="RealEstateAgent"
-                class="sr-only">
+                [checked]="userData.role === UserRole.RealEstateAgent"
+                [value]="UserRole.RealEstateAgent"
+                class="sr-only"
+                (change)="userData.role = UserRole.RealEstateAgent">
               <div class="flex items-center gap-4 w-full">
                 <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-green-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
                   <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,7 +185,7 @@
                   <p class="font-bold text-white text-base">Agente Imobiliário</p>
                   <p class="text-sm text-white/70">Vender e gerir imóveis</p>
                 </div>
-                @if (userData.role === 'RealEstateAgent') {
+                @if (userData.role === UserRole.RealEstateAgent) {
                   <div class="flex-shrink-0">
                     <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>

@@ -25,6 +25,7 @@ public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, R
             user.Name.FirstName,
             user.Name.LastName,
             user.Phone ?? string.Empty,
+            user.Address,
             user.DateOfBirth,
             user.ProfileImageUrl,
             user.Role.ToString(),

@@ -1,12 +1,25 @@
-using DreamLuso.Application.CQ.PropertyProposals.Commands;
-using DreamLuso.Application.CQ.PropertyProposals.Queries;
+using DreamLuso.Application.CQ.PropertyProposals.Commands.ApproveProposal;
+using DreamLuso.Application.CQ.PropertyProposals.Commands.CreateProposal;
+using DreamLuso.Application.CQ.PropertyProposals.Commands.RejectProposal;
+using DreamLuso.Application.CQ.PropertyProposals.Commands.AddNegotiation;
+using DreamLuso.Application.CQ.PropertyProposals.Commands.UpdateNegotiationStatus;
+using DreamLuso.Application.CQ.PropertyProposals.Commands.CancelProposal;
+using DreamLuso.Application.CQ.PropertyProposals.Commands.StartAnalysis;
+using DreamLuso.Application.CQ.PropertyProposals.Queries.GetProposals;
+using DreamLuso.Application.CQ.PropertyProposals.Queries.GetProposalById;
+using DreamLuso.Application.CQ.PropertyProposals.Queries.GetProposalsByClient;
+using DreamLuso.Application.CQ.PropertyProposals.Queries.GetProposalsByAgent;
+using DreamLuso.Application.CQ.PropertyProposals.Common;
 using DreamLuso.Application.Common.Responses;
+using DreamLuso.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DreamLuso.WebAPI.Endpoints;
+
+public record UpdateNegotiationStatusRequest(NegotiationStatus Status);
 
 public static class PropertyProposalEndpoints
 {
@@ -23,10 +36,7 @@ public static class PropertyProposalEndpoints
             .WithName("CreateProposal")
             .RequireAuthorization();
 
-        proposals.MapGet("/{proposalId:guid}", Commands.GetProposalById)
-            .WithName("GetProposalById")
-            .RequireAuthorization();
-
+        // Specific routes must come before generic {proposalId:guid} route
         proposals.MapGet("/client/{clientId:guid}", Commands.GetProposalsByClient)
             .WithName("GetProposalsByClient")
             .RequireAuthorization();
@@ -35,6 +45,11 @@ public static class PropertyProposalEndpoints
             .WithName("GetProposalsByAgent")
             .RequireAuthorization();
 
+        proposals.MapPut("/negotiations/{negotiationId:guid}/status", Commands.UpdateNegotiationStatus)
+            .WithName("UpdateNegotiationStatus")
+            .RequireAuthorization();
+
+        // Action routes for specific proposal
         proposals.MapPut("/{proposalId:guid}/approve", Commands.ApproveProposal)
             .WithName("ApproveProposal")
             .RequireAuthorization();
@@ -43,8 +58,21 @@ public static class PropertyProposalEndpoints
             .WithName("RejectProposal")
             .RequireAuthorization();
 
+        proposals.MapPut("/{proposalId:guid}/cancel", Commands.CancelProposal)
+            .WithName("CancelProposal")
+            .RequireAuthorization();
+
+        proposals.MapPut("/{proposalId:guid}/start-analysis", Commands.StartAnalysis)
+            .WithName("StartAnalysis")
+            .RequireAuthorization();
+
         proposals.MapPost("/{proposalId:guid}/negotiate", Commands.AddNegotiation)
             .WithName("AddNegotiation")
+            .RequireAuthorization();
+
+        // Generic route must come last
+        proposals.MapGet("/{proposalId:guid}", Commands.GetProposalById)
+            .WithName("GetProposalById")
             .RequireAuthorization();
     }
 
@@ -153,6 +181,46 @@ public static class PropertyProposalEndpoints
 
             return result.IsSuccess
                 ? TypedResults.Ok(result.Value)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<object>, BadRequest<Error>>> UpdateNegotiationStatus(
+            [FromServices] ISender sender,
+            [FromRoute] Guid negotiationId,
+            [FromBody] UpdateNegotiationStatusRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new UpdateNegotiationStatusCommand(negotiationId, request.Status);
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(new { message = "Estado da negociação atualizado" } as object)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<object>, BadRequest<Error>>> CancelProposal(
+            [FromServices] ISender sender,
+            [FromRoute] Guid proposalId,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new CancelProposalCommand(proposalId);
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(new { message = "Proposta cancelada com sucesso" } as object)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<object>, BadRequest<Error>>> StartAnalysis(
+            [FromServices] ISender sender,
+            [FromRoute] Guid proposalId,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new StartAnalysisCommand(proposalId);
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(new { message = "Análise iniciada" } as object)
                 : TypedResults.BadRequest(result.Error!);
         }
     }

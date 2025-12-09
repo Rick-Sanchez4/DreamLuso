@@ -18,6 +18,8 @@ public class PropertyVisitResponse
     public int? ClientRating { get; set; }
     public string ConfirmationToken { get; set; } = string.Empty;
     public DateTime? ConfirmedAt { get; set; }
+    public DateTime? CancelledAt { get; set; }
+    public string? CancellationReason { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 

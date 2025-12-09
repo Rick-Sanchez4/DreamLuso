@@ -29,13 +29,16 @@ public class CreateContractCommandHandler : IRequestHandler<CreateContractComman
 
         var prop = (Property)property;
 
-        // Check if property is available
+        // Check if property is available (permitir Reserved e UnderContract para criação de contrato)
         if (prop.Status == PropertyStatus.Sold || prop.Status == PropertyStatus.Rented)
         {
             _logger.LogWarning("Imóvel já não está disponível: {PropertyId}, Status: {Status}", 
                 request.PropertyId, prop.Status);
             return Error.PropertyUnavailable;
         }
+        
+        // Permitir criação de contrato mesmo se estiver Reserved ou UnderContract
+        // (isso acontece quando uma proposta foi aprovada e o contrato está sendo criado)
 
         // Verify client exists
         var client = await _unitOfWork.ClientRepository.GetByIdAsync(request.ClientId);

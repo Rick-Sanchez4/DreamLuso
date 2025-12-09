@@ -64,6 +64,7 @@
             <option value="Confirmed">Confirmada</option>
             <option value="Completed">Concluída</option>
             <option value="Cancelled">Cancelada</option>
+            <option value="Rescheduled">Reagendada</option>
             <option value="NoShow">Não Compareceu</option>
           </select>
         </div>
@@ -127,16 +128,7 @@
                           <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                           </svg>
-                          <span class="text-blue-700 dark:text-blue-400 font-bold">{{ formatDate(visit.scheduledDate) }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800/30">
-                          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                          </svg>
-                          <span class="text-green-700 dark:text-green-400 font-semibold">{{ visit.scheduledDate | date: 'HH:mm' }}</span>
-                        </div>
-                        <div class="px-3 py-1.5 bg-gray-100 dark:bg-dark-800 rounded-xl">
-                          <span class="text-gray-700 dark:text-gray-300 font-medium">{{ visit.duration }} min</span>
+                          <span class="text-blue-700 dark:text-blue-400 font-bold">{{ formatVisitDateTime(visit) }}</span>
                         </div>
                       </div>
                       
@@ -153,7 +145,7 @@
                 <!-- Status & Actions -->
                 <div class="flex flex-col items-end gap-4">
                   <span [class]="getStatusBadgeClass(visit.status)" class="text-sm px-4 py-2">
-                    {{ visit.status }}
+                    {{ getStatusLabel(visit.status) }}
                   </span>
                   
                   <div class="flex flex-wrap gap-2 justify-end">
@@ -179,7 +171,7 @@
                       </button>
                     }
 
-                    @if (visit.status === 'Completed' && visit.feedback) {
+                    @if (visit.status === 'Completed' && visit.clientFeedback) {
                       <div class="px-5 py-2.5 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 text-blue-700 dark:text-blue-400 font-medium rounded-xl border border-blue-200 dark:border-blue-800/30">
                         Feedback registado
                       </div>
@@ -189,7 +181,7 @@
               </div>
 
               <!-- Feedback Section -->
-              @if (visit.status === 'Completed' && visit.feedback) {
+              @if (visit.status === 'Completed' && visit.clientFeedback) {
                 <div class="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
                   <div class="flex gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800/30">
                     <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,7 +189,25 @@
                     </svg>
                     <div class="flex-1">
                       <p class="text-sm font-semibold text-green-900 dark:text-green-300 mb-1">Feedback da Visita:</p>
-                      <p class="text-sm text-green-800 dark:text-green-400">{{ visit.feedback }}</p>
+                      <p class="text-sm text-green-800 dark:text-green-400">{{ visit.clientFeedback }}</p>
+                      @if (visit.clientRating) {
+                        <p class="text-sm text-green-800 dark:text-green-400 mt-1">
+                          <span class="font-semibold">Avaliação:</span> {{ visit.clientRating }}/5 ⭐
+                        </p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+              @if (visit.cancellationReason) {
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
+                  <div class="flex gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800/30">
+                    <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <div class="flex-1">
+                      <p class="text-sm font-semibold text-red-900 dark:text-red-300 mb-1">Motivo do Cancelamento:</p>
+                      <p class="text-sm text-red-800 dark:text-red-400">{{ visit.cancellationReason }}</p>
                     </div>
                   </div>
                 </div>
@@ -209,4 +219,54 @@
     }
   </div>
 </div>
+
+<!-- Modal de Confirmação -->
+@if (showConfirmModal) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeConfirmModal()">
+    <div class="bg-white dark:bg-dark-800 rounded-xl shadow-xl p-6 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Confirmar Visita</h3>
+      <p class="text-gray-600 dark:text-gray-300 mb-6">Tem certeza que deseja confirmar esta visita?</p>
+      <div class="flex gap-3 justify-end">
+        <button
+          (click)="closeConfirmModal()"
+          class="px-4 py-2 bg-gray-200 dark:bg-dark-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-dark-600 transition-colors">
+          Cancelar
+        </button>
+        <button
+          (click)="confirmVisitAction()"
+          class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de Cancelamento -->
+@if (showCancelModal) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeCancelModal()">
+    <div class="bg-white dark:bg-dark-800 rounded-xl shadow-xl p-6 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Cancelar Visita</h3>
+      <p class="text-gray-600 dark:text-gray-300 mb-4">Tem certeza que deseja cancelar esta visita? Por favor, forneça um motivo:</p>
+      <textarea
+        [(ngModel)]="cancellationReason"
+        placeholder="Motivo do cancelamento..."
+        rows="4"
+        class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:border-red-500 mb-4 resize-none"
+        maxlength="500"></textarea>
+      <div class="flex gap-3 justify-end">
+        <button
+          (click)="closeCancelModal()"
+          class="px-4 py-2 bg-gray-200 dark:bg-dark-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-dark-600 transition-colors">
+          Cancelar
+        </button>
+        <button
+          (click)="confirmCancelVisit()"
+          class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors">
+          Confirmar Cancelamento
+        </button>
+      </div>
+    </div>
+  </div>
+}
 

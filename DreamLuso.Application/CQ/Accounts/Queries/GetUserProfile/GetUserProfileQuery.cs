@@ -11,6 +11,7 @@ public record UserProfileResponse(
     string FirstName,
     string LastName,
     string PhoneNumber,
+    string? Address,
     DateTime? DateOfBirth,
     string? ImageUrl,
     string Account,

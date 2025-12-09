@@ -25,6 +25,9 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
 
     public async Task<Result<RegisterUserResponse, Success, Error>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("RegisterUserCommandHandler - Processing registration: Email={Email}, Role={Role}, FirstName={FirstName}, LastName={LastName}", 
+            request.Email, request.Role, request.FirstName, request.LastName);
+        
         // Check if email already exists
         if (await _unitOfWork.UserRepository.EmailExistsAsync(request.Email))
         {
@@ -55,6 +58,54 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
         await _unitOfWork.CommitAsync(cancellationToken);
 
         _logger.LogInformation("Utilizador registado com sucesso: {Email}", request.Email);
+
+        // If user is a Client, create Client profile automatically
+        if (request.Role == UserRole.Client)
+        {
+            // Check if client already exists (shouldn't, but just in case)
+            var existingClient = await _unitOfWork.ClientRepository.GetByUserIdAsync(savedUser.Id);
+            if (existingClient == null)
+            {
+                var client = new Client
+                {
+                    UserId = savedUser.Id,
+                    User = savedUser,
+                    Type = ClientType.Individual, // Default to Individual
+                    IsActive = true
+                };
+
+                await _unitOfWork.ClientRepository.SaveAsync(client);
+                await _unitOfWork.CommitAsync(cancellationToken);
+                
+                _logger.LogInformation("Perfil de cliente criado automaticamente para userId: {UserId}", savedUser.Id);
+            }
+        }
+        // If user is a RealEstateAgent, create RealEstateAgent profile automatically (pending approval)
+        else if (request.Role == UserRole.RealEstateAgent)
+        {
+            // Check if agent already exists (shouldn't, but just in case)
+            var existingAgent = await _unitOfWork.RealEstateAgentRepository.GetByUserIdAsync(savedUser.Id);
+            if (existingAgent == null)
+            {
+                var agent = new RealEstateAgent
+                {
+                    UserId = savedUser.Id,
+                    User = savedUser,
+                    IsActive = false, // Start as inactive, requires admin approval
+                    LicenseNumber = null, // Will be filled later or during approval
+                    CommissionRate = 0,
+                    TotalSales = 0,
+                    TotalRevenue = 0,
+                    Rating = 0,
+                    ReviewCount = 0
+                };
+
+                await _unitOfWork.RealEstateAgentRepository.SaveAsync(agent);
+                await _unitOfWork.CommitAsync(cancellationToken);
+                
+                _logger.LogInformation("Perfil de agente imobiliário criado automaticamente para userId: {UserId} (pendente de aprovação)", savedUser.Id);
+            }
+        }
 
         var response = new RegisterUserResponse(
             savedUser.Id,

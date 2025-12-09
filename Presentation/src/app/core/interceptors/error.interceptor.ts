@@ -25,7 +25,11 @@ export class ErrorInterceptor implements HttpInterceptor {
         }
 
         // Não mostrar toast para erros 401 (handled by auth interceptor)
-        if (error.status !== 401) {
+        // Não mostrar toast para erros 400 em /accounts/login (handled by login component)
+        // Não mostrar toast para erros 401 em /notifications (user might not be authenticated yet)
+        const isLoginEndpoint = request.url.includes('/accounts/login');
+        const isNotificationEndpoint = request.url.includes('/notifications');
+        if (error.status !== 401 && !(error.status === 400 && isLoginEndpoint)) {
           this.toastService.error(errorMessage);
         }
 

@@ -9,7 +9,16 @@
           <h1 class="text-3xl font-bold">Proposta #{{ proposal?.proposalNumber }}</h1>
           <p class="text-white/70 text-sm">Acompanhe o estado e a negociação da proposta</p>
         </div>
-        <a routerLink="/client/proposals" class="px-4 py-2 text-white/80 hover:text-white transition-colors">← Voltar</a>
+          <div class="flex items-center gap-3">
+            @if (proposal && (proposal.status === 'Pending' || proposal.status === 'UnderAnalysis' || proposal.status === 'InNegotiation')) {
+              <button 
+                (click)="openCancelModal()"
+                class="px-4 py-2 bg-red-500/80 hover:bg-red-600 text-white rounded-lg transition-colors">
+                Cancelar Proposta
+              </button>
+            }
+            <a routerLink="/client/proposals" class="px-4 py-2 text-white/80 hover:text-white transition-colors">← Voltar</a>
+          </div>
       </div>
     </div>
   </div>
@@ -37,12 +46,12 @@
               </div>
               <div>
                 <p class="text-gray-500 dark:text-gray-400">Valor Proposto</p>
-                <p class="font-semibold">€{{ proposal.proposedValue?.toLocaleString('pt-PT') }}</p>
+                <p class="font-semibold">€{{ proposal.proposedValue.toLocaleString('pt-PT') }}</p>
               </div>
               <div>
                 <p class="text-gray-500 dark:text-gray-400">Estado</p>
-                <span class="px-3 py-1 rounded-full text-xs font-semibold" [class]="' ' + (proposal.status === 'Approved' ? 'bg-green-100 text-green-800' : proposal.status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')">
-                  {{ proposal.status }}
+                <span class="px-3 py-1 rounded-full text-xs font-semibold" [class]="getStatusBadgeClass(proposal.status)">
+                  {{ getStatusLabel(proposal.status) }}
                 </span>
               </div>
               <div>
@@ -54,17 +63,22 @@
 
           <div class="bg-white dark:bg-dark-800 dark:border dark:border-white/10 rounded-xl shadow-md p-6">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Negociação</h2>
-            @if (proposal.negotiations?.length) {
+            @if (proposal.negotiations.length) {
               <div class="space-y-3 mb-6">
                 @for (n of proposal.negotiations; track n.id) {
                   <div class="p-4 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-dark-750">
-                    <div class="flex items-center justify-between">
-                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ n.senderName || 'Participante' }}</p>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-2">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ n.senderName || 'Participante' }}</p>
+                        <span [class]="getNegotiationStatusBadgeClass(n.status)" class="text-xs px-2 py-1 rounded-full">
+                          {{ getNegotiationStatusLabel(n.status) }}
+                        </span>
+                      </div>
                       <span class="text-xs text-gray-500 dark:text-gray-400">{{ n.sentAt | date:'dd/MM/yyyy HH:mm' }}</span>
                     </div>
                     <p class="text-sm text-gray-700 dark:text-gray-200 mt-2">{{ n.message }}</p>
                     @if (n.counterOffer) {
-                      <p class="text-sm text-green-600 dark:text-green-400 mt-1">Contraproposta: €{{ n.counterOffer.toLocaleString('pt-PT') }}</p>
+                      <p class="text-sm font-semibold text-green-600 dark:text-green-400 mt-1">Contraproposta: €{{ n.counterOffer.toLocaleString('pt-PT') }}</p>
                     }
                   </div>
                 }
@@ -73,21 +87,55 @@
               <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">Sem mensagens de negociação.</p>
             }
 
-            <form class="grid grid-cols-1 md:grid-cols-5 gap-3" (ngSubmit)="sendNegotiation()">
-              <input 
-                type="text"
-                [(ngModel)]="negotiationMessage"
-                name="message"
-                placeholder="Escreva uma mensagem"
-                class="md:col-span-3 w-full px-4 py-2 border border-gray-300 dark:border-white/10 bg-white dark:bg-dark-750 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-              <input 
-                type="number"
-                [(ngModel)]="counterOffer"
-                name="counterOffer"
-                placeholder="€ Contraproposta (opcional)"
-                class="md:col-span-1 w-full px-4 py-2 border border-gray-300 dark:border-white/10 bg-white dark:bg-dark-750 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-              <button type="submit" class="md:col-span-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">Enviar</button>
-            </form>
+            <!-- Form to Add Negotiation (only if proposal allows negotiation) -->
+            @if (proposal.status === 'InNegotiation' || proposal.status === 'Pending' || proposal.status === 'UnderAnalysis') {
+              <form class="grid grid-cols-1 md:grid-cols-5 gap-3" (ngSubmit)="sendNegotiation()">
+                <div class="md:col-span-3">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mensagem</label>
+                  <textarea
+                    [(ngModel)]="negotiationMessage"
+                    name="message"
+                    rows="2"
+                    placeholder="Escreva uma mensagem"
+                    minlength="5"
+                    maxlength="2000"
+                    class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"></textarea>
+                </div>
+                <div class="md:col-span-1">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contraproposta (€)</label>
+                  <input 
+                    type="number"
+                    [(ngModel)]="counterOffer"
+                    name="counterOffer"
+                    placeholder="Opcional"
+                    min="0"
+                    step="0.01"
+                    class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
+                </div>
+                <div class="md:col-span-1 flex items-end">
+                  <button type="submit" class="w-full px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">
+                    Enviar
+                  </button>
+                </div>
+              </form>
+            } @else if (proposal.status === 'Rejected') {
+              <div class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800/30">
+                <p class="text-sm text-red-700 dark:text-red-300">
+                  <strong>Esta proposta foi rejeitada.</strong> Não é possível adicionar mais negociações.
+                </p>
+                @if (proposal.rejectionReason) {
+                  <p class="text-sm text-red-600 dark:text-red-400 mt-2">
+                    <strong>Motivo:</strong> {{ proposal.rejectionReason }}
+                  </p>
+                }
+              </div>
+            } @else if (proposal.status === 'Approved') {
+              <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/30">
+                <p class="text-sm text-green-700 dark:text-green-300">
+                  <strong>Esta proposta foi aprovada!</strong> A negociação foi concluída com sucesso.
+                </p>
+              </div>
+            }
           </div>
         </div>
 
@@ -105,6 +153,47 @@
       </div>
     }
   </div>
+
+  <!-- Cancel Proposal Modal -->
+  @if (showCancelModal) {
+    <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="closeCancelModal()">
+      <div class="bg-white dark:bg-dark-800 rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all" (click)="$event.stopPropagation()">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Cancelar Proposta</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Esta ação não pode ser desfeita</p>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-gray-700 dark:text-gray-300">
+            Tem certeza que deseja cancelar a proposta <strong>#{{ proposal?.proposalNumber }}</strong>?
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            O agente será notificado sobre o cancelamento e não será possível reverter esta ação.
+          </p>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            (click)="closeCancelModal()"
+            class="flex-1 px-4 py-3 bg-gray-200 dark:bg-dark-700 hover:bg-gray-300 dark:hover:bg-dark-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-colors">
+            Voltar
+          </button>
+          <button
+            (click)="confirmCancel()"
+            class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">
+            Confirmar Cancelamento
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
 
 

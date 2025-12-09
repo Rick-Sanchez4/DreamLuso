@@ -67,5 +67,20 @@ export class AgentService {
   updateProfile(agentId: string, data: Partial<AgentProfile>): Observable<any> {
     return this.http.put(`${this.apiUrl}/${agentId}`, data);
   }
+
+  // Approve agent
+  approveAgent(agentId: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${agentId}/approve`, {
+      isApproved: true
+    });
+  }
+
+  // Reject agent
+  rejectAgent(agentId: string, rejectionReason?: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${agentId}/approve`, {
+      isApproved: false,
+      rejectionReason: rejectionReason || null
+    });
+  }
 }
 

@@ -68,7 +68,10 @@ public class PropertyProposalRepository : Repository<PropertyProposal>, IPropert
         return await _dbSet
             .Include(p => p.Property)
                 .ThenInclude(pr => pr.Address)
+            .Include(p => p.Client)
+                .ThenInclude(c => c.User)
             .Include(p => p.Negotiations)
+                .ThenInclude(n => n.Sender)
             .Where(p => p.ClientId == clientId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
@@ -82,6 +85,7 @@ public class PropertyProposalRepository : Repository<PropertyProposal>, IPropert
             .Include(p => p.Client)
                 .ThenInclude(c => c!.User)
             .Include(p => p.Negotiations)
+                .ThenInclude(n => n.Sender)
             .Where(p => p.Property!.RealEstateAgentId == agentId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();

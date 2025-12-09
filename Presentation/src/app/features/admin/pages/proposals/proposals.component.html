@@ -111,14 +111,14 @@
                   <!-- Status -->
                   <td class="py-4 px-6">
                     <span [class]="getStatusBadgeClass(proposal.status)">
-                      {{ proposal.status }}
+                      {{ getStatusLabel(proposal.status) }}
                     </span>
                   </td>
 
                   <!-- Date -->
                   <td class="py-4 px-6">
-                    <p class="text-sm text-gray-900 dark:text-white">{{ proposal.submittedDate | date:'dd/MM/yyyy' }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ proposal.submittedDate | date:'HH:mm' }}</p>
+                    <p class="text-sm text-gray-900 dark:text-white">{{ (proposal.createdAt || proposal.submittedDate) | date:'dd/MM/yyyy' }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ (proposal.createdAt || proposal.submittedDate) | date:'HH:mm' }}</p>
                   </td>
 
                   <!-- Actions -->

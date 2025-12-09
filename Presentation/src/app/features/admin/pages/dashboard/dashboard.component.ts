@@ -66,8 +66,13 @@ export class AdminDashboardComponent implements OnInit {
   loadDashboardData(): void {
     this.loading = true;
 
+    // Debug: Log the API URL being used
+    console.log('API URL:', environment.apiUrl);
+    const fullUrl = `${environment.apiUrl}/dashboard/admin`;
+    console.log('Full URL:', fullUrl);
+
     // Load admin statistics from the real endpoint
-    this.http.get<AdminStats>(`${environment.apiUrl}/dashboard/admin`).subscribe({
+    this.http.get<AdminStats>(fullUrl).subscribe({
       next: (stats) => {
         this.stats = stats;
         this.loading = false;

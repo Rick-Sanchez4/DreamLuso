@@ -34,50 +34,31 @@ export class AdminProposalsComponent implements OnInit {
   loadProposals(): void {
     this.loading = true;
     
-    // Get all agents to fetch their proposals
-    this.http.get<any>(`${environment.apiUrl}/agents?pageSize=100`).subscribe({
-      next: (agentsResult) => {
-        const agents = agentsResult.agents || [];
-        let allProposals: any[] = [];
-        let completed = 0;
-        
-        if (agents.length === 0) {
+    // Use the direct /api/proposals endpoint to get all proposals
+    this.http.get<any>(`${environment.apiUrl}/proposals?pageSize=1000`).subscribe({
+      next: (result) => {
+        // Handle different response formats
+        if (result && result.proposals && Array.isArray(result.proposals)) {
+          // Response with proposals property
+          this.proposals = result.proposals;
+        } else if (result && Array.isArray(result)) {
+          // Direct array response
+          this.proposals = result;
+        } else if (result && result.value && Array.isArray(result.value)) {
+          // Result<T> format
+          this.proposals = result.value;
+        } else {
           this.proposals = [];
-          this.applyFilters();
-          this.loading = false;
-          return;
         }
-        
-        // Fetch proposals for each agent
-        agents.forEach((agent: any, index: number) => {
-          this.http.get<any>(`${environment.apiUrl}/proposals/agent/${agent.id}`).subscribe({
-            next: (agentProposals) => {
-              if (Array.isArray(agentProposals)) {
-                allProposals = allProposals.concat(agentProposals);
-              }
-              completed++;
-              
-              if (completed === agents.length) {
-                this.proposals = allProposals;
-                this.applyFilters();
-                this.loading = false;
-              }
-            },
-            error: () => {
-              completed++;
-              if (completed === agents.length) {
-                this.proposals = allProposals;
-                this.applyFilters();
-                this.loading = false;
-              }
-            }
-          });
-        });
+        this.applyFilters();
+        this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading proposals:', error);
         this.proposals = [];
         this.applyFilters();
         this.loading = false;
+        this.toastService.error('Erro ao carregar propostas');
       }
     });
   }
@@ -95,6 +76,27 @@ export class AdminProposalsComponent implements OnInit {
 
   onFilterChange(): void {
     this.applyFilters();
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'Pending':
+        return 'Pendente';
+      case 'UnderAnalysis':
+        return 'Em Análise';
+      case 'InNegotiation':
+        return 'Em Negociação';
+      case 'Approved':
+        return 'Aprovada';
+      case 'Rejected':
+        return 'Rejeitada';
+      case 'Cancelled':
+        return 'Cancelada';
+      case 'Completed':
+        return 'Concluída';
+      default:
+        return status;
+    }
   }
 
   getStatusBadgeClass(status: string): string {
@@ -154,12 +156,18 @@ export class AdminProposalsComponent implements OnInit {
   }
 
   rejectProposal(proposal: any): void {
-    const reason = prompt('Motivo da rejeição (opcional):');
+    const reason = prompt('Motivo da rejeição (mínimo 10 caracteres):');
     if (reason === null) return; // User cancelled
+    
+    // Validate minimum length
+    if (reason && reason.trim().length < 10) {
+      this.toastService.error('O motivo da rejeição deve ter pelo menos 10 caracteres');
+      return;
+    }
 
     this.http.put(`${environment.apiUrl}/proposals/${proposal.id}/reject`, {
       proposalId: proposal.id,
-      reason: reason || 'Não especificado'
+      rejectionReason: reason || 'Não especificado'
     }).subscribe({
       next: () => {
         this.toastService.success('Proposta rejeitada!');
