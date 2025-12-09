@@ -20,8 +20,29 @@ public class GetPropertiesQueryHandler : IRequestHandler<GetPropertiesQuery, Res
 
     public async Task<Result<GetPropertiesResponse, Success, Error>> Handle(GetPropertiesQuery request, CancellationToken cancellationToken)
     {
-        var allProperties = await _unitOfWork.PropertyRepository.GetAllAsync();
-        var properties = allProperties.Cast<Property>().AsQueryable();
+        // If AgentId is provided, filter by agent and show all properties (including reserved/under contract)
+        // Otherwise, filter only active and available properties for public search
+        IQueryable<Property> properties;
+        
+        if (request.AgentId.HasValue)
+        {
+            // For agent view: show all properties (including reserved/under contract/sold/rented)
+            var agentProperties = await _unitOfWork.PropertyRepository.GetByAgentIdAsync(request.AgentId.Value);
+            properties = agentProperties.Cast<Property>().AsQueryable();
+        }
+        else
+        {
+            // For public view: filter only active and available properties
+            var allProperties = await _unitOfWork.PropertyRepository.GetAllAsync();
+            properties = allProperties
+                .Cast<Property>()
+                .Where(p => p.IsActive && 
+                           p.Status != PropertyStatus.Sold && 
+                           p.Status != PropertyStatus.Rented &&
+                           p.Status != PropertyStatus.Reserved &&
+                           p.Status != PropertyStatus.UnderContract)
+                .AsQueryable();
+        }
 
         // Apply filters
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -30,8 +51,8 @@ public class GetPropertiesQueryHandler : IRequestHandler<GetPropertiesQuery, Res
             properties = properties.Where(p =>
                 p.Title.ToLower().Contains(searchLower) ||
                 p.Description.ToLower().Contains(searchLower) ||
-                p.Address.Municipality.ToLower().Contains(searchLower) ||
-                p.Address.District.ToLower().Contains(searchLower));
+                (p.Address != null && p.Address.Municipality != null && p.Address.Municipality.ToLower().Contains(searchLower)) ||
+                (p.Address != null && p.Address.District != null && p.Address.District.ToLower().Contains(searchLower)));
         }
 
         if (request.Type.HasValue)
@@ -56,7 +77,8 @@ public class GetPropertiesQueryHandler : IRequestHandler<GetPropertiesQuery, Res
 
         if (!string.IsNullOrWhiteSpace(request.Municipality))
         {
-            properties = properties.Where(p => p.Address.Municipality.Equals(request.Municipality, StringComparison.OrdinalIgnoreCase));
+            properties = properties.Where(p => p.Address != null && p.Address.Municipality != null && 
+                p.Address.Municipality.Equals(request.Municipality, StringComparison.OrdinalIgnoreCase));
         }
 
         if (request.MinBedrooms.HasValue)
@@ -64,9 +86,19 @@ public class GetPropertiesQueryHandler : IRequestHandler<GetPropertiesQuery, Res
             properties = properties.Where(p => p.Bedrooms >= request.MinBedrooms.Value);
         }
 
+        if (request.MinBathrooms.HasValue)
+        {
+            properties = properties.Where(p => p.Bathrooms >= request.MinBathrooms.Value);
+        }
+
         if (request.FeaturedOnly == true)
         {
             properties = properties.Where(p => p.IsFeatured);
+        }
+
+        if (request.TransactionType.HasValue)
+        {
+            properties = properties.Where(p => (int)p.TransactionType == request.TransactionType.Value);
         }
 
         // Get total count
@@ -97,12 +129,12 @@ public class GetPropertiesQueryHandler : IRequestHandler<GetPropertiesQuery, Res
                 YearBuilt = p.YearBuilt,
                 IsFeatured = p.IsFeatured,
                 ViewCount = p.ViewCount,
-                Street = p.Address.Street,
-                Municipality = p.Address.Municipality,
-                District = p.Address.District,
-                PostalCode = p.Address.PostalCode,
+                Street = p.Address?.Street ?? "",
+                Municipality = p.Address?.Municipality ?? "",
+                District = p.Address?.District ?? "",
+                PostalCode = p.Address?.PostalCode ?? "",
                 AgentId = p.RealEstateAgentId,
-                AgentName = p.RealEstateAgent.User.Name.FullName,
+                AgentName = p.RealEstateAgent?.User?.Name?.FullName ?? "Agente não encontrado",
                 ImageUrls = p.Images.Select(img => img.ImageUrl).ToList(),
                 CreatedAt = p.CreatedAt
             }),

@@ -34,9 +34,9 @@ public class GetAgentByIdQueryHandler : IRequestHandler<GetAgentByIdQuery, Resul
         {
             Id = agent.Id,
             UserId = agent.UserId,
-            FullName = agent.User.Name.FullName,
-            Email = agent.User.Email,
-            Phone = agent.User.Phone,
+            FullName = agent.User?.Name?.FullName ?? "Nome não disponível",
+            Email = agent.User?.Email ?? "",
+            Phone = agent.User?.Phone ?? "",
             LicenseNumber = agent.LicenseNumber,
             LicenseExpiry = agent.LicenseExpiry,
             OfficeEmail = agent.OfficeEmail,

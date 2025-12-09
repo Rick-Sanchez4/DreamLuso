@@ -18,8 +18,8 @@ public class UpdateUserProfileCommandValidator : AbstractValidator<UpdateUserPro
             .MaximumLength(100).WithMessage("Último nome não pode exceder 100 caracteres");
 
         RuleFor(x => x.PhoneNumber)
-            .NotEmpty().WithMessage("Telefone é obrigatório")
-            .Matches(@"^[0-9]{9,15}$").WithMessage("Telefone inválido");
+            .Matches(@"^[0-9]{9,15}$").WithMessage("Telefone inválido")
+            .When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber));
 
         RuleFor(x => x.DateOfBirth)
             .LessThan(DateTime.Now).WithMessage("Data de nascimento inválida")

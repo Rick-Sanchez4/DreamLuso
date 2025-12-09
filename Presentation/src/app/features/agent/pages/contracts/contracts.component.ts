@@ -25,6 +25,13 @@ interface Contract {
   totalValue: number;
   status: string;
   createdAt: Date;
+  // Additional details
+  agentName?: string;
+  securityDeposit?: number;
+  commission?: number;
+  paymentFrequency?: string;
+  autoRenewal?: boolean;
+  signatureDate?: Date;
 }
 
 @Component({
@@ -44,6 +51,11 @@ export class AgentContractsComponent implements OnInit {
   // Filters
   statusFilter: string = 'all';
   searchTerm: string = '';
+  
+  // Modal
+  showDetailsModal: boolean = false;
+  selectedContract: Contract | null = null;
+  loadingDetails: boolean = false;
 
   constructor(
     private agentService: AgentService,
@@ -78,11 +90,45 @@ export class AgentContractsComponent implements OnInit {
     if (!this.agentId) return;
     
     this.loading = true;
-    // For now using mock endpoint - will implement when backend is ready
-    this.http.get<Contract[]>(`${environment.apiUrl}/contracts/agent/${this.agentId}`).subscribe({
-      next: (contracts) => {
+    // Use query parameter instead of route parameter
+    this.http.get<any>(`${environment.apiUrl}/contracts?agentId=${this.agentId}`).subscribe({
+      next: (response) => {
+        // Backend returns { contracts: [...], totalCount: ... }
+        const contracts = response?.contracts || (Array.isArray(response) ? response : []);
         if (contracts && Array.isArray(contracts)) {
-          this.contracts = contracts;
+          // Map backend response to frontend Contract interface
+          this.contracts = contracts.map((c: any) => {
+            // Ensure totalValue is always a number
+            const totalValue = typeof c.value === 'number' ? c.value : 
+                              (typeof c.totalValue === 'number' ? c.totalValue : 0);
+            
+            // Ensure monthlyValue is a number or undefined
+            const monthlyValue = typeof c.monthlyRent === 'number' ? c.monthlyRent : 
+                                (typeof c.monthlyValue === 'number' ? c.monthlyValue : undefined);
+            
+            return {
+              id: c.id,
+              contractNumber: c.contractNumber || `CT-${c.id.substring(0, 8).toUpperCase()}`,
+              propertyId: c.propertyId,
+              propertyTitle: c.propertyTitle || 'Imóvel não encontrado',
+              clientId: c.clientId,
+              clientName: c.clientName || 'Cliente não encontrado',
+              contractType: c.type || c.contractType || 'Sale',
+              startDate: c.startDate ? new Date(c.startDate) : new Date(),
+              endDate: c.endDate ? new Date(c.endDate) : undefined,
+              monthlyValue: monthlyValue,
+              totalValue: totalValue,
+              status: c.status || 'Draft',
+              createdAt: c.createdAt ? new Date(c.createdAt) : new Date(),
+              // Additional fields
+              agentName: c.agentName,
+              securityDeposit: c.securityDeposit,
+              commission: c.commission,
+              paymentFrequency: c.paymentFrequency,
+              autoRenewal: c.autoRenewal,
+              signatureDate: c.signatureDate ? new Date(c.signatureDate) : undefined
+            };
+          });
           this.applyFilters();
         }
         this.loading = false;
@@ -145,6 +191,56 @@ export class AgentContractsComponent implements OnInit {
         return 'Arrendamento';
       default:
         return type;
+    }
+  }
+
+  openDetailsModal(contract: Contract): void {
+    this.selectedContract = contract;
+    this.loadingDetails = true;
+    this.showDetailsModal = true;
+    
+    // Load full contract details from API
+    this.http.get<any>(`${environment.apiUrl}/contracts/${contract.id}`).subscribe({
+      next: (response) => {
+        // Update selected contract with full details
+        if (response) {
+          this.selectedContract = {
+            ...contract,
+            agentName: response.agentName || contract.agentName,
+            securityDeposit: response.securityDeposit,
+            commission: response.commission,
+            paymentFrequency: response.paymentFrequency,
+            autoRenewal: response.autoRenewal,
+            signatureDate: response.signatureDate ? new Date(response.signatureDate) : undefined
+          };
+        }
+        this.loadingDetails = false;
+      },
+      error: (error) => {
+        console.error('Error loading contract details:', error);
+        this.toastService.error('Erro ao carregar detalhes do contrato');
+        this.loadingDetails = false;
+      }
+    });
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedContract = null;
+    this.loadingDetails = false;
+  }
+
+  getPaymentFrequencyLabel(frequency?: string): string {
+    if (!frequency) return 'N/A';
+    switch (frequency.toLowerCase()) {
+      case 'monthly':
+        return 'Mensal';
+      case 'quarterly':
+        return 'Trimestral';
+      case 'yearly':
+        return 'Anual';
+      default:
+        return frequency;
     }
   }
 }

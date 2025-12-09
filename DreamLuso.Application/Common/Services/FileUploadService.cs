@@ -44,7 +44,8 @@ public class FileUploadService : IFileUploadService
             await file.CopyToAsync(stream);
         }
 
-        var fileUrl = $"{_baseUrl}/uploads/{folder}/{fileName}";
+        // Return relative path for static file serving (wwwroot/images/{folder}/{fileName})
+        var fileUrl = $"/images/{folder}/{fileName}";
         _logger.LogInformation("Ficheiro carregado com sucesso: {FileUrl}", fileUrl);
 
         return fileUrl;
@@ -54,9 +55,43 @@ public class FileUploadService : IFileUploadService
     {
         try
         {
-            var fileName = Path.GetFileName(fileUrl);
-            var folder = Path.GetFileName(Path.GetDirectoryName(fileUrl));
-            var filePath = Path.Combine(_uploadPath, folder!, fileName);
+            // Handle both relative paths (/images/profiles/file.jpg) and full URLs
+            string fileName;
+            string folder;
+            
+            if (fileUrl.StartsWith("http"))
+            {
+                // Full URL - extract path
+                var uri = new Uri(fileUrl);
+                var pathParts = uri.AbsolutePath.TrimStart('/').Split('/');
+                if (pathParts.Length >= 3 && pathParts[0] == "images")
+                {
+                    folder = pathParts[1];
+                    fileName = pathParts[2];
+                }
+                else
+                {
+                    fileName = Path.GetFileName(uri.AbsolutePath);
+                    folder = "profiles"; // Default
+                }
+            }
+            else
+            {
+                // Relative path like /images/profiles/file.jpg
+                var pathParts = fileUrl.TrimStart('/').Split('/');
+                if (pathParts.Length >= 3 && pathParts[0] == "images")
+                {
+                    folder = pathParts[1];
+                    fileName = pathParts[2];
+                }
+                else
+                {
+                    fileName = Path.GetFileName(fileUrl);
+                    folder = "profiles"; // Default
+                }
+            }
+            
+            var filePath = Path.Combine(_uploadPath, folder, fileName);
 
             if (File.Exists(filePath))
             {

@@ -164,6 +164,18 @@
             <app-property-card [property]="property"></app-property-card>
           }
         </div>
+
+        <!-- Pagination -->
+        @if (paginationInfo.totalPages > 1) {
+          <div class="mt-12">
+            <app-pagination
+              [paginationInfo]="paginationInfo"
+              [showPageSizeSelector]="true"
+              (pageChange)="onPageChange($event)"
+              (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+          </div>
+        }
       }
     </div>
   </div>

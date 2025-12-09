@@ -1,5 +1,5 @@
 using DreamLuso.Application.Common.Responses;
-using DreamLuso.Application.CQ.Notifications.Commands;
+using DreamLuso.Application.CQ.Notifications.Commands.SendNotification;
 using DreamLuso.Domain.Core.Uow;
 using DreamLuso.Domain.Model;
 using MediatR;

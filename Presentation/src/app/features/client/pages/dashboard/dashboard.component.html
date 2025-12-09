@@ -200,24 +200,24 @@
             </thead>
             <tbody>
               @for (proposal of myProposals; track proposal.id) {
-                <tr class="border-b border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-dark-750 transition-colors">
+                <tr class="border-b border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors group">
                   <td class="py-4 px-4">
-                    <p class="font-medium text-gray-900 dark:text-white">{{ proposal.propertyTitle }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ proposal.proposalNumber }}</p>
+                    <p class="font-medium text-gray-900 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white">{{ proposal.propertyTitle }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300">{{ proposal.proposalNumber }}</p>
                   </td>
                   <td class="py-4 px-4">
-                    <p class="font-semibold text-gray-900 dark:text-white">€{{ proposal.proposedValue.toLocaleString('pt-PT') }}</p>
+                    <p class="font-semibold text-gray-900 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white">€{{ proposal.proposedValue.toLocaleString('pt-PT') }}</p>
                   </td>
                   <td class="py-4 px-4">
                     <span [class]="getStatusBadgeClass(proposal.status)">
                       {{ proposal.status }}
                     </span>
                   </td>
-                  <td class="py-4 px-4 text-gray-600 dark:text-gray-300">
+                  <td class="py-4 px-4 text-gray-600 dark:text-gray-300 group-hover:text-gray-700 dark:group-hover:text-gray-200">
                     {{ proposal.createdAt | date: 'dd/MM/yyyy' }}
                   </td>
                   <td class="py-4 px-4">
-                    <button [routerLink]="['/client/proposals', proposal.id]" class="text-green-600 hover:text-green-700 font-medium">
+                    <button [routerLink]="['/client/proposals', proposal.id]" class="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 font-medium transition-colors">
                       Ver Detalhes →
                     </button>
                   </td>

@@ -9,10 +9,14 @@ import { AdminAgentsComponent } from './pages/agents/agents.component';
 import { AdminProposalsComponent } from './pages/proposals/proposals.component';
 import { AdminCommentsComponent } from './pages/comments/comments.component';
 import { AdminAnalyticsComponent } from './pages/analytics/analytics.component';
+import { AuthGuard } from '../../core/guards/auth.guard';
+import { RoleGuard } from '../../core/guards/role.guard';
 
 const routes: Routes = [
   {
     path: '',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Admin'] },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: AdminDashboardComponent },

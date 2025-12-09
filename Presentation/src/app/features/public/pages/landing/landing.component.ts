@@ -78,11 +78,22 @@ export class LandingComponent implements OnInit, OnDestroy {
 
   loadFeaturedProperties(): void {
     this.loading = true;
-    this.propertyService.getAll().subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.featuredProperties = result.value.slice(0, 6); // Top 6
+    this.propertyService.getAll().subscribe({
+      next: (result: any) => {
+        if (result.isSuccess && result.value) {
+          this.featuredProperties = result.value.slice(0, 6); // Top 6
+        } else {
+          this.featuredProperties = [];
+        }
+        this.loading = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading featured properties:', error);
+        this.featuredProperties = [];
+        this.loading = false;
+        // Silently handle connection errors - backend might not be running
+        // No need to show error to user on landing page
       }
-      this.loading = false;
     });
   }
 

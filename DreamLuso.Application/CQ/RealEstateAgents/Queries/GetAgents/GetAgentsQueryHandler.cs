@@ -34,8 +34,8 @@ public class GetAgentsQueryHandler : IRequestHandler<GetAgentsQuery, Result<GetA
         {
             var searchLower = request.SearchTerm.ToLower();
             agents = agents.Where(a =>
-                a.User.Name.FullName.ToLower().Contains(searchLower) ||
-                a.User.Email.ToLower().Contains(searchLower) ||
+                (a.User != null && a.User.Name != null && a.User.Name.FullName.ToLower().Contains(searchLower)) ||
+                (a.User != null && a.User.Email != null && a.User.Email.ToLower().Contains(searchLower)) ||
                 (a.LicenseNumber != null && a.LicenseNumber.Contains(searchLower)) ||
                 (a.Specialization != null && a.Specialization.ToLower().Contains(searchLower)));
         }
@@ -68,9 +68,9 @@ public class GetAgentsQueryHandler : IRequestHandler<GetAgentsQuery, Result<GetA
             {
                 Id = a.Id,
                 UserId = a.UserId,
-                FullName = a.User.Name.FullName,
-                Email = a.User.Email,
-                Phone = a.User.Phone,
+                FullName = a.User?.Name?.FullName ?? "Nome não disponível",
+                Email = a.User?.Email ?? "",
+                Phone = a.User?.Phone ?? "",
                 LicenseNumber = a.LicenseNumber,
                 LicenseExpiry = a.LicenseExpiry,
                 OfficeEmail = a.OfficeEmail,

@@ -84,10 +84,18 @@ export class PropertyFormComponent implements OnInit {
     this.agentService.getByUserId(userId).subscribe({
       next: (agent: any) => {
         this.agentId = agent.id;
+        if (!agent.isActive) {
+          this.toastService.warning('O seu perfil de agente está pendente de aprovação. Algumas funcionalidades podem estar limitadas.');
+        }
       },
       error: (error) => {
         console.error('Error loading agent profile:', error);
-        this.toastService.error('Erro ao carregar perfil do agente');
+        const errorMsg = error.error?.description || error.message || 'Erro desconhecido';
+        if (error.status === 404) {
+          this.toastService.error('Perfil de agente não encontrado. Por favor, contacte o suporte.');
+        } else {
+          this.toastService.error(`Erro ao carregar perfil do agente: ${errorMsg}`);
+        }
       }
     });
   }
@@ -308,8 +316,8 @@ export class PropertyFormComponent implements OnInit {
     console.log('Sending property with', this.imageFiles.length, 'images');
     
     const request = this.isEditMode && this.propertyId
-      ? this.http.put(`${environment.apiUrl}/property/update/${this.propertyId}`, formData)
-      : this.http.post(`${environment.apiUrl}/property/create`, formData);
+      ? this.http.put(`${environment.apiUrl}/properties/${this.propertyId}`, formData)
+      : this.http.post(`${environment.apiUrl}/properties`, formData);
 
     request.subscribe({
       next: (response) => {
@@ -321,7 +329,20 @@ export class PropertyFormComponent implements OnInit {
       error: (error) => {
         console.error('Error saving property:', error);
         console.error('Error details:', error.error);
-        const errorMsg = error.error?.message || error.message || 'Erro desconhecido';
+        
+        let errorMsg = 'Erro desconhecido';
+        
+        // Handle connection errors
+        if (error.status === 0 || error.status === undefined) {
+          errorMsg = 'Não foi possível conectar ao servidor. Verifique se o backend está rodando.';
+        } else if (error.error?.description) {
+          errorMsg = error.error.description;
+        } else if (error.error?.message) {
+          errorMsg = error.error.message;
+        } else if (error.message) {
+          errorMsg = error.message;
+        }
+        
         this.toastService.error(`${this.isEditMode ? 'Erro ao atualizar' : 'Erro ao criar'} imóvel: ${errorMsg}`);
         this.loading = false;
       }

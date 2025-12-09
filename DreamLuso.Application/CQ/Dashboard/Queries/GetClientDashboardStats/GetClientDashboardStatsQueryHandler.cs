@@ -35,16 +35,14 @@ public class GetClientDashboardStatsQueryHandler : IRequestHandler<GetClientDash
             .Where(p => p.ClientId == request.ClientId)
             .ToList();
 
-        // Get all visits for this client
-        var allVisits = (await _unitOfWork.PropertyVisitRepository.GetAllAsync())
+        // Get all visits for this client (use GetByClientIdAsync which includes related entities)
+        var allVisits = (await _unitOfWork.PropertyVisitRepository.GetByClientIdAsync(request.ClientId))
             .Cast<PropertyVisit>()
-            .Where(v => v.ClientId == request.ClientId)
             .ToList();
 
-        // Get all contracts for this client
-        var allContracts = (await _unitOfWork.ContractRepository.GetAllAsync())
+        // Get all contracts for this client (use GetByClientIdAsync which includes related entities)
+        var allContracts = (await _unitOfWork.ContractRepository.GetByClientIdAsync(request.ClientId))
             .Cast<Contract>()
-            .Where(c => c.ClientId == request.ClientId)
             .ToList();
 
         // Get all properties (to count favorites)

@@ -150,10 +150,20 @@
                 <!-- Status & Actions -->
                 <div class="flex flex-col items-end gap-4">
                   <span [class]="getStatusBadgeClass(proposal.status)" class="text-sm px-4 py-2">
-                    {{ proposal.status }}
+                    {{ getStatusLabel(proposal.status) }}
                   </span>
                   
                   <div class="flex flex-wrap gap-2 justify-end">
+                    @if (proposal.status === 'Pending') {
+                      <button 
+                        (click)="startAnalysis(proposal.id)"
+                        class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Iniciar Análise
+                      </button>
+                    }
                     @if (proposal.status === 'Pending' || proposal.status === 'UnderAnalysis' || proposal.status === 'InNegotiation') {
                       <button 
                         (click)="openApproveModal(proposal)"
@@ -172,16 +182,6 @@
                         Rejeitar
                       </button>
                     }
-                    
-                    <button 
-                      (click)="openDetailsModal(proposal)"
-                      class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-teal-600 hover:from-blue-600 hover:to-teal-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                      </svg>
-                      Ver Detalhes
-                    </button>
                   </div>
                 </div>
               </div>
@@ -230,17 +230,118 @@
                   }
                 </div>
 
-                <!-- Negotiation Count -->
-                @if (proposal.negotiations && proposal.negotiations.length > 0) {
-                  <div class="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800/30">
-                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
-                    <p class="text-sm font-semibold text-purple-900 dark:text-purple-300">
-                      {{ proposal.negotiations.length }} mensagem(ns) de negociação
-                    </p>
-                  </div>
-                }
+                <!-- Negotiations Section -->
+                <div class="mt-4 space-y-4">
+                  <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Negociações @if (proposal.negotiations && proposal.negotiations.length > 0) {
+                      <span class="text-purple-600 dark:text-purple-400">({{ proposal.negotiations.length }})</span>
+                    }
+                  </h4>
+
+                  <!-- Negotiations List -->
+                  @if (proposal.negotiations && proposal.negotiations.length > 0) {
+                    <div class="space-y-3">
+                      @for (negotiation of proposal.negotiations; track negotiation.id) {
+                        <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800/30">
+                          <div class="flex items-start justify-between gap-4 mb-3">
+                            <div class="flex-1">
+                              <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                  {{ negotiation.senderName }}
+                                </span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                  {{ negotiation.sentAt | date:'short' }}
+                                </span>
+                              </div>
+                              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                {{ negotiation.message }}
+                              </p>
+                              @if (negotiation.counterOffer) {
+                                <p class="text-sm font-semibold text-green-600 dark:text-green-400">
+                                  Contraproposta: €{{ negotiation.counterOffer.toLocaleString('pt-PT') }}
+                                </p>
+                              }
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-3">
+                            <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                              Estado:
+                            </label>
+                            <select 
+                              [value]="negotiation.status"
+                              (change)="updateNegotiationStatus(negotiation.id, $any($event))"
+                              class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                              <option value="Sent">Enviado</option>
+                              <option value="Viewed">Visualizado</option>
+                              <option value="Accepted">Aceito</option>
+                              <option value="Rejected">Rejeitado</option>
+                            </select>
+                            <span [class]="getNegotiationStatusBadgeClass(negotiation.status)" class="text-xs px-2 py-1 rounded-full">
+                              {{ getNegotiationStatusLabel(negotiation.status) }}
+                            </span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">Nenhuma negociação ainda</p>
+                  }
+
+                  <!-- Form to Add Negotiation (Agent can respond) - Only if proposal allows negotiation -->
+                  @if (proposal.status === 'InNegotiation' || proposal.status === 'Pending' || proposal.status === 'UnderAnalysis') {
+                    <div class="mt-4 p-4 bg-white dark:bg-dark-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                      <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Responder Negociação</h5>
+                      <form class="grid grid-cols-1 md:grid-cols-5 gap-3" (ngSubmit)="sendNegotiation(proposal.id)">
+                        <div class="md:col-span-3">
+                          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mensagem</label>
+                          <textarea
+                            [value]="getNegotiationMessage(proposal.id)"
+                            (input)="setNegotiationMessage(proposal.id, $any($event.target).value)"
+                            name="message"
+                            rows="2"
+                            placeholder="Escreva uma mensagem"
+                            minlength="5"
+                            maxlength="2000"
+                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500 resize-none"></textarea>
+                        </div>
+                        <div class="md:col-span-1">
+                          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contraproposta (€)</label>
+                          <input
+                            type="number"
+                            [value]="getCounterOffer(proposal.id)"
+                            (input)="onCounterOfferChange(proposal.id, $event)"
+                            name="counterOffer"
+                            placeholder="Opcional"
+                            min="0"
+                            step="0.01"
+                            class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500">
+                        </div>
+                        <div class="md:col-span-1 flex items-end">
+                          <button type="submit" class="w-full px-4 py-2.5 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">
+                            Enviar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  } @else if (proposal.status === 'Rejected') {
+                    <div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800/30">
+                      <p class="text-sm text-red-700 dark:text-red-300">
+                        <strong>Esta proposta foi rejeitada.</strong> Não é possível adicionar mais negociações.
+                      </p>
+                      @if (proposal.rejectionReason) {
+                        <p class="text-sm text-red-600 dark:text-red-400 mt-2">
+                          <strong>Motivo:</strong> {{ proposal.rejectionReason }}
+                        </p>
+                      }
+                    </div>
+                  } @else if (proposal.status === 'Approved') {
+                    <div class="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800/30">
+                      <p class="text-sm text-green-700 dark:text-green-300">
+                        <strong>Esta proposta foi aprovada!</strong> A negociação foi concluída com sucesso.
+                      </p>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
           </div>
@@ -249,116 +350,6 @@
     }
   </div>
 </div>
-
-<!-- Modal de Detalhes da Proposta -->
-@if (showDetailsModal && selectedProposal) {
-  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="closeAllModals()">
-    <div class="bg-white dark:bg-dark-900 rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
-      
-      <!-- Modal Header -->
-      <div class="bg-gradient-to-r from-green-800 to-teal-800 dark:from-green-950 dark:to-teal-950 text-white p-6 rounded-t-3xl">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold mb-1">Detalhes da Proposta</h2>
-            <p class="text-white/70 text-sm">{{ selectedProposal.proposalNumber }}</p>
-          </div>
-          <button (click)="closeAllModals()" class="p-2 hover:bg-white/10 rounded-full transition-all">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Modal Body -->
-      <div class="p-8 space-y-6">
-        
-        <!-- Property Info -->
-        <div class="p-6 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-2xl border border-green-200 dark:border-green-800/30">
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">🏡 Imóvel</h3>
-          <p class="text-lg font-semibold text-green-700 dark:text-green-400">{{ selectedProposal.propertyTitle }}</p>
-        </div>
-
-        <!-- Client Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 bg-gray-50 dark:bg-dark-800 rounded-xl">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Cliente</p>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedProposal.clientName }}</p>
-          </div>
-          <div class="p-4 bg-gray-50 dark:bg-dark-800 rounded-xl">
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Data da Proposta</p>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedProposal.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
-          </div>
-        </div>
-
-        <!-- Proposal Value -->
-        <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border-2 border-green-300 dark:border-green-700/50">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Valor Proposto</p>
-          <p class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-            €{{ selectedProposal.proposedValue.toLocaleString('pt-PT') }}
-          </p>
-        </div>
-
-        <!-- Additional Details -->
-        <div class="space-y-3">
-          @if (selectedProposal.paymentMethod) {
-            <div class="p-4 bg-gray-50 dark:bg-dark-800 rounded-xl">
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Método de Pagamento</p>
-              <p class="text-base font-semibold text-gray-900 dark:text-white">{{ selectedProposal.paymentMethod }}</p>
-            </div>
-          }
-          @if (selectedProposal.intendedMoveDate) {
-            <div class="p-4 bg-gray-50 dark:bg-dark-800 rounded-xl">
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Data Prevista de Mudança</p>
-              <p class="text-base font-semibold text-gray-900 dark:text-white">{{ selectedProposal.intendedMoveDate | date: 'dd/MM/yyyy' }}</p>
-            </div>
-          }
-          @if (selectedProposal.additionalNotes) {
-            <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800/30">
-              <p class="text-sm text-blue-600 dark:text-blue-400 mb-2 font-semibold">Notas do Cliente:</p>
-              <p class="text-base text-gray-900 dark:text-white">{{ selectedProposal.additionalNotes }}</p>
-            </div>
-          }
-        </div>
-
-        <!-- Status -->
-        <div class="p-4 bg-gray-50 dark:bg-dark-800 rounded-xl">
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Estado Atual</p>
-          <span [class]="getStatusBadgeClass(selectedProposal.status)" class="text-sm px-4 py-2 inline-block">
-            {{ selectedProposal.status }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="p-6 border-t border-gray-200 dark:border-white/10 flex gap-3">
-        @if (selectedProposal.status === 'Pending' || selectedProposal.status === 'UnderAnalysis' || selectedProposal.status === 'InNegotiation') {
-          <button 
-            (click)="closeAllModals(); openApproveModal(selectedProposal)"
-            class="flex-1 px-6 py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            Aprovar Proposta
-          </button>
-          <button 
-            (click)="closeAllModals(); openRejectModal(selectedProposal)"
-            class="flex-1 px-6 py-3.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            Rejeitar Proposta
-          </button>
-        }
-        <button 
-          (click)="closeAllModals()"
-          class="px-8 py-3.5 bg-gray-200 dark:bg-dark-700 hover:bg-gray-300 dark:hover:bg-dark-600 text-gray-700 dark:text-gray-300 font-bold rounded-xl transition-all">
-          Fechar
-        </button>
-      </div>
-    </div>
-  </div>
-}
 
 <!-- Modal de Aprovação -->
 @if (showApproveModal && selectedProposal) {
@@ -463,10 +454,22 @@
             [(ngModel)]="rejectionReason"
             rows="4"
             placeholder="Ex: Valor abaixo do esperado, cliente não cumpre requisitos..."
+            minlength="10"
+            maxlength="500"
             class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"></textarea>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            O motivo será enviado ao cliente por email
+            O motivo será enviado ao cliente por email. Mínimo de 10 caracteres e máximo de 500 caracteres.
           </p>
+          @if (rejectionReason && rejectionReason.trim().length > 0 && rejectionReason.trim().length < 10) {
+            <p class="text-xs text-red-500 mt-1">
+              ⚠️ O motivo deve ter pelo menos 10 caracteres ({{ rejectionReason.trim().length }}/10)
+            </p>
+          }
+          @if (rejectionReason && rejectionReason.trim().length > 500) {
+            <p class="text-xs text-red-500 mt-1">
+              ⚠️ O motivo não pode exceder 500 caracteres ({{ rejectionReason.trim().length }}/500)
+            </p>
+          }
         </div>
       </div>
 
@@ -474,7 +477,7 @@
       <div class="p-6 border-t border-gray-200 dark:border-white/10 flex gap-3">
         <button 
           (click)="confirmReject()"
-          [disabled]="loading || !rejectionReason.trim()"
+          [disabled]="loading || !rejectionReason.trim() || rejectionReason.trim().length < 10 || rejectionReason.trim().length > 500"
           class="flex-1 px-6 py-3.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
           @if (loading) {
             <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>

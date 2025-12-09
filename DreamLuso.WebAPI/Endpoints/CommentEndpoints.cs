@@ -1,5 +1,10 @@
-using DreamLuso.Application.CQ.Comments.Commands;
-using DreamLuso.Application.CQ.Comments.Queries;
+using DreamLuso.Application.CQ.Comments.Commands.CreateComment;
+using DreamLuso.Application.CQ.Comments.Commands.DeleteComment;
+using DreamLuso.Application.CQ.Comments.Commands.FlagComment;
+using DreamLuso.Application.CQ.Comments.Commands.IncrementHelpful;
+using DreamLuso.Application.CQ.Comments.Queries.GetPropertyComments;
+using DreamLuso.Application.CQ.Comments.Queries.GetPropertyRating;
+using DreamLuso.Application.CQ.Comments.Common;
 using DreamLuso.Application.Common.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

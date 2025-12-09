@@ -159,14 +159,25 @@
                   <div class="text-right">
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Valor Total</p>
                     <p class="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                      €{{ contract.totalValue.toLocaleString('pt-PT') }}
+                      €{{ (contract.totalValue || 0).toLocaleString('pt-PT') }}
                     </p>
                     @if (contract.monthlyValue) {
                       <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        €{{ contract.monthlyValue.toLocaleString('pt-PT') }}/mês
+                        €{{ (contract.monthlyValue || 0).toLocaleString('pt-PT') }}/mês
                       </p>
                     }
                   </div>
+                  
+                  <!-- View Details Button -->
+                  <button 
+                    (click)="openDetailsModal(contract)"
+                    class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    Ver Detalhes
+                  </button>
                 </div>
               </div>
             </div>
@@ -176,4 +187,156 @@
     }
   </div>
 </div>
+
+<!-- Contract Details Modal -->
+@if (showDetailsModal && selectedContract) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="closeDetailsModal()">
+    <div class="bg-white dark:bg-dark-900 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-800 dark:to-emerald-800 text-white p-6 rounded-t-2xl flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold mb-1">Detalhes do Contrato</h2>
+          <p class="text-white/80 text-sm">{{ selectedContract.contractNumber }}</p>
+        </div>
+        <button 
+          (click)="closeDetailsModal()"
+          class="p-2 hover:bg-white/20 rounded-full transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6">
+        @if (loadingDetails) {
+          <div class="flex items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          </div>
+        } @else {
+          <div class="space-y-6">
+            <!-- Status & Type -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p>
+                <span [class]="getStatusBadgeClass(selectedContract.status)" class="text-sm px-3 py-1">
+                  {{ selectedContract.status }}
+                </span>
+              </div>
+              <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Tipo</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ getContractTypeLabel(selectedContract.contractType) }}</p>
+              </div>
+            </div>
+
+            <!-- Property & Client Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800/30">
+                <p class="text-sm text-blue-600 dark:text-blue-400 font-semibold mb-2">🏠 Imóvel</p>
+                <p class="text-gray-900 dark:text-white font-medium">{{ selectedContract.propertyTitle }}</p>
+                <button 
+                  [routerLink]="['/property', selectedContract.propertyId]"
+                  class="text-blue-600 dark:text-blue-400 text-sm mt-2 hover:underline">
+                  Ver imóvel →
+                </button>
+              </div>
+              <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-xl border border-purple-200 dark:border-purple-800/30">
+                <p class="text-sm text-purple-600 dark:text-purple-400 font-semibold mb-2">👤 Cliente</p>
+                <p class="text-gray-900 dark:text-white font-medium">{{ selectedContract.clientName }}</p>
+              </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Data de Início</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedContract.startDate | date: 'dd/MM/yyyy' }}</p>
+              </div>
+              @if (selectedContract.endDate) {
+                <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Data de Fim</p>
+                  <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedContract.endDate | date: 'dd/MM/yyyy' }}</p>
+                </div>
+              }
+              @if (selectedContract.signatureDate) {
+                <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Data de Assinatura</p>
+                  <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedContract.signatureDate | date: 'dd/MM/yyyy' }}</p>
+                </div>
+              }
+            </div>
+
+            <!-- Financial Details -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 rounded-xl border border-green-200 dark:border-green-800/30">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">💰 Informações Financeiras</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Valor Total</p>
+                  <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+                    €{{ (selectedContract.totalValue || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                  </p>
+                </div>
+                @if (selectedContract.monthlyValue) {
+                  <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Renda Mensal</p>
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+                      €{{ (selectedContract.monthlyValue || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                    </p>
+                  </div>
+                }
+                @if (selectedContract.securityDeposit) {
+                  <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Caução</p>
+                    <p class="text-xl font-semibold text-gray-900 dark:text-white">
+                      €{{ (selectedContract.securityDeposit || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                    </p>
+                  </div>
+                }
+                @if (selectedContract.commission) {
+                  <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Comissão</p>
+                    <p class="text-xl font-semibold text-gray-900 dark:text-white">
+                      €{{ (selectedContract.commission || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                    </p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @if (selectedContract.paymentFrequency) {
+                <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Frequência de Pagamento</p>
+                  <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ getPaymentFrequencyLabel(selectedContract.paymentFrequency) }}</p>
+                </div>
+              }
+              <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Renovação Automática</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                  {{ selectedContract.autoRenewal ? 'Sim' : 'Não' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Created Date -->
+            <div class="bg-gray-50 dark:bg-dark-800 p-4 rounded-xl">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Data de Criação</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedContract.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="sticky bottom-0 bg-gray-50 dark:bg-dark-800 p-6 rounded-b-2xl flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700">
+        <button 
+          (click)="closeDetailsModal()"
+          class="px-6 py-2 bg-gray-200 dark:bg-dark-700 hover:bg-gray-300 dark:hover:bg-dark-600 text-gray-900 dark:text-white rounded-lg font-semibold transition-colors">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+}
 

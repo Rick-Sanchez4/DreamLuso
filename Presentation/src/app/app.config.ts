@@ -17,11 +17,13 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     provideToastr({
-      timeOut: 3000,
+      timeOut: 5000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
       closeButton: true,
-      progressBar: true
+      progressBar: true,
+      enableHtml: false,
+      tapToDismiss: true
     }),
     {
       provide: HTTP_INTERCEPTORS,

@@ -6,10 +6,14 @@ import { ClientProfileComponent } from './pages/profile/profile.component';
 import { ClientVisitsComponent } from './pages/visits/visits.component';
 import { ClientProposalDetailComponent } from './pages/proposals/proposal-detail.component';
 import { ClientFavoritesComponent } from './pages/favorites/favorites.component';
+import { AuthGuard } from '../../core/guards/auth.guard';
+import { RoleGuard } from '../../core/guards/role.guard';
 
 const routes: Routes = [
   {
     path: '',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['Client'] },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: ClientDashboardComponent },

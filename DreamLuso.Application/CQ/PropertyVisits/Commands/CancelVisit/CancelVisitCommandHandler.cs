@@ -1,6 +1,6 @@
 using MediatR;
 using DreamLuso.Application.Common.Responses;
-using DreamLuso.Application.CQ.Notifications.Commands;
+using DreamLuso.Application.CQ.Notifications.Commands.SendNotification;
 using DreamLuso.Domain.Core.Uow;
 using DreamLuso.Domain.Model;
 using Microsoft.Extensions.Logging;
@@ -50,13 +50,26 @@ public class CancelVisitCommandHandler : IRequestHandler<CancelVisitCommand, Res
 
         _logger.LogInformation("Visita cancelada: {VisitId}, Razão: {Reason}", visit.Id, request.CancellationReason);
 
-        // Get property, client and agent for notifications
+        // Get property, client and agent for notifications (carregar com User)
         var property = await _unitOfWork.PropertyRepository.GetByIdAsync(visit.PropertyId);
-        var client = await _unitOfWork.ClientRepository.GetByIdAsync(visit.ClientId);
-        var agent = await _unitOfWork.RealEstateAgentRepository.GetByIdAsync(visit.RealEstateAgentId);
+        var clientObj = await _unitOfWork.ClientRepository.GetByIdWithFavoritesAsync(visit.ClientId);
+        var agentDirect = await _unitOfWork.RealEstateAgentRepository.GetByIdAsync(visit.RealEstateAgentId);
 
-        if (property != null && client != null && agent != null)
+        if (property != null && clientObj != null && agentDirect != null)
         {
+            var client = (Client)clientObj;
+            var agent = (RealEstateAgent)agentDirect;
+            
+            // Carregar User do agente se não estiver carregado
+            if (agent.User == null && agent.UserId != Guid.Empty)
+            {
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(agent.UserId);
+                if (user != null)
+                {
+                    agent.User = (User)user;
+                }
+            }
+
             var cancellationMsg = string.IsNullOrWhiteSpace(request.CancellationReason) 
                 ? "" 
                 : $" Motivo: {request.CancellationReason}";
@@ -65,7 +78,7 @@ public class CancelVisitCommandHandler : IRequestHandler<CancelVisitCommand, Res
             var clientNotification = $"❌ Visita cancelada. Sua visita ao imóvel '{((Property)property).Title}' agendada para {visit.VisitDate:dd/MM/yyyy} foi cancelada.{cancellationMsg}";
             await _sender.Send(new SendNotificationCommand(
                 SenderId: null,
-                RecipientId: ((Client)client).UserId,
+                RecipientId: client.UserId,
                 Message: clientNotification,
                 Type: NotificationType.Visit,
                 Priority: NotificationPriority.Medium,
@@ -74,10 +87,11 @@ public class CancelVisitCommandHandler : IRequestHandler<CancelVisitCommand, Res
             ), cancellationToken);
 
             // Notify agent
-            var agentNotification = $"❌ Visita cancelada. A visita do cliente {((Client)client).User.Name.FullName} ao imóvel '{((Property)property).Title}' foi cancelada.{cancellationMsg}";
+            var clientName = client.User?.Name?.FullName ?? "Cliente";
+            var agentNotification = $"❌ Visita cancelada. A visita do cliente {clientName} ao imóvel '{((Property)property).Title}' foi cancelada.{cancellationMsg}";
             await _sender.Send(new SendNotificationCommand(
                 SenderId: null,
-                RecipientId: ((RealEstateAgent)agent).UserId,
+                RecipientId: agent.UserId,
                 Message: agentNotification,
                 Type: NotificationType.Visit,
                 Priority: NotificationPriority.Medium,

@@ -47,6 +47,11 @@ public class GetAgentDashboardStatsQueryHandler : IRequestHandler<GetAgentDashbo
             .Where(v => v.RealEstateAgentId == request.AgentId)
             .ToList();
 
+        // Get all contracts for this agent (use GetByAgentIdAsync which includes related entities)
+        var allContracts = (await _unitOfWork.ContractRepository.GetByAgentIdAsync(request.AgentId))
+            .Cast<Contract>()
+            .ToList();
+
         // Calculate stats
         var activeProperties = allProperties.Count(p => p.IsActive && p.Status == PropertyStatus.Available);
         var pendingProposals = allProposals.Count(p => 
@@ -58,6 +63,32 @@ public class GetAgentDashboardStatsQueryHandler : IRequestHandler<GetAgentDashbo
             v.Status == VisitStatus.Confirmed);
         var completedVisits = allVisits.Count(v => v.Status == VisitStatus.Completed);
 
+        // Calculate revenue and sales from contracts
+        // Include both Active and Draft contracts (Draft contracts are created when proposal is approved)
+        var activeContracts = allContracts.Where(c => 
+            c.Status == ContractStatus.Active || 
+            c.Status == ContractStatus.Draft).ToList();
+        
+        _logger.LogInformation(
+            "Contratos encontrados para agente {AgentId}: Total={Total}, Active={Active}, Draft={Draft}",
+            request.AgentId, allContracts.Count, 
+            allContracts.Count(c => c.Status == ContractStatus.Active),
+            allContracts.Count(c => c.Status == ContractStatus.Draft));
+        
+        // Total revenue: sum of all contract values (both Sale and Rent)
+        var totalRevenue = activeContracts.Sum(c => c.Value);
+        
+        // Total commissions: sum of commission from contracts, or calculate 5% if not set
+        var totalCommissions = activeContracts.Sum(c => 
+            c.Commission ?? (c.Value * 0.05m));
+        
+        // Total sales: count of contracts (both Sale and Rent)
+        var totalSales = activeContracts.Count;
+        
+        _logger.LogInformation(
+            "Estatísticas calculadas para agente {AgentId}: TotalSales={TotalSales}, TotalRevenue={TotalRevenue}, TotalCommissions={TotalCommissions}",
+            request.AgentId, totalSales, totalRevenue, totalCommissions);
+
         // Build response
         var response = new GetAgentDashboardStatsResponse
         {
@@ -67,9 +98,9 @@ public class GetAgentDashboardStatsQueryHandler : IRequestHandler<GetAgentDashbo
             PendingProposals = pendingProposals,
             ScheduledVisits = scheduledVisits,
             CompletedVisits = completedVisits,
-            TotalRevenue = agent.TotalRevenue,
-            TotalCommissions = agent.TotalRevenue * (agent.CommissionRate ?? 0),
-            TotalSales = agent.TotalSales,
+            TotalRevenue = totalRevenue,
+            TotalCommissions = totalCommissions,
+            TotalSales = totalSales,
             AverageRating = agent.Rating
         };
 

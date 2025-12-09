@@ -10,8 +10,11 @@
 //
 // TEMPORÁRIO: Usando URL placeholder - ATUALIZE COM A URL REAL DO RENDER!
 
-export const environment = {
+import { Environment } from './environment.interface';
+
+export const environment: Environment = {
   production: true,
-  apiUrl: 'https://dreamluso-api.onrender.com/api' // ← ATUALIZE COM A URL REAL DO RENDER
+  apiUrl: 'https://dreamluso-api.onrender.com/api', // ← ATUALIZE COM A URL REAL DO RENDER
+  baseUrl: 'https://dreamluso-api.onrender.com' // Base URL without /api for static files
 };
 

@@ -8,6 +8,7 @@ public record UpdateUserProfileCommand(
     string FirstName,
     string LastName,
     string PhoneNumber,
+    string? Address,
     DateTime? DateOfBirth
 ) : IRequest<Result<bool, Success, Error>>;
 

@@ -55,7 +55,18 @@ public class ContractRepository : Repository<Contract>, IContractRepository
         return await _dbSet
             .Include(c => c.Property).ThenInclude(p => p.Address)
             .Include(c => c.Client).ThenInclude(cl => cl.User)
+            .Include(c => c.RealEstateAgent).ThenInclude(a => a.User)
             .Where(c => c.RealEstateAgentId == agentId)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync();
+    }
+    
+    public override async Task<IEnumerable<Contract>> GetAllAsync()
+    {
+        return await _dbSet
+            .Include(c => c.Property).ThenInclude(p => p.Address)
+            .Include(c => c.Client).ThenInclude(cl => cl.User)
+            .Include(c => c.RealEstateAgent).ThenInclude(a => a.User)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
     }

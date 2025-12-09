@@ -39,6 +39,10 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(20)
             .IsRequired(false);
 
+        builder.Property(u => u.Address)
+            .HasMaxLength(500)
+            .IsRequired(false);
+
         builder.Property(u => u.PasswordHash)
             .IsRequired(false);
 

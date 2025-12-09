@@ -1,4 +1,6 @@
 using DreamLuso.Domain.Core.Uow;
+using iText.Kernel.Font;
+using iText.IO.Font.Constants;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
@@ -33,7 +35,7 @@ public class PdfGenerationService : IPdfGenerationService
         document.Add(new Paragraph("DreamLuso - Contrato Imobiliário")
             .SetTextAlignment(TextAlignment.CENTER)
             .SetFontSize(18)
-            .SetBold());
+            .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)));
 
         document.Add(new Paragraph($"Nº Contrato: {contract.Id}")
             .SetFontSize(12));
@@ -46,7 +48,7 @@ public class PdfGenerationService : IPdfGenerationService
         // Contract Details
         document.Add(new Paragraph("Detalhes do Contrato")
             .SetFontSize(14)
-            .SetBold());
+            .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)));
 
         document.Add(new Paragraph($"Tipo: {contract.Type}"));
         document.Add(new Paragraph($"Valor: €{contract.Value:N2}"));
@@ -60,7 +62,7 @@ public class PdfGenerationService : IPdfGenerationService
             document.Add(new Paragraph("\n"));
             document.Add(new Paragraph("Termos e Condições")
                 .SetFontSize(14)
-                .SetBold());
+                .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)));
             document.Add(new Paragraph(contract.TermsAndConditions));
         }
 

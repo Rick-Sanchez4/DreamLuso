@@ -24,15 +24,23 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<Result<LoginResponse>> {
+    console.log('AuthService.login - Sending credentials:', { ...credentials, password: '***' });
     return this.http.post<any>(`${this.apiUrl}/accounts/login`, credentials).pipe(
       tap(response => {
+        console.log('AuthService.login - Response:', response);
         if (response) {
           this.setTokens(response.token || response.accessToken, response.refreshToken);
+          // Parse fullName into firstName and lastName
+          const fullName = response.fullName || '';
+          const nameParts = fullName.split(' ');
+          const firstName = nameParts[0] || '';
+          const lastName = nameParts.slice(1).join(' ') || '';
+          
           const user: User = {
             id: response.userId || response.user?.id,
             email: response.email || response.user?.email,
-            firstName: response.firstName || response.user?.firstName,
-            lastName: response.lastName || response.user?.lastName,
+            firstName: response.firstName || firstName || response.user?.firstName,
+            lastName: response.lastName || lastName || response.user?.lastName,
             role: response.role || response.user?.role,
             isActive: true,
             profileImageUrl: response.profileImageUrl || response.user?.profileImageUrl
@@ -41,14 +49,26 @@ export class AuthService {
         }
       }),
       map(response => ({ isSuccess: true, value: response } as Result<LoginResponse>)),
-      catchError(error => of({ isSuccess: false, error: error.error } as Result<LoginResponse>))
+      catchError(error => {
+        console.error('AuthService.login - Error:', error);
+        console.error('AuthService.login - Error details:', error.error);
+        // Preserve the full error response
+        const errorResponse = error.error || { code: 'UnknownError', description: 'Erro desconhecido' };
+        return of({ isSuccess: false, error: errorResponse } as Result<LoginResponse>);
+      })
     );
   }
 
   register(userData: RegisterRequest): Observable<Result<void>> {
+    console.log('AuthService.register - Sending data:', { ...userData, password: '***' });
     return this.http.post<void>(`${this.apiUrl}/accounts/register`, userData).pipe(
+      tap(response => console.log('AuthService.register - Response:', response)),
       map(() => ({ isSuccess: true } as Result<void>)),
-      catchError(error => of({ isSuccess: false, error: error.error } as Result<void>))
+      catchError(error => {
+        console.error('AuthService.register - Error:', error);
+        console.error('AuthService.register - Error details:', error.error);
+        return of({ isSuccess: false, error: error.error } as Result<void>);
+      })
     );
   }
 
@@ -106,6 +126,10 @@ export class AuthService {
   private setCurrentUser(user: User): void {
     localStorage.setItem('current_user', JSON.stringify(user));
     this.currentUserSubject.next(user);
+  }
+
+  public updateCurrentUser(user: User): void {
+    this.setCurrentUser(user);
   }
 
   private loadUserFromStorage(): void {

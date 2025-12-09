@@ -406,4 +406,13 @@
     
     }
   </div>
+
+  <!-- Image Cropper Modal -->
+  @if (showCropper && selectedImageFile) {
+    <app-image-cropper
+      [imageFile]="selectedImageFile"
+      (croppedImage)="onImageCropped($event)"
+      (cancel)="onCropperCancel()">
+    </app-image-cropper>
+  }
 </div>

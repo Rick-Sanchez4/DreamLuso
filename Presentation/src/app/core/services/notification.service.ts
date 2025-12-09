@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { Notification } from '../models/notification.model';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { tap, catchError, map } from 'rxjs/operators';
+import { Notification, NotificationStatus } from '../models/notification.model';
 import { Result } from '../models/result.model';
 import { environment } from '../../../environments/environment';
 
@@ -17,15 +17,49 @@ export class NotificationService {
   constructor(private http: HttpClient) {}
 
   getUserNotifications(userId: string): Observable<Result<Notification[]>> {
-    return this.http.get<Result<Notification[]>>(`${this.apiUrl}/${userId}`);
+    console.log('NotificationService.getUserNotifications - Requesting notifications for userId:', userId);
+    return this.http.get<Notification[]>(`${this.apiUrl}/${userId}`).pipe(
+      map(notifications => {
+        console.log('NotificationService.getUserNotifications - Response:', notifications);
+        // Update unread count based on notifications - use proper status check
+        const unreadCount = notifications.filter(n => {
+          const status = n.status?.toString() || '';
+          return status.toLowerCase() === NotificationStatus.Unread.toLowerCase() || 
+                 status === NotificationStatus.Unread ||
+                 status === 'Unread';
+        }).length;
+        this.unreadCountSubject.next(unreadCount);
+        // Transform array response to Result format
+        return { isSuccess: true, value: notifications } as Result<Notification[]>;
+      }),
+      catchError(error => {
+        console.error('NotificationService.getUserNotifications - Error:', error);
+        // Silently handle 401/404 errors and connection refused (status 0)
+        if (error.status === 401 || error.status === 404 || error.status === 0) {
+          this.unreadCountSubject.next(0);
+          return of({ isSuccess: true, value: [] } as Result<Notification[]>);
+        }
+        return throwError(() => error);
+      })
+    );
   }
 
   getUnreadCount(userId: string): Observable<Result<{ unreadCount: number }>> {
-    return this.http.get<Result<{ unreadCount: number }>>(`${this.apiUrl}/unread-count/${userId}`).pipe(
-      tap(result => {
-        if (result.isSuccess && result.value) {
-          this.unreadCountSubject.next(result.value.unreadCount);
+    return this.http.get<{ unreadCount: number }>(`${this.apiUrl}/unread-count/${userId}`).pipe(
+      map(response => {
+        const unreadCount = response.unreadCount || 0;
+        this.unreadCountSubject.next(unreadCount);
+        return { isSuccess: true, value: { unreadCount } } as Result<{ unreadCount: number }>;
+      }),
+      catchError((error) => {
+        console.error('NotificationService.getUnreadCount - Error:', error);
+        // Silently handle 401/404 errors and connection refused (status 0)
+        if (error.status === 401 || error.status === 404 || error.status === 0) {
+          this.unreadCountSubject.next(0);
+          return of({ isSuccess: true, value: { unreadCount: 0 } } as Result<{ unreadCount: number }>);
         }
+        // Re-throw other errors
+        return throwError(() => error);
       })
     );
   }
